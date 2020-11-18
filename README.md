@@ -29,6 +29,6 @@ run the *show* script:
 
 ## Similar projects
 
-[neat-openai-gym](https://github.com/sroj/neat-openai-gym
+[neat-openai-gym](https://github.com/sroj/neat-openai-gym)
 
 [OpenAI-NEAT](https://github.com/HackerShackOfficial/OpenAI-NEAT)
