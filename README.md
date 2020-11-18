@@ -1,17 +1,12 @@
-# Evolving a neural controller
+This repository contains code allowing you to train, test, and visualize OpenAI gym environments (games)
+using the NEAT algorithm.  The main goal was to make this effort as simple as possible.  For example,
+the name of the NEAT configuration file is the same as the name of the environment.
 
-Like some other [researchers](https://openai.com/blog/evolution-strategies/), I have switched focus recently
-from Deep Reinforcement Learning (DRL) to Evolution Strategies (ES).  Current work (with Washington and 
-Lee undergraduate student Coletta Fuller) focuses on applying the
-[NEAT](https://www.cse.unr.edu/~sushil/class/gas/papers/NEAT.pdf) algorithm to
-solve tasks in the GymCopter environment.
-
-To try this out for yourself, you should install [neat-python](https://github.com/CodeReclaimers/neat-python).  Then 
-do the following in the gym-copter repository:
+To get started you should install [neat-python](https://github.com/CodeReclaimers/neat-python).  Then 
+do the following:
 
 ```
-% cd neat
-% python3 evolve.py gym_copter:Lander-v2
+% python3 evolve.py LunarLanderContinuous-v2
 ```
 This will run neat-python using the
 [parallel fitness evaluator](https://neat-python.readthedocs.io/en/latest/module_summaries.html#parallel),
@@ -20,7 +15,7 @@ so you can take advantage of all the cores on your computer.
 Once evolution finishes, you can test out your evolved network by doing:
 
 ```
-% python3 test.py nets/<fitness>.dat
+% python3 test.py LunarLanderContinuous-v2/<fitness>.dat
 ```
 
 where ```<fitness>``` is the fitness of your evolved network.
@@ -29,5 +24,11 @@ To visualize the evolved network you should first install graphviz (```pip3 inst
 run the *show* script:
 
 ```
-% python3 show.py nets/<fitness>.dat
+% python3 show.py LunarLanderContinuous-v2/<fitness>.dat
 ```
+
+## Similar projects
+
+[neat-openai-gym](https://github.com/sroj/neat-openai-gym
+
+[OpenAI-NEAT](https://github.com/HackerShackOfficial/OpenAI-NEAT)
