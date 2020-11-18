@@ -1,6 +1,8 @@
-This repository contains code allowing you to train, test, and visualize OpenAI gym environments (games)
-using the NEAT algorithm.  The main goal was to make this effort as simple as possible.  For example,
-the name of the NEAT configuration file is the same as the name of the environment.
+This repository contains code allowing you to train, test, and visualize
+[OpenAI Gym](https://gym.openai.com/) environments (games) using the
+[NEAT](https://www.cse.unr.edu/~sushil/class/gas/papers/NEAT.pdf) algorithm.
+The main goal was to make this effort as simple as possible.  For example, the
+name of the NEAT configuration file is the same as the name of the environment.
 
 To get started you should install [neat-python](https://github.com/CodeReclaimers/neat-python).  Then 
 do the following:
