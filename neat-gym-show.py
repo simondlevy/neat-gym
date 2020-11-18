@@ -9,7 +9,7 @@ MIT License
 
 import visualize
 
-from common import read_file, eval_genome
+from neat_gym import read_file, eval_genome
 
 if __name__ == '__main__':
 

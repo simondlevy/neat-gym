@@ -15,7 +15,7 @@ import pickle
 import argparse
 import random
 
-from common import eval_genome, GymConfig
+from neat_gym import eval_genome, GymConfig
 
 def _makedir(name):
     if not os.path.exists(name):

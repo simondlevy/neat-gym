@@ -7,7 +7,7 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-from common import read_file, eval_genome
+from neat_gym import read_file, eval_genome
 
 if __name__ == '__main__':
 
