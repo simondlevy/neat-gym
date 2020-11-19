@@ -1,2 +1,5 @@
+build/
+dist/
+*.egg-info
 __pycache__/
 LunarLanderContinuous-v2/

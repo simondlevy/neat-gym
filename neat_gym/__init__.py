@@ -12,7 +12,7 @@ import numpy as np
 import argparse
 import pickle
 
-class GymConfig(neat.Config):
+class _GymConfig(neat.Config):
 
     def __init__(self, env_name, reps):
         '''

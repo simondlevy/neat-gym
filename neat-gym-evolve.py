@@ -15,7 +15,7 @@ import pickle
 import argparse
 import random
 
-from neat_gym import eval_genome, GymConfig
+from neat_gym import eval_genome, _GymConfig
 
 def _makedir(name):
     if not os.path.exists(name):
@@ -39,7 +39,7 @@ def main():
     _makedir(args.environment)
 
     # Load configuration.
-    config = GymConfig(args.environment, args.reps)
+    config = _GymConfig(args.environment, args.reps)
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
