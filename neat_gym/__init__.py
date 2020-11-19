@@ -26,40 +26,33 @@ class _GymConfig(neat.Config):
 
         self.reps = reps
 
-def eval_genome(genome, config, render=False):
+def eval_net(net, env, render=False):
     '''
-    Evaluates a genome in a configuration.
-    @param genome the genome
-    @param config the configuration
-    @param render set to True for animated display
-    @return average fitness over config.reps
+    Evaluates an evolved network
+    @param net the network
+    @param env the Gym environment
+    @param render set to True for rendering
+    @return total reward
     '''
 
-    net = neat.nn.FeedForwardNetwork.create(genome, config)
+    state = env.reset()
+    rewards = 0
+    steps = 0
 
-    fitness = 0
+    while True:
+        action = net.activate(state)
+        state, reward, done, _ = env.step(action)
+        if render:
+            env.render()
+        rewards += reward
+        steps += 1
+        if done:
+            break
 
-    for _ in range(config.reps):
+    env.close()
 
-        state = config.env.reset()
-        rewards = 0
-        steps = 0
+    return rewards
 
-        while True:
-            action = net.activate(state)
-            state, reward, done, _ = config.env.step(action)
-            if render:
-                config.env.render()
-            rewards += reward
-            steps += 1
-            if done:
-                break
-
-        fitness += rewards
-
-    config.env.close()
-
-    return fitness / config.reps
 
 def read_file():
     '''

@@ -7,13 +7,15 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-from neat_gym import read_file, eval_genome
+import neat
+from neat_gym import read_file, eval_net
 
 if __name__ == '__main__':
 
-     # Load genome and configuration from pickled file
+    # Load genome and configuration from pickled file
     genome, config = read_file()
 
-    # Training uses multiple repetitions, testing only one
-    config.reps = 1 
-    print('%6.6f' % eval_genome(genome, config, True))
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+    # Run the network
+    print('%6.6f' % eval_net(net, config.env, render=True))

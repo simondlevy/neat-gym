@@ -9,17 +9,29 @@ MIT License
 
 import multiprocessing
 import os
-import visualize
 import neat
 import pickle
 import argparse
 import random
+from neat_gym import visualize
 
-from neat_gym import eval_genome, _GymConfig
+from neat_gym import eval_net, _GymConfig
 
 def _makedir(name):
     if not os.path.exists(name):
         os.makedirs(name)
+
+def _eval_genome(genome, config):
+
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+    fitness = 0
+
+    for _ in range(config.reps):
+
+        fitness += eval_net(net, config.env)
+
+    return fitness / config.reps
 
 def main():
 
@@ -50,9 +62,9 @@ def main():
     p.add_reporter(stats)
 
     # Create a parallel fitness evaluator
-    pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
+    pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), _eval_genome)
 
-    # Runn for number of generations specified in config file
+    # Run for number of generations specified in config file
     winner = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
 
     # Pickle the winner 
