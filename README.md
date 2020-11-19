@@ -31,8 +31,11 @@ run the *show* script:
 
 ## Using NEAT-Gym in other projects
 
-The [neat_gym]() module has functions for loading a .dat file and using it to run an episode of your Gym environment.
-To make these functions available other projects (e.g., 3D animation of your environment), do:
+The
+[neat_gym](https://github.com/simondlevy/NEAT-Gym/blob/master/neat_gym/__init__.py)
+module has functions for loading a .dat file and using it to run an episode of
+your Gym environment.  To make these functions available other projects (e.g.,
+3D animation of your environment), do:
 
 ```
 % sudo python3 setup.py install

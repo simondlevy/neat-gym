@@ -1,6 +1,5 @@
 '''
-Common code for using NEAT with OpenAI Gym environments Test script for using
-NEAT with OpenAI Gym environments
+Common code for using NEAT with OpenAI Gym environments
 
 Copyright (C) 2020 Simon D. Levy
 
