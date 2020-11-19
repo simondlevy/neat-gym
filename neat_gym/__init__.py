@@ -56,7 +56,7 @@ def eval_net(net, env, render=False):
 def read_file():
     '''
     Reads a genome/config file based on command-line argument
-    @return gengome,config tuple
+    @return genome,config tuple
     '''
 
     # Parse command-line arguments
