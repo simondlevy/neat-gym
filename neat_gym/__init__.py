@@ -35,22 +35,20 @@ def eval_net(net, env, render=False):
     '''
 
     state = env.reset()
-    rewards = 0
-    steps = 0
+    total_reward = 0
 
     while True:
         action = net.activate(state)
         state, reward, done, _ = env.step(action)
         if render:
             env.render()
-        rewards += reward
-        steps += 1
+        total_reward += reward
         if done:
             break
 
     env.close()
 
-    return rewards
+    return total_reward
 
 
 def read_file():
