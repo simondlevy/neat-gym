@@ -9,7 +9,6 @@ MIT License
 
 import neat
 import gym
-import numpy as np
 import argparse
 import pickle
 
@@ -47,7 +46,7 @@ def eval_genome(genome, config, render=False):
         steps = 0
 
         while True:
-            action = np.clip(net.activate(state), -1, +1)
+            action = net.activate(state)
             state, reward, done, _ = config.env.step(action)
             if render:
                 config.env.render()
