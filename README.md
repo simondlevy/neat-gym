@@ -29,6 +29,15 @@ run the *show* script:
 % python3 neat-gym-show.py LunarLanderContinuous-v2/<fitness>.dat
 ```
 
+## Using NEAT-Gym in other projects
+
+The [neat_gym]() module has functions for loading a .dat file and using it to run an episode of your Gym environment.
+To make these functions available other projects (e.g., 3D animation of your environment), do:
+
+```
+% sudo python3 setup.py install
+```
+
 ## Similar projects
 
 [neat-openai-gym](https://github.com/sroj/neat-openai-gym)
