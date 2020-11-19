@@ -1,5 +1,6 @@
 '''
-Common code for using NEAT with OpenAI Gym environments Test script for using NEAT with OpenAI Gym environments
+Common code for using NEAT with OpenAI Gym environments Test script for using
+NEAT with OpenAI Gym environments
 
 Copyright (C) 2020 Simon D. Levy
 
@@ -27,6 +28,13 @@ class _GymConfig(neat.Config):
         self.reps = reps
 
 def eval_genome(genome, config, render=False):
+    '''
+    Evaluates a genome in a configuration.
+    @param genome the genome
+    @param config the configuration
+    @param render set to True for animated display
+    @return average fitness over config.reps
+    '''
 
     net = neat.nn.FeedForwardNetwork.create(genome, config)
 
@@ -55,6 +63,10 @@ def eval_genome(genome, config, render=False):
     return fitness / config.reps
 
 def read_file():
+    '''
+    Reads a genome/config file based on command-line argument
+    @return gengome,config tuple
+    '''
 
     # Parse command-line arguments
     parser = argparse.ArgumentParser()
@@ -63,5 +75,3 @@ def read_file():
 
     # Load genome and configuration from pickled file
     return pickle.load(open(args.filename, 'rb'))
-
-
