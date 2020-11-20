@@ -10,6 +10,7 @@ import neat
 import gym
 import argparse
 import pickle
+import time
 
 class _GymConfig(neat.Config):
 
@@ -42,6 +43,7 @@ def eval_net(net, env, render=False):
         state, reward, done, _ = env.step(action)
         if render:
             env.render()
+            time.sleep(1./env.FRAMES_PER_SECOND)
         total_reward += reward
         if done:
             break
