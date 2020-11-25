@@ -11,6 +11,8 @@ import gym
 import argparse
 import pickle
 import time
+import os
+from PIL import Image
 
 class _GymConfig(neat.Config):
 
@@ -26,7 +28,7 @@ class _GymConfig(neat.Config):
 
         self.reps = reps
 
-def eval_net(net, env, render=False):
+def eval_net(net, env, render=False, savedir=None):
     '''
     Evaluates an evolved network
     @param net the network
@@ -37,23 +39,30 @@ def eval_net(net, env, render=False):
 
     state = env.reset()
     total_reward = 0
+    steps = 0
 
     while True:
         action = net.activate(state)
         state, reward, done, _ = env.step(action)
         if render:
-            env.render()
+            o = env.render('rgb_array')
+            if savedir is not None:
+                if not os.path.exists(savedir):
+                    os.mkdir(savedir)
+                img = Image.fromarray(o)
+                img.save('%s/%05d.png' % (savedir, steps))
             time.sleep(1./env.FRAMES_PER_SECOND)
         total_reward += reward
         if done:
             break
+        steps += 1
 
     env.close()
 
     return total_reward
 
 
-def read_file():
+def read_file(save=False):
     '''
     Reads a genome/config file based on command-line argument
     @return genome,config tuple
@@ -62,7 +71,12 @@ def read_file():
     # Parse command-line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('filename', metavar='FILENAME', help='input file')
+    if save:
+        parser.add_argument("-s", "--savedir", help="If specified, save every N-th step as an image in named directory")
     args = parser.parse_args()
 
     # Load genome and configuration from pickled file
-    return pickle.load(open(args.filename, 'rb'))
+    genome, config = pickle.load(open(args.filename, 'rb'))
+
+    # Return genome, config, and optional save flag
+    return genome, config, args.savedir
