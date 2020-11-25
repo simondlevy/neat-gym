@@ -79,4 +79,4 @@ def read_file(save=False):
     genome, config = pickle.load(open(args.filename, 'rb'))
 
     # Return genome, config, and optional save flag
-    return genome, config, args.savedir
+    return genome, config, args.savedir if save else None
