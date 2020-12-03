@@ -70,7 +70,7 @@ def main():
     p = neat.Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
-    p.add_reporter(neat.StdOutReporter(True))
+    p.add_reporter(neat.StdOutReporter(show_species_detail=False))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     
