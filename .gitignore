@@ -3,6 +3,7 @@ dist/
 *.egg-info
 __pycache__/
 
+models/
 Digraph.*
 Pendulum-v0/
 LunarLanderContinuous-v2/

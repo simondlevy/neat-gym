@@ -49,8 +49,8 @@ def _eval_genome(genome, config):
 def main():
 
     # Parse command-line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('environment', metavar='ENVIRONMENT', help='environment (e.g. gym_copter:Lander-v2')
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
     parser.add_argument('-g', '--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('-r', '--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
     parser.add_argument('-v', '--viz', dest='visualize', action='store_true')
@@ -64,7 +64,7 @@ def main():
     os.makedirs('models', exist_ok=True)
 
     # Load configuration.
-    config = _GymConfig(args.environment, args.reps)
+    config = _GymConfig(args.env, args.reps)
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
@@ -75,7 +75,7 @@ def main():
     p.add_reporter(stats)
     
     # Add a reporter to save the best
-    p.add_reporter(_SaveReporter(args.environment))
+    p.add_reporter(_SaveReporter(args.env))
 
     # Create a parallel fitness evaluator
     pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), _eval_genome)
