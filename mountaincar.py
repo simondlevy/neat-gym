@@ -37,11 +37,16 @@ def eval_genomes(genomes, config):
 
         eval_genome(g, config, env)
 
-config = neat.config.Config(neat.genome.DefaultGenome, neat.reproduction.DefaultReproduction,
-        neat.species.DefaultSpeciesSet, neat.stagnation.DefaultStagnation,
-        'config_neat_mountain_car')
+def main():
 
-pop = neat.population.Population(config)
+    config = neat.config.Config(neat.genome.DefaultGenome, neat.reproduction.DefaultReproduction,
+            neat.species.DefaultSpeciesSet, neat.stagnation.DefaultStagnation,
+            'config_neat_mountain_car')
 
-pop.run(eval_genomes, 1)
+    pop = neat.population.Population(config)
+
+    pop.run(eval_genomes, 1)
+
+if __name__ == '__main__':
+    main()
 
