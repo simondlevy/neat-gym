@@ -1,2 +1,2 @@
 clean:
-	rm -rf models/
+	rm -rf models/ tmp/
