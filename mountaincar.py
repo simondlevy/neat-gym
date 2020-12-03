@@ -5,9 +5,11 @@ import numpy as np
 
 class GymConfig(neat.config.Config):
 
-    def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename):
+    def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename, env_name):
 
         neat.config.Config.__init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename)
+
+        self.env_name = env_name
 
 def eval_genome(genome, config, env):
 
@@ -37,7 +39,7 @@ def eval_genome(genome, config, env):
 
 def eval_genomes(genomes, config):
 
-    env = gym.make('MountainCar-v0')
+    env = gym.make(config.env_name)
 
     for _, g in genomes:
 
@@ -47,7 +49,7 @@ def main():
 
     config = GymConfig(neat.genome.DefaultGenome, neat.reproduction.DefaultReproduction,
             neat.species.DefaultSpeciesSet, neat.stagnation.DefaultStagnation,
-            'config_neat_mountain_car')
+            'config_neat_mountain_car', 'MountainCar-v0')
 
     pop = neat.population.Population(config)
 
