@@ -8,7 +8,7 @@ To get started you should install [neat-python](https://github.com/CodeReclaimer
 do the following:
 
 ```
-% python3 neat-gym-evolve.py LunarLanderContinuous-v2
+% python3 evolve.py LunarLanderContinuous-v2
 ```
 This will run neat-python using the
 [parallel fitness evaluator](https://neat-python.readthedocs.io/en/latest/module_summaries.html#parallel),
@@ -17,7 +17,7 @@ so you can take advantage of all the cores on your computer.
 Once evolution finishes, you can test out your evolved network by doing:
 
 ```
-% python3 neat-gym-test.py LunarLanderContinuous-v2/<fitness>.dat
+% python3 test.py LunarLanderContinuous-v2/<fitness>.dat
 ```
 
 where ```<fitness>``` is the fitness of your evolved network.

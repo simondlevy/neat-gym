@@ -10,12 +10,29 @@ MIT License
 import multiprocessing
 import os
 import neat
-import pickle
 import argparse
+import pickle
 import random
 from neat_gym import visualize
 
 from neat_gym import eval_net, _GymConfig
+
+class _SaveReporter(neat.reporting.BaseReporter):
+
+    def __init__(self, env_name):
+
+        neat.reporting.BaseReporter.__init__(self)
+
+        self.best = None
+        self.env_name = env_name
+
+    def post_evaluate(self, config, population, species, best_genome):
+
+        if self.best is None or best_genome.fitness > self.best:
+            self.best = best_genome.fitness
+            filename = 'models/%s%f.dat' % (self.env_name, best_genome.fitness)
+            print('Saving %s' % filename)
+            pickle.dump((best_genome, config), open(filename, 'wb'))
 
 def _eval_genome(genome, config):
 
@@ -44,7 +61,7 @@ def main():
     random.seed(args.seed)
 
     # Make directory for pickling nets
-    os.makedirs(args.environment, exist_ok=True)
+    os.makedirs('models', exist_ok=True)
 
     # Load configuration.
     config = _GymConfig(args.environment, args.reps)
@@ -56,17 +73,15 @@ def main():
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
+    
+    # Add a reporter to save the best
+    p.add_reporter(_SaveReporter(args.environment))
 
     # Create a parallel fitness evaluator
     pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), _eval_genome)
 
     # Run for number of generations specified in config file
-    winner = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
-
-    # Pickle the winner 
-    filename = '%s/%f.dat' % (args.environment, winner.fitness)
-    print('Saving %s' % filename)
-    pickle.dump((winner, config), open(filename, 'wb'))
+    p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
 
     # Visualize results if indicated
     if args.visualize:
