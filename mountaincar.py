@@ -3,16 +3,7 @@ import gym
 import neat 
 import numpy as np
 
-def ini_pop(state, stats, config, output):
-    pop = neat.population.Population(config, state)
-    if output:
-        pop.add_reporter(neat.reporting.StdOutReporter(True))
-    pop.add_reporter(stats)
-    return pop
-
-
 def run_neat(gens, env, max_steps, config, max_trials=100, output=True):
-    trials = 1
 
     def eval_fitness(genomes, config):
 
@@ -21,7 +12,7 @@ def run_neat(gens, env, max_steps, config, max_trials=100, output=True):
 
             fitnesses = []
 
-            for i in range(trials):
+            for i in range(1):
                 ob = env.reset()
 
                 total_reward = 0
@@ -37,24 +28,9 @@ def run_neat(gens, env, max_steps, config, max_trials=100, output=True):
             
             g.fitness = np.array(fitnesses).mean()
 
-    # Create population and train the network. Return winner of network running 100 episodes.
-    stats_one = neat.statistics.StatisticsReporter()
-    pop = ini_pop(None, stats_one, config, output)
+    pop = neat.population.Population(config)
+
     pop.run(eval_fitness, gens)
-
-    stats_ten = neat.statistics.StatisticsReporter()
-    pop = ini_pop((pop.population, pop.species, 0), stats_ten, config, output)
-    trials = 10
-    winner_ten = pop.run(eval_fitness, gens)
-
-    if max_trials is 0:
-        return winner_ten, (stats_one, stats_ten)
-
-    stats_hundred = neat.statistics.StatisticsReporter()
-    pop = ini_pop((pop.population, pop.species, 0), stats_hundred, config, output)
-    trials = max_trials
-    winner_hundred = pop.run(eval_fitness, gens)
-    return winner_hundred, (stats_one, stats_ten, stats_hundred)
 
 config = neat.config.Config(neat.genome.DefaultGenome, neat.reproduction.DefaultReproduction,
         neat.species.DefaultSpeciesSet, neat.stagnation.DefaultStagnation,
