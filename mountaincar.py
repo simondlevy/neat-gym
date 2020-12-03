@@ -9,9 +9,9 @@ class GymConfig(neat.config.Config):
 
         neat.config.Config.__init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename)
 
-        self.env_name = env_name
+        self.env = gym.make(env_name)
 
-def eval_genome(genome, config, env):
+def eval_genome(genome, config):
 
     max_steps = 200
     evals = 2
@@ -22,14 +22,14 @@ def eval_genome(genome, config, env):
 
     for i in range(evals):
 
-        ob = env.reset()
+        ob = config.env.reset()
 
         total_reward = 0
 
         for j in range(max_steps):
             o = net.activate(ob)
             action = np.argmax(o)
-            ob, reward, done, info = env.step(action)
+            ob, reward, done, info = config.env.step(action)
             total_reward += reward
             if done:
                 break
@@ -39,11 +39,9 @@ def eval_genome(genome, config, env):
 
 def eval_genomes(genomes, config):
 
-    env = gym.make(config.env_name)
-
     for _, g in genomes:
 
-        eval_genome(g, config, env)
+        eval_genome(g, config)
 
 def main():
 
