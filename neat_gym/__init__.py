@@ -51,7 +51,7 @@ def eval_net(net, env, render=False, savedir=None):
                     os.mkdir(savedir)
                 img = Image.fromarray(o)
                 img.save('%s/%05d.png' % (savedir, steps))
-            time.sleep(1./env.FRAMES_PER_SECOND)
+            time.sleep(.02)
         total_reward += reward
         if done:
             break
