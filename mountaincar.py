@@ -3,6 +3,12 @@ import gym
 import neat 
 import numpy as np
 
+class GymConfig(neat.config.Config):
+
+    def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename):
+
+        neat.config.Config.__init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename)
+
 def eval_genome(genome, config, env):
 
     max_steps = 200
@@ -39,7 +45,7 @@ def eval_genomes(genomes, config):
 
 def main():
 
-    config = neat.config.Config(neat.genome.DefaultGenome, neat.reproduction.DefaultReproduction,
+    config = GymConfig(neat.genome.DefaultGenome, neat.reproduction.DefaultReproduction,
             neat.species.DefaultSpeciesSet, neat.stagnation.DefaultStagnation,
             'config_neat_mountain_car')
 
