@@ -3,33 +3,39 @@ import gym
 import neat 
 import numpy as np
 
-def eval_genomes(genomes, config):
+def eval_genome(genome, config, env):
 
-    env = gym.make('MountainCar-v0')
     max_steps = 200
     evals = 2
 
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+    fitnesses = []
+
+    for i in range(evals):
+
+        ob = env.reset()
+
+        total_reward = 0
+
+        for j in range(max_steps):
+            o = net.activate(ob)
+            action = np.argmax(o)
+            ob, reward, done, info = env.step(action)
+            total_reward += reward
+            if done:
+                break
+        fitnesses.append(total_reward)
+    
+    genome.fitness = np.array(fitnesses).mean()
+
+def eval_genomes(genomes, config):
+
+    env = gym.make('MountainCar-v0')
+
     for _, g in genomes:
 
-        net = neat.nn.FeedForwardNetwork.create(g, config)
-
-        fitnesses = []
-
-        for i in range(evals):
-            ob = env.reset()
-
-            total_reward = 0
-
-            for j in range(max_steps):
-                o = net.activate(ob)
-                action = np.argmax(o)
-                ob, reward, done, info = env.step(action)
-                total_reward += reward
-                if done:
-                    break
-            fitnesses.append(total_reward)
-        
-        g.fitness = np.array(fitnesses).mean()
+        eval_genome(g, config, env)
 
 config = neat.config.Config(neat.genome.DefaultGenome, neat.reproduction.DefaultReproduction,
         neat.species.DefaultSpeciesSet, neat.stagnation.DefaultStagnation,
