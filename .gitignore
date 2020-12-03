@@ -4,4 +4,5 @@ dist/
 __pycache__/
 
 Digraph.*
+Pendulum-v0/
 LunarLanderContinuous-v2/

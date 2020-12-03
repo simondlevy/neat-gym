@@ -17,10 +17,6 @@ from neat_gym import visualize
 
 from neat_gym import eval_net, _GymConfig
 
-def _makedir(name):
-    if not os.path.exists(name):
-        os.makedirs(name)
-
 def _eval_genome(genome, config):
 
     net = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -47,8 +43,8 @@ def main():
     # Set random seed (including None)
     random.seed(args.seed)
 
-    # Make directory for pickling nets, if it doesn't already exist
-    _makedir(args.environment)
+    # Make directory for pickling nets
+    os.makedirs(args.environment, exist_ok=True)
 
     # Load configuration.
     config = _GymConfig(args.environment, args.reps)
