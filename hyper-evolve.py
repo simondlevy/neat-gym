@@ -16,9 +16,10 @@ import random
 from configparser import ConfigParser
 
 from neat_gym import visualize
-from neat_gym import eval_net, _GymHyperConfig
+from neat_gym import _GymHyperConfig
 
 from pureples.shared.substrate import Substrate
+from pureples.hyperneat.hyperneat import create_phenotype_network
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -39,21 +40,44 @@ class _SaveReporter(neat.reporting.BaseReporter):
 
 def _eval_genome(genome, config):
 
-    net = neat.nn.FeedForwardNetwork.create(genome, config)
+    print(config.substrate)
+    return 0
 
-    fitness = 0
+    cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+    net = create_phenotype_network(cppn, config.substrate, config.actfun)
 
-    for _ in range(config.reps):
+    '''
+    activations = len(hidden_coordinates) + 2
 
-        fitness += eval_net(net, config.env)
+    fitnesses = []
 
-    return fitness / config.reps
+    ob = env.reset()
+    net.reset()
+
+    total_reward = 0
+
+    for j in range(config.reps):
+
+        for k in range(activations):
+
+            o = net.activate(ob)
+
+        action = np.argmax(o)
+        ob, reward, done, info = env.step(action)
+        total_reward += reward
+        if done:
+            break
+    fitnesses.append(total_reward)
+
+    g.fitness = np.array(fitnesses).mean()
+    '''
+
 
 def main():
 
     # Parse command-line arguments
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
+    parser.add_argument('--env', default='MountainCar-v0', help='Environment id')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
     parser.add_argument('--viz', dest='visualize', action='store_true', help='Visualize evolution history')
@@ -66,16 +90,15 @@ def main():
     # Make directory for pickling nets
     os.makedirs('models', exist_ok=True)
 
-    # Load substrate
-    substrate = ConfigParser()
-    substrate.read(args.env + '.subs')
-    coords =  substrate['Coordinates']
+    # Load substrate info
+    subscfg = ConfigParser()
+    subscfg.read(args.env + '.subs')
+    coords =  subscfg['Coordinates']
     substrate = Substrate(coords['input'], coords['output'], coords['hidden'])
+    actfun = subscfg['Activation']['function']
 
     # Load configuration
-    config = _GymHyperConfig(args.env, args.reps, substrate)
-
-    exit(0)
+    config = _GymHyperConfig(args.env, args.reps, substrate, actfun)
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)

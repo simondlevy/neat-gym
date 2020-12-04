@@ -31,11 +31,12 @@ class _GymConfig(neat.Config):
 
 class _GymHyperConfig(_GymConfig):
 
-    def __init__(self, env_name, reps, substrate):
+    def __init__(self, env_name, reps, substrate, actfun):
 
         _GymConfig.__init__(self, env_name, reps)
 
         self.substrate = substrate
+        self.actfun = actfun
 
 def eval_net(net, env, render=False, record_dir=None):
     '''
