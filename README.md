@@ -1,23 +1,29 @@
 his repository contains code allowing you to train, test, and visualize
 [OpenAI Gym](https://gym.openai.com/) environments (games) using the
 [NEAT](https://www.cse.unr.edu/~sushil/class/gas/papers/NEAT.pdf) algorithm.
-The main goal was to make this effort as simple as possible.  For example, the
-name of the NEAT configuration file is the same as the name of the environment.
+
+The two goals of this project are 
+
+1. Make this work as simple as possible.  For example, the name of the NEAT
+configuration file is the same as the name of the environment.
+
+2. Make the code run fast, by simultaneously evaluating the fitnesses of the
+population on multiprocessor machines.
 
 To get started you should install [neat-python](https://github.com/CodeReclaimers/neat-python).  Then 
 do the following:
 
 ```
-% python3 evolve.py LunarLanderContinuous-v2
+% python3 evolve.py 
 ```
-This will run neat-python using the
+This will run neat-python on the default [Pendulum-v0](https://gym.openai.com/envs/Pendulum-v0/) environment using the
 [parallel fitness evaluator](https://neat-python.readthedocs.io/en/latest/module_summaries.html#parallel),
 so you can take advantage of all the cores on your computer.
 
 Once evolution finishes, you can test out your evolved network by doing:
 
 ```
-% python3 test.py LunarLanderContinuous-v2/<fitness>.dat
+% python3 test.py models/Pendulum-v0<fitness>.dat
 ```
 
 where ```<fitness>``` is the fitness of your evolved network.
