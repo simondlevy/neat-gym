@@ -29,6 +29,14 @@ class _GymConfig(neat.Config):
 
         self.reps = reps
 
+class _GymHyperConfig(_GymConfig):
+
+    def __init__(self, env_name, reps):
+
+        _GymConfig.__init__(self, env_name, reps, substrate)
+
+        self.substrate = substrate
+
 def eval_net(net, env, render=False, record_dir=None):
     '''
     Evaluates an evolved network

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-Evolver script for OpenAI Gym environemnts
+HyperNEAT evolver script for OpenAI Gym environemnts
 
 Copyright (C) 2020 Simon D. Levy
 
@@ -13,8 +13,9 @@ import neat
 import argparse
 import pickle
 import random
-from neat_gym import visualize
+from configparser import ConfigParser
 
+from neat_gym import visualize
 from neat_gym import eval_net, _GymConfig
 
 class _SaveReporter(neat.reporting.BaseReporter):
@@ -51,7 +52,6 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
-    parser.add_argument('--hyper', dest='use_hyper', action='store_true', help='Use HyperNEAT')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
     parser.add_argument('--viz', dest='visualize', action='store_true', help='Visualize evolution history')
@@ -64,8 +64,15 @@ def main():
     # Make directory for pickling nets
     os.makedirs('models', exist_ok=True)
 
+    # Load substrate
+    hyper = ConfigParser()
+    with open(args.env + '.subs') as f:
+        hyper.read_file(f)
+
+    exit(0)
+
     # Load configuration.
-    config = _GymConfig(args.env, args.reps)
+    config = _GymHyperConfig(args.env, args.reps)
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
