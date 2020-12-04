@@ -51,10 +51,10 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
-    parser.add_argument('-g', '--ngen', type=int, required=False, help='Number of generations to run')
-    parser.add_argument('-r', '--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
-    parser.add_argument('-v', '--viz', dest='visualize', action='store_true')
-    parser.add_argument('-s', '--seed', type=int, required=False, help='Seed for random number generator')
+    parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
+    parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
+    parser.add_argument('--viz', dest='visualize', action='store_true', help='Visualize evolution history')
+    parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
 
     # Set random seed (including None)
