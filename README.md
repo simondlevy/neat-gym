@@ -10,7 +10,7 @@ configuration file is the same as the name of the environment.
 2. Make the code run fast, by simultaneously evaluating the fitnesses of the
 population on multiprocessor machines.
 
-To get started you should install [neat-python](https://github.com/CodeReclaimers/neat-python).  Then 
+To get started you should install [neat-python](https://github.com/CodeReclaimers/neat-python) from source.  Then 
 do the following:
 
 ```
