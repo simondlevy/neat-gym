@@ -18,6 +18,8 @@ from configparser import ConfigParser
 from neat_gym import visualize
 from neat_gym import eval_net, _GymConfig
 
+from pureples.shared.substrate import Substrate
+
 class _SaveReporter(neat.reporting.BaseReporter):
 
     def __init__(self, env_name):
@@ -67,7 +69,12 @@ def main():
     # Load substrate
     substrate = ConfigParser()
     substrate.read(args.env + '.subs')
-    print(substrate['Coordinates']['input'])
+    coords =  substrate['Coordinates']
+    print(coords['input'])
+
+    substrate = Substrate(coords['input'], coords['output'], coords['hidden'])
+
+    print(substrate)
 
     exit(0)
 
