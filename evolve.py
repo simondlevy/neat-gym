@@ -51,6 +51,7 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
+    parser.add_argument('--hyper', dest='use_hyper', action='store_true', help='Use HyperNEAT')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
     parser.add_argument('--viz', dest='visualize', action='store_true', help='Visualize evolution history')
