@@ -16,7 +16,7 @@ import random
 from configparser import ConfigParser
 
 from neat_gym import visualize
-from neat_gym import eval_net, _GymConfig
+from neat_gym import eval_net, _GymHyperConfig
 
 from pureples.shared.substrate import Substrate
 
@@ -70,16 +70,12 @@ def main():
     substrate = ConfigParser()
     substrate.read(args.env + '.subs')
     coords =  substrate['Coordinates']
-    print(coords['input'])
-
     substrate = Substrate(coords['input'], coords['output'], coords['hidden'])
 
-    print(substrate)
+    # Load configuration
+    config = _GymHyperConfig(args.env, args.reps, substrate)
 
     exit(0)
-
-    # Load configuration.
-    config = _GymHyperConfig(args.env, args.reps)
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)

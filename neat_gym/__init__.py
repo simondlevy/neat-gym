@@ -31,9 +31,9 @@ class _GymConfig(neat.Config):
 
 class _GymHyperConfig(_GymConfig):
 
-    def __init__(self, env_name, reps):
+    def __init__(self, env_name, reps, substrate):
 
-        _GymConfig.__init__(self, env_name, reps, substrate)
+        _GymConfig.__init__(self, env_name, reps)
 
         self.substrate = substrate
 
