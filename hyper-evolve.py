@@ -65,9 +65,9 @@ def main():
     os.makedirs('models', exist_ok=True)
 
     # Load substrate
-    hyper = ConfigParser()
-    with open(args.env + '.subs') as f:
-        hyper.read_file(f)
+    substrate = ConfigParser()
+    substrate.read(args.env + '.subs')
+    print(substrate['Coordinates']['input'])
 
     exit(0)
 
