@@ -13,9 +13,7 @@ import neat
 import argparse
 import pickle
 import random
-from neat_gym import visualize
-
-from neat_gym import eval_net, _GymConfig
+from neat_gym import visualize, eval_net, _GymConfig
 
 class _SaveReporter(neat.reporting.BaseReporter):
 

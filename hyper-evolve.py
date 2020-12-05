@@ -7,7 +7,8 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-import multiprocessing
+import multiprocessing as mp
+import numpy as np
 import os
 import neat
 import argparse
@@ -15,8 +16,7 @@ import pickle
 import random
 from configparser import ConfigParser
 
-from neat_gym import visualize
-from neat_gym import _GymHyperConfig
+from neat_gym import visualize, eval_net, _GymHyperConfig
 
 from pureples.shared.substrate import Substrate
 from pureples.hyperneat.hyperneat import create_phenotype_network
@@ -40,46 +40,26 @@ class _SaveReporter(neat.reporting.BaseReporter):
 
 def _eval_genome(genome, config):
 
-    activations = len(config.substrate.hidden_coordinates) + 2
 
     cppn = neat.nn.FeedForwardNetwork.create(genome, config)
 
     net = create_phenotype_network(cppn, config.substrate, config.actfun)
 
-    return 0
+    activations = len(config.substrate.hidden_coordinates) + 2
 
-    '''
-    activations = len(hidden_coordinates) + 2
+    fitness = 0
 
-    fitnesses = []
+    for _ in range(config.reps):
 
-    ob = env.reset()
-    net.reset()
+        fitness += eval_net(net, config.env, activations)
 
-    total_reward = 0
-
-    for j in range(config.reps):
-
-        for k in range(activations):
-
-            o = net.activate(ob)
-
-        action = np.argmax(o)
-        ob, reward, done, info = env.step(action)
-        total_reward += reward
-        if done:
-            break
-    fitnesses.append(total_reward)
-
-    g.fitness = np.array(fitnesses).mean()
-    '''
-
+    return fitness / config.reps
 
 def main():
 
     # Parse command-line arguments
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--env', default='MountainCar-v0', help='Environment id')
+    parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
     parser.add_argument('--viz', dest='visualize', action='store_true', help='Visualize evolution history')
@@ -114,7 +94,7 @@ def main():
     p.add_reporter(_SaveReporter(args.env))
 
     # Create a parallel fitness evaluator
-    pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), _eval_genome)
+    pe = neat.ParallelEvaluator(mp.cpu_count(), _eval_genome)
 
     # Run for number of generations specified in config file
     p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 

@@ -38,7 +38,7 @@ class _GymHyperConfig(_GymConfig):
         self.substrate = substrate
         self.actfun = actfun
 
-def eval_net(net, env, render=False, record_dir=None):
+def eval_net(net, env, render=False, record_dir=None, activations=1):
     '''
     Evaluates an evolved network
     @param net the network
@@ -56,7 +56,8 @@ def eval_net(net, env, render=False, record_dir=None):
     steps = 0
 
     while True:
-        action = net.activate(state)
+        for k in range(activations): # Support recurrent nets
+            action = net.activate(state)
         state, reward, done, _ = env.step(action)
         if render:
             o = env.render('rgb_array')
