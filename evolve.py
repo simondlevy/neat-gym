@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-HyperNEAT evolver script for OpenAI Gym environemnts
+(Hyper)NEAT evolver script for OpenAI Gym environemnts
 
 Copyright (C) 2020 Simon D. Levy
 
@@ -16,10 +16,16 @@ import pickle
 import random
 from configparser import ConfigParser
 
-from neat_gym import visualize, eval_net, _GymHyperConfig
+from neat_gym import visualize, eval_net
 
-from pureples.shared.substrate import Substrate
-from pureples.hyperneat.hyperneat import create_phenotype_network
+_allow_hyper = True
+
+try:
+    from pureples.shared.substrate import Substrate
+    from pureples.hyperneat.hyperneat import create_phenotype_network
+    from neat_gym import visualize, eval_net, _GymHyperConfig
+except:
+    _allow_hyper = False
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -57,13 +63,21 @@ def _eval_genome(genome, config):
 def main():
 
     # Parse command-line arguments
+
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
     parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
     parser.add_argument('--viz', dest='visualize', action='store_true', help='Visualize evolution history')
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
+
+    if _allow_hyper:
+        parser.add_argument('--hyper', dest='hyper', action='store_true', help='Use HyperNEAT')
+
     args = parser.parse_args()
+
+    exit(0)
 
     # Set random seed (including None)
     random.seed(args.seed)
