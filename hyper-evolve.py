@@ -40,11 +40,13 @@ class _SaveReporter(neat.reporting.BaseReporter):
 
 def _eval_genome(genome, config):
 
-    print(config.substrate)
-    return 0
+    activations = len(config.substrate.hidden_coordinates) + 2
 
     cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+
     net = create_phenotype_network(cppn, config.substrate, config.actfun)
+
+    return 0
 
     '''
     activations = len(hidden_coordinates) + 2
@@ -94,7 +96,7 @@ def main():
     subscfg = ConfigParser()
     subscfg.read(args.env + '.subs')
     coords =  subscfg['Coordinates']
-    substrate = Substrate(coords['input'], coords['output'], coords['hidden'])
+    substrate = Substrate(eval(coords['input']), eval(coords['output']), eval(coords['hidden']))
     actfun = subscfg['Activation']['function']
 
     # Load configuration

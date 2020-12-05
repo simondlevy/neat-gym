@@ -17,13 +17,13 @@ from PIL import Image
 
 class _GymConfig(neat.Config):
 
-    def __init__(self, env_name, reps):
+    def __init__(self, env_name, reps, suffix='cfg'):
         '''
         env_name names environment and config file
         '''
 
         neat.Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat.DefaultStagnation, env_name+'.cfg')
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation, env_name+'.'+suffix)
 
         self.env = gym.make(env_name)
 
@@ -33,7 +33,7 @@ class _GymHyperConfig(_GymConfig):
 
     def __init__(self, env_name, reps, substrate, actfun):
 
-        _GymConfig.__init__(self, env_name, reps)
+        _GymConfig.__init__(self, env_name, reps, 'cppn')
 
         self.substrate = substrate
         self.actfun = actfun

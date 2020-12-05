@@ -4,4 +4,4 @@ output = [(-0.5, 1.), (0.,1.), (0.5, 1.)]
 hidden = [[(-0.5, 0.5), (0.5, 0.5)], [(0.0, 0.0)], [(-0.5, -0.5), (0.5, -0.5)]]
 
 [Activation]
-function = 'sigmoid'
+function = sigmoid
