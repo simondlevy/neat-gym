@@ -8,7 +8,6 @@ MIT License
 '''
 
 import multiprocessing as mp
-import numpy as np
 import os
 import neat
 import argparse
@@ -17,13 +16,15 @@ import random
 from configparser import ConfigParser
 
 from neat_gym import visualize, eval_net
+    
+from neat_gym import _GymConfig
 
 _allow_hyper = True
 
 try:
     from pureples.shared.substrate import Substrate
     from pureples.hyperneat.hyperneat import create_phenotype_network
-    from neat_gym import visualize, eval_net, _GymHyperConfig
+    from neat_gym import _GymHyperConfig
 except:
     _allow_hyper = False
 
@@ -44,13 +45,7 @@ class _SaveReporter(neat.reporting.BaseReporter):
             print('Saving %s' % filename)
             pickle.dump((best_genome, config), open(filename, 'wb'))
 
-def _eval_genome(genome, config):
-
-    cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-
-    net = create_phenotype_network(cppn, config.substrate, config.actfun)
-
-    activations = len(config.substrate.hidden_coordinates) + 2
+def _eval_genome(genome, config, net, activations):
 
     fitness = 0
 
@@ -59,6 +54,21 @@ def _eval_genome(genome, config):
         fitness += eval_net(net, config.env, activations=activations)
 
     return fitness / config.reps
+
+def _eval_genome_neat(genome, config):
+
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+    return _eval_genome(genome, config, net, 1)
+
+def _eval_genome_hyper(genome, config):
+
+    cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+    net = create_phenotype_network(cppn, config.substrate, config.actfun)
+
+    activations = len(config.substrate.hidden_coordinates) + 2
+
+    return _eval_genome(genome, config, net, activations)
 
 def main():
 
@@ -77,23 +87,28 @@ def main():
 
     args = parser.parse_args()
 
-    exit(0)
-
     # Set random seed (including None)
     random.seed(args.seed)
 
     # Make directory for pickling nets
     os.makedirs('models', exist_ok=True)
 
-    # Load substrate info
-    subscfg = ConfigParser()
-    subscfg.read(args.env + '.subs')
-    coords =  subscfg['Coordinates']
-    substrate = Substrate(eval(coords['input']), eval(coords['output']), eval(coords['hidden']))
-    actfun = subscfg['Activation']['function']
+    # If HyperNEAT is supported and was requested, use it
+    if _allow_hyper and args.hyper:
 
-    # Load configuration
-    config = _GymHyperConfig(args.env, args.reps, substrate, actfun)
+        subscfg = ConfigParser()
+        subscfg.read(args.env + '.subs')
+        coords =  subscfg['Coordinates']
+        substrate = Substrate(eval(coords['input']), eval(coords['output']), eval(coords['hidden']))
+        actfun = subscfg['Activation']['function']
+        config = _GymHyperConfig(args.env, args.reps, substrate, actfun)
+        evalfun = _eval_genome_hyper
+
+    # Otherwise, use NEAT
+    else:
+
+        config = _GymConfig(args.env, args.reps)
+        evalfun = _eval_genome_neat
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
@@ -107,7 +122,7 @@ def main():
     p.add_reporter(_SaveReporter(args.env))
 
     # Create a parallel fitness evaluator
-    pe = neat.ParallelEvaluator(mp.cpu_count(), _eval_genome)
+    pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
 
     # Run for number of generations specified in config file
     p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
