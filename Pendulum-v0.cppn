@@ -1,4 +1,11 @@
-#--- parameters for the CPPN regarding the mountain car experiment  ---#
+# HyperNEAT configuration for Pendulum-v0
+#
+# Copyright (C) 2020 Simon D. Levy
+#
+# MIT License
+
+# The `NEAT` section specifies parameters particular to the NEAT algorithm
+# or the experiment itself.  This is the only required section.
 
 [NEAT]
 fitness_criterion     = max
