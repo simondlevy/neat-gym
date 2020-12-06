@@ -31,7 +31,7 @@ where ```<fitness>``` is the fitness of your evolved network.
 ## HyperNEAT support
 
 NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the
-[PUREPLES](https://github.com/simondlevy/pureples) library.  Once you have
+[PUREPLES](https://github.com/ukuleleplayer/pureples) library.  Once you have
 installed PUREPLES, you can use HyperNEAT by running the ```evolve.py``` script with the ```--hyper``` option.
 
 ## Using NEAT-Gym in other projects
