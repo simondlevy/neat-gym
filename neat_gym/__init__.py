@@ -12,28 +12,26 @@ from gym import wrappers
 import argparse
 import pickle
 import time
-import os
-from PIL import Image
 
 class _GymConfig(neat.Config):
 
-    def __init__(self, env_name, reps, suffix='cfg'):
+    def __init__(self, args, suffix='cfg'):
         '''
         env_name names environment and config file
         '''
 
         neat.Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat.DefaultStagnation, env_name+'.'+suffix)
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation, args.env+'.'+suffix)
 
-        self.env = gym.make(env_name)
+        self.env = gym.make(args.env)
 
-        self.reps = reps
+        self.reps = args.reps
 
 class _GymHyperConfig(_GymConfig):
 
-    def __init__(self, env_name, reps, substrate, actfun):
+    def __init__(self, args, substrate, actfun):
 
-        _GymConfig.__init__(self, env_name, reps, 'cppn')
+        _GymConfig.__init__(self, args, 'cppn')
 
         self.substrate = substrate
         self.actfun = actfun
@@ -62,7 +60,7 @@ def eval_net(net, env, render=False, record_dir=None, activations=1):
             action = net.activate(state)
         state, reward, done, _ = env.step(action)
         if render:
-            o = env.render('rgb_array')
+            env.render('rgb_array')
             time.sleep(.02)
         total_reward += reward
         if done:

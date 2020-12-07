@@ -103,13 +103,13 @@ def main():
         coords =  subscfg['Coordinates']
         substrate = Substrate(eval(coords['input']), eval(coords['output']), eval(coords['hidden']))
         actfun = subscfg['Activation']['function']
-        config = _GymHyperConfig(args.env, args.reps, substrate, actfun)
+        config = _GymHyperConfig(args, substrate, actfun)
         evalfun = _eval_genome_hyper
 
     # Otherwise, use NEAT
     else:
 
-        config = _GymConfig(args.env, args.reps)
+        config = _GymConfig(args)
         evalfun = _eval_genome_neat
 
     # Create the population, which is the top-level object for a NEAT run.
