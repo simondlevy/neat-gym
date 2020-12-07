@@ -16,18 +16,11 @@ import pickle
 import random
 from configparser import ConfigParser
 
-from neat_gym import visualize, eval_net
-    
-from neat_gym import _GymConfig
+from neat_gym import eval_net, _GymConfig
 
-_allow_hyper = True
-
-try:
-    from pureples.shared.substrate import Substrate
-    from pureples.hyperneat.hyperneat import create_phenotype_network
-    from neat_gym import _GymHyperConfig
-except:
-    _allow_hyper = False
+from pureples.shared.substrate import Substrate
+from pureples.hyperneat.hyperneat import create_phenotype_network
+from neat_gym import _GymHyperConfig
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -80,12 +73,8 @@ def main():
     parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
-    parser.add_argument('--viz', dest='visualize', action='store_true', help='Visualize evolution history')
+    parser.add_argument('--hyper', dest='hyper', action='store_true', help='Use HyperNEAT')
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
-
-    if _allow_hyper:
-        parser.add_argument('--hyper', dest='hyper', action='store_true', help='Use HyperNEAT')
-
     args = parser.parse_args()
 
     # Set random seed (including None)
@@ -94,8 +83,8 @@ def main():
     # Make directory for pickling nets
     os.makedirs('models', exist_ok=True)
 
-    # If HyperNEAT is supported and was requested, use it
-    if _allow_hyper and args.hyper:
+    # If HyperNEAT was requested, use it
+    if args.hyper:
 
         subscfg = ConfigParser()
         subscfg.read(args.env + '.subs')
@@ -127,11 +116,6 @@ def main():
 
     # Run for number of generations specified in config file
     p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
-
-    # Visualize results if indicated
-    if args.visualize:
-        visualize.plot_stats(stats, ylog=False, view=True)
-        visualize.plot_species(stats, view=True)
 
 if __name__ == '__main__':
 

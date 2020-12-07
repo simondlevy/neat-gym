@@ -10,7 +10,8 @@ configuration file is the same as the name of the environment.
 2. Make the code run fast, by simultaneously evaluating the fitnesses of the
 population on multiprocessor machines.
 
-To get started you should install [neat-python](https://github.com/CodeReclaimers/neat-python) from source.  Then 
+To get started you should install [neat-python](https://github.com/CodeReclaimers/neat-python) 
+and [PUREPLES](https://github.com/ukuleleplayer/pureples) from source. Then 
 do the following:
 
 ```
@@ -30,9 +31,7 @@ where ```<fitness>``` is the fitness of your evolved network.
 
 ## HyperNEAT support
 
-NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the
-[PUREPLES](https://github.com/ukuleleplayer/pureples) library.  Once you have
-installed PUREPLES, you can use HyperNEAT by running the ```evolve.py``` script with the ```--hyper``` option.
+NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the ```--hyper``` option.
 
 ## Using NEAT-Gym in other projects
 
