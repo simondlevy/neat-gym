@@ -4,8 +4,5 @@ dist/
 *.egg-info
 __pycache__/
 
-tmp/
 models/
-Digraph.*
-Pendulum-v0/
-LunarLanderContinuous-v2/
+visuals/

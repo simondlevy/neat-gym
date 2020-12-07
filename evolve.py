@@ -79,8 +79,9 @@ def main():
     # Set random seed (including None)
     random.seed(args.seed)
 
-    # Make directory for pickling nets
+    # Make directories for saving results
     os.makedirs('models', exist_ok=True)
+    os.makedirs('visuals', exist_ok=True)
 
     # If HyperNEAT was requested, use it
     if args.hyper:
@@ -118,7 +119,7 @@ def main():
 
     # Save the net to a PDF file
     winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
-    draw_net(winner_net, filename="winner")
+    draw_net(winner_net, filename="visuals/winner")
 
 if __name__ == '__main__':
 
