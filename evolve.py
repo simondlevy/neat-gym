@@ -90,7 +90,6 @@ def main():
 
     # Set random seed (including None)
     random.seed(args.seed)
-    np.random.random(args.seed)
 
     # Make directory for pickling nets
     os.makedirs('models', exist_ok=True)
