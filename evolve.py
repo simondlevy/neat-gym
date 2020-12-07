@@ -7,7 +7,6 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-import numpy as np
 import multiprocessing as mp
 import os
 import neat
@@ -16,11 +15,11 @@ import pickle
 import random
 from configparser import ConfigParser
 
-from neat_gym import eval_net, _GymConfig
-
 from pureples.shared.substrate import Substrate
 from pureples.hyperneat.hyperneat import create_phenotype_network
-from neat_gym import _GymHyperConfig
+from pureples.shared.visualize import draw_net
+
+from neat_gym import eval_net, _GymConfig, _GymHyperConfig
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -115,7 +114,11 @@ def main():
     pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
 
     # Run for number of generations specified in config file
-    p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
+    winner_genome = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
+
+    # Save the net to a PDF file
+    winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
+    draw_net(winner_net, filename="winner")
 
 if __name__ == '__main__':
 
