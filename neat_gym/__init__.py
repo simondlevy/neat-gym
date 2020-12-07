@@ -51,7 +51,9 @@ def eval_net(net, env, render=False, record_dir=None, activations=1):
     if record_dir is not None:
         env = wrappers.Monitor(env, record_dir, force=True)
 
+    env.seed(0)
     state = env.reset()
+    env.seed(0)
     total_reward = 0
     steps = 0
 

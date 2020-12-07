@@ -7,6 +7,7 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
+import numpy as np
 import multiprocessing as mp
 import os
 import neat
@@ -89,6 +90,7 @@ def main():
 
     # Set random seed (including None)
     random.seed(args.seed)
+    np.random.random(args.seed)
 
     # Make directory for pickling nets
     os.makedirs('models', exist_ok=True)
