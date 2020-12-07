@@ -52,7 +52,7 @@ def _eval_genome(genome, config, net, activations):
 
     for _ in range(config.reps):
 
-        fitness += eval_net(net, config.env, activations=activations)
+        fitness += eval_net(net, config.env, activations=activations, seed=config.seed)
 
     return fitness / config.reps
 

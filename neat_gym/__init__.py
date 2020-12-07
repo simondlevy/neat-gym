@@ -26,6 +26,7 @@ class _GymConfig(neat.Config):
         self.env = gym.make(args.env)
 
         self.reps = args.reps
+        self.seed = args.seed
 
 class _GymHyperConfig(_GymConfig):
 
@@ -36,7 +37,7 @@ class _GymHyperConfig(_GymConfig):
         self.substrate = substrate
         self.actfun = actfun
 
-def eval_net(net, env, render=False, record_dir=None, activations=1):
+def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''
     Evaluates an evolved network
     @param net the network
@@ -49,9 +50,9 @@ def eval_net(net, env, render=False, record_dir=None, activations=1):
     if record_dir is not None:
         env = wrappers.Monitor(env, record_dir, force=True)
 
-    env.seed(0)
+    env.seed(seed)
     state = env.reset()
-    env.seed(0)
+    env.seed(seed)
     total_reward = 0
     steps = 0
 
