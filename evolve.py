@@ -21,6 +21,10 @@ from pureples.shared.visualize import draw_net
 
 from neat_gym import eval_net, _GymConfig, _GymHyperConfig
 
+def _make_name(env_name, genome):
+
+    return '%s%+f' % (env_name, genome.fitness)
+
 class _SaveReporter(neat.reporting.BaseReporter):
 
     def __init__(self, env_name):
@@ -34,7 +38,7 @@ class _SaveReporter(neat.reporting.BaseReporter):
 
         if self.best is None or best_genome.fitness > self.best:
             self.best = best_genome.fitness
-            filename = 'models/%s%f.dat' % (self.env_name, best_genome.fitness)
+            filename = 'models/%s.dat' % _make_name(self.env_name, best_genome)
             print('Saving %s' % filename)
             pickle.dump((best_genome, config), open(filename, 'wb'))
 
@@ -117,17 +121,18 @@ def main():
     # Run for number of generations specified in config file
     winner_genome = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
 
-    # Save the net to a PDF file
+    # Save the net(s) to a PDF file
+    name = _make_name(args.env, winner_genome)
 
     if args.hyper:
         winner_cppn = neat.nn.FeedForwardNetwork.create(winner_genome, config)
         winner_net = create_phenotype_network(winner_cppn, substrate)
-        draw_net(winner_cppn, filename="visuals/winner_cppn")
-        draw_net(winner_net, filename="visuals/winner_net")
+        draw_net(winner_cppn, filename='visuals/%s_cppn' % name)
+        draw_net(winner_net, filename='visuals/%s_net' % name)
 
     else:
         winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
-        draw_net(winner_net, filename="visuals/winner_net")
+        draw_net(winner_net, filename='visuals/%s_net' % name)
 
 if __name__ == '__main__':
 
