@@ -44,6 +44,8 @@ def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     @param env the Gym environment
     @param render set to True for rendering
     @param record_dir set to directory name for recording video
+    @param actviations number of times to repeat
+    @param seed seed for random number generator
     @return total reward
     '''
 
@@ -52,7 +54,6 @@ def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
 
     env.seed(seed)
     state = env.reset()
-    env.seed(seed)
     total_reward = 0
     steps = 0
 
