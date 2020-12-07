@@ -118,8 +118,16 @@ def main():
     winner_genome = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
 
     # Save the net to a PDF file
-    winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
-    draw_net(winner_net, filename="visuals/winner")
+
+    if args.hyper:
+        winner_cppn = neat.nn.FeedForwardNetwork.create(winner_genome, config)
+        winner_net = create_phenotype_network(winner_cppn, substrate)
+        draw_net(winner_cppn, filename="visuals/winner_cppn")
+        draw_net(winner_net, filename="visuals/winner_net")
+
+    else:
+        winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
+        draw_net(winner_net, filename="visuals/winner_net")
 
 if __name__ == '__main__':
 
