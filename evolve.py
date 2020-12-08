@@ -149,7 +149,7 @@ def main():
     else:
         winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
 
-    draw_net(winner_net, filename='visuals/%s_net' % name, node_names=node_names)
+    draw_net(winner_net, filename='visuals/'+_make_name(args.env, winner_genome), node_names=node_names)
 
 if __name__ == '__main__':
 
