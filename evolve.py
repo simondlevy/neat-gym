@@ -128,11 +128,11 @@ def main():
         winner_cppn = neat.nn.FeedForwardNetwork.create(winner_genome, config)
         winner_net = create_phenotype_network(winner_cppn, substrate)
         draw_net(winner_cppn, filename='visuals/%s_cppn' % name)
-        draw_net(winner_net, filename='visuals/%s_net' % name)
 
     else:
         winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
-        draw_net(winner_net, filename='visuals/%s_net' % name)
+
+    draw_net(winner_net, filename='visuals/%s_net' % name)
 
 if __name__ == '__main__':
 
