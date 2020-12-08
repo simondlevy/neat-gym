@@ -25,6 +25,13 @@ def _make_name(env_name, genome):
 
     return '%s%+f' % (env_name, genome.fitness)
 
+def _read_config(args, ext):
+
+    parser = ConfigParser()
+    parser.read(args.env + '.' + ext)
+    return parser
+
+
 class _SaveReporter(neat.reporting.BaseReporter):
 
     def __init__(self, env_name):
@@ -89,9 +96,7 @@ def main():
 
     # If HyperNEAT was requested, use it
     if args.hyper:
-
-        subscfg = ConfigParser()
-        subscfg.read(args.env + '.subs')
+        subscfg = _read_config(args, 'subs')
         coords =  subscfg['Coordinates']
         substrate = Substrate(eval(coords['input']), eval(coords['output']), eval(coords['hidden']))
         actfun = subscfg['Activation']['function']
@@ -124,6 +129,18 @@ def main():
     # Save the net(s) to a PDF file
     name = _make_name(args.env, winner_genome)
 
+    # Open nodenames file if available
+    try:
+        namescfg = _read_config(args, 'names')
+        names =  namescfg['Names']
+        node_names = {}
+        for idx,name in enumerate(eval(names['input'])):
+            node_names[-idx-1] = name
+        for idx,name in enumerate(eval(names['output'])):
+            node_names[idx] = name
+    except:
+        node_names = {}
+
     if args.hyper:
         winner_cppn = neat.nn.FeedForwardNetwork.create(winner_genome, config)
         winner_net = create_phenotype_network(winner_cppn, substrate)
@@ -132,7 +149,7 @@ def main():
     else:
         winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
 
-    draw_net(winner_net, filename='visuals/%s_net' % name)
+    draw_net(winner_net, filename='visuals/%s_net' % name, node_names=node_names)
 
 if __name__ == '__main__':
 
