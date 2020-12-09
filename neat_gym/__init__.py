@@ -6,12 +6,13 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-import neat
-import gym
-from gym import wrappers
 import argparse
 import pickle
 import time
+import numpy as np
+import neat
+import gym
+from gym import wrappers
 
 class _GymConfig(neat.Config):
 
@@ -58,9 +59,13 @@ def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     total_reward = 0
     steps = 0
 
+    is_discrete = 'Discrete' in str(type(env.action_space))
+
     while True:
         for k in range(activations): # Support recurrent nets
             action = net.activate(state)
+        if is_discrete:
+            action = np.argmax(action)
         state, reward, done, _ = env.step(action)
         if render:
             env.render('rgb_array')
