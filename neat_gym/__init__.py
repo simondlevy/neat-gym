@@ -21,7 +21,8 @@ class _GymConfig(neat.Config):
         '''
 
         neat.Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat.DefaultStagnation, args.env+'.'+suffix)
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation, 
+                         args.cfgdir + '/' + args.env+'.' + suffix)
 
         self.env = gym.make(args.env)
 

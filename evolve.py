@@ -28,7 +28,7 @@ def _make_name(env_name, genome):
 def _read_config(args, ext):
 
     parser = ConfigParser()
-    parser.read(args.env + '.' + ext)
+    parser.read(args.cfgdir + '/' + args.env + '.' + ext)
     return parser
 
 
@@ -79,8 +79,8 @@ def main():
     # Parse command-line arguments
 
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
     parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
+    parser.add_argument('--cfgdir', required=False, default='./config', help='Directory for config files')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
     parser.add_argument('--hyper', dest='hyper', action='store_true', help='Use HyperNEAT')
