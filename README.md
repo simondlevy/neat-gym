@@ -1,4 +1,4 @@
-his repository contains code allowing you to train, test, and visualize
+This repository contains code allowing you to train, test, and visualize
 [OpenAI Gym](https://gym.openai.com/) environments (games) using the
 [NEAT](https://www.cse.unr.edu/~sushil/class/gas/papers/NEAT.pdf) algorithm.
 
