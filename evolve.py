@@ -146,10 +146,14 @@ def main():
         winner_cppn = neat.nn.FeedForwardNetwork.create(winner_genome, config)
         draw_net(winner_cppn, filename='visuals/%s-cppn' % fullname)
         winner_net = create_phenotype_network(winner_cppn, substrate)
-        node_names = {-idx:node_names[idx] for idx in node_names} # output of CPPN is recurrent, so negate indices
+
+        # Output of CPPN is recurrent, so negate indices
+        node_names = {j:node_names[k] for j,k in enumerate(node_names)} 
 
     else:
         winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
+
+    print(node_names)
 
     draw_net(winner_net, filename='visuals/%s' % fullname, node_names=node_names)
 
