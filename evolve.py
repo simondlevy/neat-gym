@@ -126,9 +126,6 @@ def main():
     # Run for number of generations specified in config file
     winner_genome = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
 
-    # Save the net(s) to a PDF file
-    name = _make_name(args.env, winner_genome)
-
     # Open nodenames file if available
     try:
         namescfg = _read_config(args, 'names')
@@ -141,15 +138,19 @@ def main():
     except:
         node_names = {}
 
+    # Save the net(s) to a PDF file
+
+    fullname = _make_name(args.env, winner_genome)
+
     if args.hyper:
         winner_cppn = neat.nn.FeedForwardNetwork.create(winner_genome, config)
         winner_net = create_phenotype_network(winner_cppn, substrate)
-        draw_net(winner_cppn, filename='visuals/%s_cppn' % name)
+        draw_net(winner_cppn, filename='visuals/%s_cppn' % fullname)
 
     else:
         winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
 
-    draw_net(winner_net, filename='visuals/'+_make_name(args.env, winner_genome), node_names=node_names)
+    draw_net(winner_net, filename='visuals/%s' % fullname, node_names=node_names)
 
 if __name__ == '__main__':
 
