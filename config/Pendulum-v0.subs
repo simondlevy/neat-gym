@@ -1,7 +1,7 @@
 [Coordinates]
 input  = [(-0.5, -1.), (0,-1), (0.5, -1.)]
-output = [(0, 1.)]
 hidden = [[(-1.0, 0.0), (0.0, 0.0), (1.0, 0.0)]]
+output = [(0, 1.)]
 
 [Activation]
 function = sigmoid
