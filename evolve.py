@@ -11,18 +11,12 @@ import multiprocessing as mp
 import os
 import neat
 import argparse
-import pickle
 import random
 
 from pureples.shared.substrate import Substrate
 from pureples.hyperneat.hyperneat import create_phenotype_network
-from pureples.shared.visualize import draw_net
 
 from neat_gym import eval_net, _GymConfig, _GymHyperConfig, _read_config
-
-def _make_name(env_name, genome, suffix=''):
-
-    return '%s%s%+f' % (env_name, suffix, genome.fitness)
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -37,10 +31,8 @@ class _SaveReporter(neat.reporting.BaseReporter):
 
         if self.best is None or best_genome.fitness > self.best:
             self.best = best_genome.fitness
-            filename = 'models/%s.dat' % (_make_name(self.env_name, best_genome, config.get_suffix()))
-            print('Saving %s' % filename)
-            net = neat.nn.FeedForwardNetwork.create(best_genome, config)
-            pickle.dump((config.get_net(net), config.env), open(filename, 'wb'))
+            print('############# Saving new best %f ##############' % self.best)
+            config.save_genome(best_genome)
 
 def _eval_genome(genome, config, net, activations):
 
@@ -117,21 +109,7 @@ def main():
     pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
 
     # Run for number of generations specified in config file
-    winner_genome = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
-
-    # Save the net(s) to a PDF file
-
-    fullname = _make_name(args.env, winner_genome)
-
-    if args.hyper:
-        winner_cppn = neat.nn.FeedForwardNetwork.create(winner_genome, config)
-        draw_net(winner_cppn, filename='visuals/%s-cppn' % fullname)
-        winner_net = create_phenotype_network(winner_cppn, substrate)
-
-    else:
-        winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
-
-    draw_net(winner_net, filename='visuals/%s' % fullname, node_names=config.node_names)
+    p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
 
 if __name__ == '__main__':
 

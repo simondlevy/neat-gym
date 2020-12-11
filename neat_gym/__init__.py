@@ -15,6 +15,11 @@ import neat
 import gym
 from gym import wrappers
 from pureples.hyperneat.hyperneat import create_phenotype_network
+from pureples.shared.visualize import draw_net
+
+def _make_name(env_name, genome, suffix=''):
+
+    return '%s%s%+f' % (env_name, suffix, genome.fitness)
 
 class _GymConfig(neat.Config):
 
@@ -27,6 +32,7 @@ class _GymConfig(neat.Config):
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, 
                          args.cfgdir + '/' + args.env+'.' + suffix)
 
+        self.env_name = args.env
         self.env = gym.make(args.env)
 
         self.reps = args.reps
@@ -48,14 +54,13 @@ class _GymConfig(neat.Config):
         if args.hyper:
             self.node_names = {j:self.node_names[k] for j,k in enumerate(self.node_names)} 
 
-    def get_net(self, net):
+    def save_genome(self, genome):
 
-        return net
+        name = _make_name(self.env_name, genome)
+        net = neat.nn.FeedForwardNetwork.create(genome, self)
+        pickle.dump((net, self.env), open('models/%s.dat' % name, 'wb'))
+        draw_net(net, filename='visuals/%s'%name)
 
-    def get_suffix(self):
-        
-        return ''
-            
 class _GymHyperConfig(_GymConfig):
 
     def __init__(self, args, substrate, actfun):
@@ -65,13 +70,14 @@ class _GymHyperConfig(_GymConfig):
         self.substrate = substrate
         self.actfun = actfun
 
-    def get_net(self, net):
+    def save_genome(self, genome):
 
-        return create_phenotype_network(net, self.substrate)
-
-    def get_suffix(self):
-        
-        return '-hyper'
+        name = _make_name(self.env_name, genome, suffix='-hyper')
+        cppn = neat.nn.FeedForwardNetwork.create(genome, self)
+        net = create_phenotype_network(cppn, self.substrate)
+        pickle.dump((net, self.env), open('models/%s.dat' % name, 'wb'))
+        draw_net(cppn, filename='visuals/%s-cppn' % name)
+        draw_net(net, filename='visuals/%s' % name, node_names=self.node_names)
 
 def _read_config(args, ext):
 
