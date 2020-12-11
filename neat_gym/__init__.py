@@ -55,7 +55,7 @@ class _GymConfig(neat.Config):
         name = self._make_name(genome)
         net = neat.nn.FeedForwardNetwork.create(genome, self)
         pickle.dump((net, self.env), open('models/%s.dat' % name, 'wb'))
-        draw_net(net, filename='visuals/%s'%name)
+        draw_net(net, filename='visuals/%s'%name, node_names=self.node_names)
 
     def _make_name(self, genome, suffix=''):
 
