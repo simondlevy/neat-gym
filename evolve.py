@@ -21,9 +21,9 @@ from pureples.shared.visualize import draw_net
 
 from neat_gym import eval_net, _GymConfig, _GymHyperConfig
 
-def _make_name(env_name, genome):
+def _make_name(env_name, genome, suffix=''):
 
-    return '%s%+f' % (env_name, genome.fitness)
+    return '%s%s%+f' % (env_name, suffix, genome.fitness)
 
 def _read_config(args, ext):
 
@@ -45,7 +45,7 @@ class _SaveReporter(neat.reporting.BaseReporter):
 
         if self.best is None or best_genome.fitness > self.best:
             self.best = best_genome.fitness
-            filename = 'models/%s.dat' % _make_name(self.env_name, best_genome)
+            filename = 'models/%s.dat' % (_make_name(self.env_name, best_genome, config.get_suffix()))
             print('Saving %s' % filename)
             net = neat.nn.FeedForwardNetwork.create(best_genome, config)
             pickle.dump((config.get_net(net), config.env), open(filename, 'wb'))

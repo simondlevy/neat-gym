@@ -34,6 +34,10 @@ class _GymConfig(neat.Config):
     def get_net(self, net):
 
         return net
+
+    def get_suffix(self):
+        
+        return ''
             
 class _GymHyperConfig(_GymConfig):
 
@@ -47,6 +51,10 @@ class _GymHyperConfig(_GymConfig):
     def get_net(self, net):
 
         return create_phenotype_network(net, self.substrate)
+
+    def get_suffix(self):
+        
+        return '-hyper'
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''
