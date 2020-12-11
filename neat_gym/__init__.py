@@ -13,6 +13,7 @@ import numpy as np
 import neat
 import gym
 from gym import wrappers
+from pureples.hyperneat.hyperneat import create_phenotype_network
 
 class _GymConfig(neat.Config):
 
@@ -30,6 +31,10 @@ class _GymConfig(neat.Config):
         self.reps = args.reps
         self.seed = args.seed
 
+    def get_net(self, genome):
+
+        return neat.nn.FeedForwardNetwork.create(genome, self)
+            
 class _GymHyperConfig(_GymConfig):
 
     def __init__(self, args, substrate, actfun):
@@ -38,6 +43,11 @@ class _GymHyperConfig(_GymConfig):
 
         self.substrate = substrate
         self.actfun = actfun
+
+    def get_net(self, genome):
+
+        cppn = neat.nn.FeedForwardNetwork.create(genome, self)
+        return create_phenotype_network(cppn, self.substrate)
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''
@@ -93,8 +103,8 @@ def read_file(allow_record=False):
         parser.add_argument('--record', default=None, help='If specified, sets the recording dir')
     args = parser.parse_args()
 
-    # Load genome and configuration from pickled file
-    genome, config = pickle.load(open(args.filename, 'rb'))
+    # Load net and environment from pickled file
+    net, env = pickle.load(open(args.filename, 'rb'))
 
     # Return genome, config, and optional save flag
-    return genome, config, args.record if allow_record else None
+    return net, env, args.record if allow_record else None
