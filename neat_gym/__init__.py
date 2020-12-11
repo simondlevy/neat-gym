@@ -54,7 +54,7 @@ class _GymConfig(neat.Config):
 
         name = self._make_name(genome)
         net = neat.nn.FeedForwardNetwork.create(genome, self)
-        pickle.dump((net, self.env), open('models/%s.dat' % name, 'wb'))
+        pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
         draw_net(net, filename='visuals/%s'%name, node_names=self.node_names)
 
     def _make_name(self, genome, suffix=''):
@@ -74,7 +74,7 @@ class _GymHyperConfig(_GymConfig):
 
         cppn = neat.nn.FeedForwardNetwork.create(genome, self)
         net = create_phenotype_network(cppn, self.substrate)
-        pickle.dump((net, self.env), open('models/%s.dat' % self._make_name(genome, suffix='-hyper'), 'wb'))
+        pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-hyper'), 'wb'))
         draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'))
         draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-hyper'), node_names=self.node_names)
 
