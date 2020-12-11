@@ -72,12 +72,11 @@ class _GymHyperConfig(_GymConfig):
 
     def save_genome(self, genome):
 
-        name = self._make_name(genome, suffix='-hyper')
         cppn = neat.nn.FeedForwardNetwork.create(genome, self)
         net = create_phenotype_network(cppn, self.substrate)
-        pickle.dump((net, self.env), open('models/%s.dat' % name, 'wb'))
-        draw_net(cppn, filename='visuals/%s-cppn' % name)
-        draw_net(net, filename='visuals/%s' % name, node_names=self.node_names)
+        pickle.dump((net, self.env), open('models/%s.dat' % self._make_name(genome, suffix='-hyper'), 'wb'))
+        draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'))
+        draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-hyper'), node_names=self.node_names)
 
 def _read_config(args, ext):
 
