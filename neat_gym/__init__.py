@@ -31,9 +31,9 @@ class _GymConfig(neat.Config):
         self.reps = args.reps
         self.seed = args.seed
 
-    def get_net(self, genome):
+    def get_net(self, net):
 
-        return neat.nn.FeedForwardNetwork.create(genome, self)
+        return net
             
 class _GymHyperConfig(_GymConfig):
 
@@ -44,10 +44,9 @@ class _GymHyperConfig(_GymConfig):
         self.substrate = substrate
         self.actfun = actfun
 
-    def get_net(self, genome):
+    def get_net(self, net):
 
-        cppn = neat.nn.FeedForwardNetwork.create(genome, self)
-        return create_phenotype_network(cppn, self.substrate)
+        return create_phenotype_network(net, self.substrate)
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''

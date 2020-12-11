@@ -47,7 +47,8 @@ class _SaveReporter(neat.reporting.BaseReporter):
             self.best = best_genome.fitness
             filename = 'models/%s.dat' % _make_name(self.env_name, best_genome)
             print('Saving %s' % filename)
-            pickle.dump((config.get_net(best_genome), config.env), open(filename, 'wb'))
+            net = neat.nn.FeedForwardNetwork.create(best_genome, config)
+            pickle.dump((config.get_net(net), config.env), open(filename, 'wb'))
 
 def _eval_genome(genome, config, net, activations):
 
