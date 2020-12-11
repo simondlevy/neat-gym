@@ -20,16 +20,17 @@ from neat_gym import eval_net, _GymConfig, _GymHyperConfig, _read_config
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
-    def __init__(self, env_name):
+    def __init__(self, env_name, checkpoint):
 
         neat.reporting.BaseReporter.__init__(self)
 
         self.best = None
         self.env_name = env_name
+        self.checkpoint = checkpoint
 
     def post_evaluate(self, config, population, species, best_genome):
 
-        if self.best is None or best_genome.fitness > self.best:
+        if self.checkpoint and (self.best is None or best_genome.fitness > self.best):
             self.best = best_genome.fitness
             print('############# Saving new best %f ##############' % self.best)
             config.save_genome(best_genome)
@@ -65,6 +66,7 @@ def main():
 
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
+    parser.add_argument('--checkpoint', dest='checkpoint', action='store_true', help='Save at each new best')
     parser.add_argument('--cfgdir', required=False, default='./config', help='Directory for config files')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
@@ -102,14 +104,17 @@ def main():
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     
-    # Add a reporter to save the best
-    p.add_reporter(_SaveReporter(args.env))
+    # Add a reporter (which can also checkpoint the best)
+    p.add_reporter(_SaveReporter(args.env, args.checkpoint))
 
     # Create a parallel fitness evaluator
     pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
 
     # Run for number of generations specified in config file
-    p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
+    winner = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
+
+    # Save winner
+    config.save_genome(winner)
 
 if __name__ == '__main__':
 
