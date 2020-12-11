@@ -13,24 +13,16 @@ import neat
 import argparse
 import pickle
 import random
-from configparser import ConfigParser
 
 from pureples.shared.substrate import Substrate
 from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.shared.visualize import draw_net
 
-from neat_gym import eval_net, _GymConfig, _GymHyperConfig
+from neat_gym import eval_net, _GymConfig, _GymHyperConfig, _read_config
 
 def _make_name(env_name, genome, suffix=''):
 
     return '%s%s%+f' % (env_name, suffix, genome.fitness)
-
-def _read_config(args, ext):
-
-    parser = ConfigParser()
-    parser.read(args.cfgdir + '/' + args.env + '.' + ext)
-    return parser
-
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -127,18 +119,6 @@ def main():
     # Run for number of generations specified in config file
     winner_genome = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
 
-    # Open nodenames file if available
-    try:
-        namescfg = _read_config(args, 'names')
-        names =  namescfg['Names']
-        node_names = {}
-        for idx,name in enumerate(eval(names['input'])):
-            node_names[-idx-1] = name
-        for idx,name in enumerate(eval(names['output'])):
-            node_names[idx] = name
-    except:
-        node_names = {}
-
     # Save the net(s) to a PDF file
 
     fullname = _make_name(args.env, winner_genome)
@@ -148,13 +128,10 @@ def main():
         draw_net(winner_cppn, filename='visuals/%s-cppn' % fullname)
         winner_net = create_phenotype_network(winner_cppn, substrate)
 
-        # Output of CPPN is recurrent, so negate indices
-        node_names = {j:node_names[k] for j,k in enumerate(node_names)} 
-
     else:
         winner_net = neat.nn.FeedForwardNetwork.create(winner_genome, config)
 
-    draw_net(winner_net, filename='visuals/%s' % fullname, node_names=node_names)
+    draw_net(winner_net, filename='visuals/%s' % fullname, node_names=config.node_names)
 
 if __name__ == '__main__':
 

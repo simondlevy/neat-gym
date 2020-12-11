@@ -10,6 +10,7 @@ import argparse
 import pickle
 import time
 import numpy as np
+from configparser import ConfigParser
 import neat
 import gym
 from gym import wrappers
@@ -30,6 +31,22 @@ class _GymConfig(neat.Config):
 
         self.reps = args.reps
         self.seed = args.seed
+
+        # Open nodenames file if available
+        try:
+            namescfg = _read_config(args, 'names')
+            names =  namescfg['Names']
+            self.node_names = {}
+            for idx,name in enumerate(eval(names['input'])):
+                self.node_names[-idx-1] = name
+            for idx,name in enumerate(eval(names['output'])):
+                self.node_names[idx] = name
+        except:
+            self.node_names = {}
+
+        # Output of CPPN is recurrent, so negate indices
+        if args.hyper:
+            self.node_names = {j:self.node_names[k] for j,k in enumerate(self.node_names)} 
 
     def get_net(self, net):
 
@@ -55,6 +72,12 @@ class _GymHyperConfig(_GymConfig):
     def get_suffix(self):
         
         return '-hyper'
+
+def _read_config(args, ext):
+
+    parser = ConfigParser()
+    parser.read(args.cfgdir + '/' + args.env + '.' + ext)
+    return parser
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''
