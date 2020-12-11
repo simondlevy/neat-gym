@@ -7,12 +7,13 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
+import gym
 from neat_gym import read_file, eval_net
 
 if __name__ == '__main__':
 
     # Load genome and configuration from pickled file
-    net, env, record_dir = read_file(allow_record=True)
+    net, env_name, record_dir = read_file(allow_record=True)
 
-    # Run the network
-    print('%6.6f' % eval_net(net, env, render=True, record_dir=record_dir))
+    # Run the network on the environment
+    print('%6.6f' % eval_net(net, gym.make(env_name), render=True, record_dir=record_dir))
