@@ -34,9 +34,8 @@ class _GymConfig(neat.Config):
         self.reps = args.reps
         self.seed = args.seed
 
-        # Open nodenames file if available
         try:
-            namescfg = _read_config(args, 'names')
+            namescfg = _read_config(args, ext)
             names =  namescfg['Names']
             self.node_names = {}
             for idx,name in enumerate(eval(names['input'])):

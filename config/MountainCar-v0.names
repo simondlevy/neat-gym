@@ -1,9 +1,0 @@
-# Node names configuration for MountainCar-v0
-#
-# Copyright (C) 2020 Simon D. Levy
-#
-# MIT License
-
-[Names]
-input  = ['pos', 'vel']
-output = ['left', 'none', 'right']

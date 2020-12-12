@@ -87,3 +87,6 @@ hidden = [[(-0.5, 0.5), (0.5, 0.5)], [(0.0, 0.0)], [(-0.5, -0.5), (0.5, -0.5)]]
 output = [(-0.5, 1.), (0.,1.), (0.5, 1.)]
 function = sigmoid
 
+[Names]
+input  = ['pos', 'vel']
+output = ['left', 'none', 'right']
