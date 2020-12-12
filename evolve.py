@@ -71,8 +71,7 @@ def main():
     parser.add_argument('--cfgdir', required=False, default='./config', help='Directory for config files')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
-    parser.add_argument('--hyper', dest='hyper', action='store_true', help='Use HyperNEAT')
-    parser.add_argument('--wyper', dest='hyperhid', help='Use HyperNEAT with specified hidden-unit layout')
+    parser.add_argument('--hyper', dest='hyperhid', help='Use HyperNEAT with specified hidden-unit layout')
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
 
@@ -84,11 +83,11 @@ def main():
     os.makedirs('visuals', exist_ok=True)
 
     # If HyperNEAT was requested, use it
-    if args.hyper:
+    if args.hyperhid is not None:
         cppncfg = _read_config(args, 'cppn')
         subs =  cppncfg['Substrate']
-        hidden = eval(subs['hidden'])
-        print(hidden)
+        nhids = [int(n) for n in args.hyperhid.split(',')]
+        hidden = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
         substrate = Substrate(eval(subs['input']), eval(subs['output']), hidden)
         actfun = subs['function']
         config = _GymHyperConfig(args, substrate, actfun)
@@ -99,12 +98,6 @@ def main():
 
         config = _GymConfig(args)
         evalfun = _eval_genome_neat
-
-    if args.hyperhid is not None:
-        nhids = [int(n) for n in args.hyperhid.split(',')]
-        hids = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
-        print(hids)
-        exit(0)
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
