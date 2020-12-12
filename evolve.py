@@ -87,7 +87,9 @@ def main():
     if args.hyper:
         cppncfg = _read_config(args, 'cppn')
         subs =  cppncfg['Substrate']
-        substrate = Substrate(eval(subs['input']), eval(subs['output']), eval(subs['hidden']))
+        hidden = eval(subs['hidden'])
+        print(hidden)
+        substrate = Substrate(eval(subs['input']), eval(subs['output']), hidden)
         actfun = subs['function']
         config = _GymHyperConfig(args, substrate, actfun)
         evalfun = _eval_genome_hyper
@@ -99,8 +101,9 @@ def main():
         evalfun = _eval_genome_neat
 
     if args.hyperhid is not None:
-        hidden = [list(np.linspace(-1,+1,int(n))) for n in args.hyperhid.split(',')]
-        print(hidden)
+        nhids = [int(n) for n in args.hyperhid.split(',')]
+        hids = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
+        print(hids)
         exit(0)
 
     # Create the population, which is the top-level object for a NEAT run.
