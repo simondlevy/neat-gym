@@ -83,10 +83,10 @@ def main():
 
     # If HyperNEAT was requested, use it
     if args.hyper:
-        subscfg = _read_config(args, 'subs')
-        coords =  subscfg['Coordinates']
-        substrate = Substrate(eval(coords['input']), eval(coords['output']), eval(coords['hidden']))
-        actfun = subscfg['Activation']['function']
+        cppncfg = _read_config(args, 'cppn')
+        subs =  cppncfg['Substrate']
+        substrate = Substrate(eval(subs['input']), eval(subs['output']), eval(subs['hidden']))
+        actfun = subs['function']
         config = _GymHyperConfig(args, substrate, actfun)
         evalfun = _eval_genome_hyper
 
