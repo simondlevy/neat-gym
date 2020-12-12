@@ -19,14 +19,14 @@ from pureples.shared.visualize import draw_net
 
 class _GymConfig(neat.Config):
 
-    def __init__(self, args, suffix='cfg'):
+    def __init__(self, args, ext='cfg'):
         '''
         env_name names environment and config file
         '''
 
         neat.Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-                         args.cfgdir + '/' + args.env+'.' + suffix)
+                         args.cfgdir + '/' + args.env+'.' + ext)
 
         self.env_name = args.env
         self.env = gym.make(args.env)
@@ -44,10 +44,6 @@ class _GymConfig(neat.Config):
                 self.node_names[idx] = name
         except:
             self.node_names = {}
-
-        # Output of CPPN is recurrent, so negate indices
-        if args.hyper:
-            self.node_names = {j:self.node_names[k] for j,k in enumerate(self.node_names)} 
 
     def save_genome(self, genome):
 
@@ -68,6 +64,9 @@ class _GymHyperConfig(_GymConfig):
 
         self.substrate = substrate
         self.actfun = actfun
+
+        # Output of CPPN is recurrent, so negate indices
+        self.node_names = {j:self.node_names[k] for j,k in enumerate(self.node_names)} 
 
     def save_genome(self, genome):
 
