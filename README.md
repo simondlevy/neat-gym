@@ -45,8 +45,12 @@ your Gym environment.  To make these functions available other projects (e.g.,
 % sudo python3 setup.py install
 ```
 
-## Similar projects
+## Related projects
 
-[neat-openai-gym](https://github.com/sroj/neat-openai-gym)
+* [neat-openai-gym](https://github.com/sroj/neat-openai-gym)
 
-[OpenAI-NEAT](https://github.com/HackerShackOfficial/OpenAI-NEAT)
+* [OpenAI-NEAT](https://github.com/HackerShackOfficial/OpenAI-NEAT)
+
+* [AC-Gym](https://github.com/simondlevy/AC-Gym)
+
+* [CMA-Gym](https://github.com/simondlevy/CMA-Gym)
