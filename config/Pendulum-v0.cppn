@@ -90,7 +90,6 @@ survival_threshold = 0.2
 
 [Substrate]
 input  = [(-0.5, -1.), (0,-1), (0.5, -1.)]
-hidden = [[(-1.0, 0.0), (0.0, 0.0), (1.0, 0.0)]]
 output = [(0, 1.)]
 function = sigmoid
 
