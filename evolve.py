@@ -7,6 +7,7 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
+import numpy as np
 import multiprocessing as mp
 import os
 import neat
@@ -98,7 +99,8 @@ def main():
         evalfun = _eval_genome_neat
 
     if args.hyperhid is not None:
-        print(args.hyperhid)
+        hidden = [list(np.linspace(-1,+1,int(n))) for n in args.hyperhid.split(',')]
+        print(hidden)
         exit(0)
 
     # Create the population, which is the top-level object for a NEAT run.
