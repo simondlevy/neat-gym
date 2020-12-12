@@ -71,6 +71,7 @@ def main():
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
     parser.add_argument('--hyper', dest='hyper', action='store_true', help='Use HyperNEAT')
+    parser.add_argument('--wyper', dest='hyperhid', help='Use HyperNEAT with specified hidden-unit layout')
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
 
@@ -95,6 +96,10 @@ def main():
 
         config = _GymConfig(args)
         evalfun = _eval_genome_neat
+
+    if args.hyperhid is not None:
+        print(args.hyperhid)
+        exit(0)
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
