@@ -79,8 +79,9 @@ class _GymHyperConfig(_GymConfig):
 def _read_config(args, ext):
 
     parser = ConfigParser()
-    parser.read(args.cfgdir + '/' + args.env + '.' + ext)
-    return parser
+    filename = args.cfgdir + '/' + args.env + '.' + ext
+    parser.read(filename)
+    return parser, filename
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''

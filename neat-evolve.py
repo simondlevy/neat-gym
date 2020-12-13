@@ -83,21 +83,25 @@ def main():
     os.makedirs('visuals', exist_ok=True)
 
     # If HyperNEAT was requested, use it
-    if args.hyperhid is not None:
-        cppncfg = _read_config(args, 'cppn')
-        subs =  cppncfg['Substrate']
-        nhids = [int(n) for n in args.hyperhid.split(',')]
-        hidden = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
-        substrate = Substrate(eval(subs['input']), eval(subs['output']), hidden)
-        actfun = subs['function']
-        config = _GymHyperConfig(args, substrate, actfun)
-        evalfun = _eval_genome_hyper
+    try:
+        if args.hyperhid is not None:
+            cppncfg,cfgname = _read_config(args, 'cppn')
+            subs =  cppncfg['Substrate']
+            nhids = [int(n) for n in args.hyperhid.split(',')]
+            hidden = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
+            substrate = Substrate(eval(subs['input']), eval(subs['output']), hidden)
+            actfun = subs['function']
+            config = _GymHyperConfig(args, substrate, actfun)
+            evalfun = _eval_genome_hyper
 
-    # Otherwise, use NEAT
-    else:
+        # Otherwise, use NEAT
+        else:
 
-        config = _GymConfig(args)
-        evalfun = _eval_genome_neat
+            config, cfgname = _GymConfig(args)
+            evalfun = _eval_genome_neat
+    except:
+        print('Unable to read config file ' + cfgname)
+        exit(1)
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
