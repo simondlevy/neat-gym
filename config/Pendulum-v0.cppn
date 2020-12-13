@@ -15,8 +15,10 @@ reset_on_extinction   = False
 
 [DefaultGenome]
 
-# network parameters
-num_inputs              = 5
+# must always be 5 for PUREPLES HyperNEAT implementation
+num_inputs              = 5 
+
+# user-settable
 num_hidden              = 0
 num_outputs             = 1
 
