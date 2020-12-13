@@ -9,6 +9,7 @@ MIT License
 import argparse
 import pickle
 import time
+import os
 import numpy as np
 from configparser import ConfigParser
 import neat
@@ -24,10 +25,13 @@ class _GymConfig(neat.Config):
         env_name names environment and config file
         '''
 
+        filename = args.cfgdir + '/' + args.env+'.' + ext
+        assert(os.path.isfile(filename))
+
         neat.Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-                         args.cfgdir + '/' + args.env+'.' + ext)
-
+                         filename)
+                         
         self.env_name = args.env
         self.env = gym.make(args.env)
 
@@ -35,7 +39,7 @@ class _GymConfig(neat.Config):
         self.seed = args.seed
 
         try:
-            namescfg = _read_config(args, ext)
+            namescfg = _GymConfig.load(args, ext)
             names =  namescfg['Names']
             self.node_names = {}
             for idx,name in enumerate(eval(names['input'])):
@@ -44,6 +48,18 @@ class _GymConfig(neat.Config):
                 self.node_names[idx] = name
         except:
             self.node_names = {}
+
+    @staticmethod
+    def load(args, ext):
+
+        filename = args.cfgdir + '/' + args.env+'.' + ext
+        if not os.path.isfile(filename):
+            print('Cannot open config file ' + filename)
+            exit(1)
+
+        parser = ConfigParser()
+        parser.read(filename)
+        return parser
 
     def save_genome(self, genome):
 
@@ -75,13 +91,6 @@ class _GymHyperConfig(_GymConfig):
         pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-hyper'), 'wb'))
         draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'))
         draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-hyper'), node_names=self.node_names)
-
-def _read_config(args, ext):
-
-    parser = ConfigParser()
-    filename = args.cfgdir + '/' + args.env + '.' + ext
-    parser.read(filename)
-    return parser, filename
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''

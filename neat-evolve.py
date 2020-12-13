@@ -17,7 +17,7 @@ import random
 from pureples.shared.substrate import Substrate
 from pureples.hyperneat.hyperneat import create_phenotype_network
 
-from neat_gym import eval_net, _GymConfig, _GymHyperConfig, _read_config
+from neat_gym import eval_net, _GymConfig, _GymHyperConfig
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -83,25 +83,22 @@ def main():
     os.makedirs('visuals', exist_ok=True)
 
     # If HyperNEAT was requested, use it
-    try:
-        if args.hyperhid is not None:
-            cppncfg,cfgname = _read_config(args, 'cppn')
-            subs =  cppncfg['Substrate']
-            nhids = [int(n) for n in args.hyperhid.split(',')]
-            hidden = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
-            substrate = Substrate(eval(subs['input']), eval(subs['output']), hidden)
-            actfun = subs['function']
-            config = _GymHyperConfig(args, substrate, actfun)
-            evalfun = _eval_genome_hyper
+    if args.hyperhid is not None:
 
-        # Otherwise, use NEAT
-        else:
+        cppncfg = _GymConfig.load(args, 'cppn')
+        subs =  cppncfg['Substrate']
+        nhids = [int(n) for n in args.hyperhid.split(',')]
+        hidden = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
+        substrate = Substrate(eval(subs['input']), eval(subs['output']), hidden)
+        actfun = subs['function']
+        config = _GymHyperConfig(args, substrate, actfun)
+        evalfun = _eval_genome_hyper
 
-            config, cfgname = _GymConfig(args)
-            evalfun = _eval_genome_neat
-    except:
-        print('Unable to read config file ' + cfgname)
-        exit(1)
+    # Otherwise, use NEAT
+    else:
+
+        config = _GymConfig(args)
+        evalfun = _eval_genome_neat
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
