@@ -73,7 +73,7 @@ class _GymConfig(neat.Config):
 
     def _make_name(self, genome, suffix=''):
 
-        return '%s%s%+f' % (self.env_name, suffix, genome.fitness)
+        return '%s%s%+010.3f' % (self.env_name, suffix, genome.fitness)
 
 class _GymHyperConfig(_GymConfig):
 
