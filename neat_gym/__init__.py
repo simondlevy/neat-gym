@@ -26,7 +26,10 @@ class _GymConfig(neat.Config):
         '''
 
         filename = args.cfgdir + '/' + args.env+'.' + ext
-        assert(os.path.isfile(filename))
+
+        if not os.path.isfile(filename):
+            print('Unable to open config file ' + filename)
+            exit(1)
 
         neat.Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, 
@@ -146,8 +149,8 @@ def read_file(allow_record=False):
         parser.add_argument('--record', default=None, help='If specified, sets the recording dir')
     args = parser.parse_args()
 
-    # Load net and environment from pickled file
-    net, env = pickle.load(open(args.filename, 'rb'))
+    # Load net and environment name from pickled file
+    net, env_name = pickle.load(open(args.filename, 'rb'))
 
     # Return genome, config, and optional save flag
-    return net, env, args.record if allow_record else None
+    return net, env_name, args.record if allow_record else None
