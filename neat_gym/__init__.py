@@ -10,17 +10,94 @@ import argparse
 import pickle
 import time
 import os
-import numpy as np
+import warnings
 from configparser import ConfigParser
+import numpy as np
 import neat
+from neat.config import ConfigParameter, UnknownConfigItemError
 import gym
 from gym import wrappers
 from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.shared.visualize import draw_net
 
-class _GymConfig(neat.Config):
+class _Config(object):
+    #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
-    def __init__(self, args, suffix=''):
+    __params = [ConfigParameter('pop_size', int),
+                ConfigParameter('fitness_criterion', str),
+                ConfigParameter('fitness_threshold', float),
+                ConfigParameter('reset_on_extinction', bool),
+                ConfigParameter('no_fitness_termination', bool, False)]
+
+    def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename, cppn_dict):
+
+        # Check that the provided types have the required methods.
+        assert hasattr(genome_type, 'parse_config')
+        assert hasattr(reproduction_type, 'parse_config')
+        assert hasattr(species_set_type, 'parse_config')
+        assert hasattr(stagnation_type, 'parse_config')
+
+        self.genome_type = genome_type
+        self.reproduction_type = reproduction_type
+        self.species_set_type = species_set_type
+        self.stagnation_type = stagnation_type
+
+        if not os.path.isfile(filename):
+            raise Exception('No such config file: ' + os.path.abspath(filename))
+
+        parameters = ConfigParser()
+        with open(filename) as f:
+            if hasattr(parameters, 'read_file'):
+                parameters.read_file(f)
+            else:
+                parameters.readfp(f)
+
+        # NEAT configuration
+        if not parameters.has_section('NEAT'):
+            raise RuntimeError("'NEAT' section not found in NEAT configuration file.")
+
+        param_list_names = []
+        for p in self.__params:
+            if p.default is None:
+                setattr(self, p.name, p.parse('NEAT', parameters))
+            else:
+                try:
+                    setattr(self, p.name, p.parse('NEAT', parameters))
+                except Exception:
+                    setattr(self, p.name, p.default)
+                    warnings.warn("Using default {!r} for '{!s}'".format(p.default, p.name),
+                                  DeprecationWarning)
+            param_list_names.append(p.name)
+        param_dict = dict(parameters.items('NEAT'))
+        unknown_list = [x for x in param_dict if x not in param_list_names]
+        if unknown_list:
+            if len(unknown_list) > 1:
+                raise UnknownConfigItemError("Unknown (section 'NEAT') configuration items:\n" +
+                                             "\n\t".join(unknown_list))
+            raise UnknownConfigItemError(
+                "Unknown (section 'NEAT') configuration item {!s}".format(unknown_list[0]))
+
+        # Parse type sections.
+        genome_dict = dict(parameters.items(genome_type.__name__))
+
+        # Add CPPN inputs/output (always 5/1) if specified 
+        for key in cppn_dict:
+            genome_dict[key] = cppn_dict[key]
+
+        self.genome_config = genome_type.parse_config(genome_dict)
+
+        species_set_dict = dict(parameters.items(species_set_type.__name__))
+        self.species_set_config = species_set_type.parse_config(species_set_dict)
+
+        stagnation_dict = dict(parameters.items(stagnation_type.__name__))
+        self.stagnation_config = stagnation_type.parse_config(stagnation_dict)
+
+        reproduction_dict = dict(parameters.items(reproduction_type.__name__))
+        self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
+
+class _GymConfig(_Config):
+
+    def __init__(self, args, suffix='', cppn_dict={}):
         '''
         env_name names environment and config file
         '''
@@ -31,10 +108,10 @@ class _GymConfig(neat.Config):
             print('Unable to open config file ' + filename)
             exit(1)
 
-        neat.Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-                         filename)
-                         
+        _Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
+                neat.DefaultSpeciesSet, neat.DefaultStagnation, 
+                filename, cppn_dict)
+
         self.env_name = args.env
         self.env = gym.make(args.env)
 
@@ -80,7 +157,7 @@ class _GymHyperConfig(_GymConfig):
 
     def __init__(self, args, substrate, actfun):
 
-        _GymConfig.__init__(self, args, '-hyper')
+        _GymConfig.__init__(self, args, '-hyper', {'num_inputs':5, 'num_outputs':1})
 
         self.substrate = substrate
         self.actfun = actfun
