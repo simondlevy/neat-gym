@@ -88,12 +88,15 @@ class _GymHyperConfig(_GymConfig):
         # Output of CPPN is recurrent, so negate indices
         self.node_names = {j:self.node_names[k] for j,k in enumerate(self.node_names)} 
 
+        # CPPN itself always has the same input and output nodes XXX are these correct?
+        self.cppn_node_names = {-1:'x1', -2:'y1', -3:'x2', -4:'y2', -5:'bias', 0:'weight'}
+
     def save_genome(self, genome):
 
         cppn = neat.nn.FeedForwardNetwork.create(genome, self)
         net = create_phenotype_network(cppn, self.substrate)
         pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-hyper'), 'wb'))
-        draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'))
+        draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'), node_names=self.cppn_node_names)
         draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-hyper'), node_names=self.node_names)
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
