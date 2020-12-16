@@ -71,7 +71,7 @@ def main():
     parser.add_argument('--cfgdir', required=False, default='./config', help='Directory for config files')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
-    parser.add_argument('--hyper', dest='hyperhid', help='Use HyperNEAT with specified hidden-unit layout')
+    parser.add_argument('--hyper', dest='hyperhid', help='Use HyperNEAT with specified hidden-unit layout or ES')
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
 
@@ -86,13 +86,25 @@ def main():
     if args.hyperhid is not None:
 
         cppncfg = _GymConfig.load(args, '-hyper')
-        subs =  cppncfg['Substrate']
-        nhids = [int(n) for n in args.hyperhid.split(',')]
-        hidden = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
-        substrate = Substrate(eval(subs['input']), eval(subs['output']), hidden)
-        actfun = subs['function']
-        config = _GymHyperConfig(args, substrate, actfun)
-        evalfun = _eval_genome_hyper
+
+        if args.hyperhid == 'es':
+            pass
+
+        else:
+
+            subs =  cppncfg['Substrate']
+            actfun = subs['function']
+
+            try:
+                nhids = [int(n) for n in args.hyperhid.split(',')]
+            except:
+                print('Hidden-unit layout should be a number or tuple of numbers')
+                exit(1)
+
+            hidden = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
+            evalfun = _eval_genome_hyper
+            substrate = Substrate(eval(subs['input']), eval(subs['output']), hidden)
+            config = _GymHyperConfig(args, substrate, actfun)
 
     # Otherwise, use NEAT
     else:
