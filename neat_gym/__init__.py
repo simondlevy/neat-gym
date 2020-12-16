@@ -41,8 +41,9 @@ class _GymConfig(neat.Config):
         self.reps = args.reps
         self.seed = args.seed
 
+        namescfg = _GymConfig.load(args, suffix)
+
         try:
-            namescfg = _GymConfig.load(args, ext)
             names =  namescfg['Names']
             self.node_names = {}
             for idx,name in enumerate(eval(names['input'])):
