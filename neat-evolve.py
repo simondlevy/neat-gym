@@ -85,7 +85,7 @@ def main():
     # If HyperNEAT was requested, use it
     if args.hyperhid is not None:
 
-        cppncfg = _GymConfig.load(args, 'cppn')
+        cppncfg = _GymConfig.load(args, '-hyper')
         subs =  cppncfg['Substrate']
         nhids = [int(n) for n in args.hyperhid.split(',')]
         hidden = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]

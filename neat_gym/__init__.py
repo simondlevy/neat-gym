@@ -20,12 +20,12 @@ from pureples.shared.visualize import draw_net
 
 class _GymConfig(neat.Config):
 
-    def __init__(self, args, ext='cfg'):
+    def __init__(self, args, suffix=''):
         '''
         env_name names environment and config file
         '''
 
-        filename = args.cfgdir + '/' + args.env+'.' + ext
+        filename = args.cfgdir + '/' + args.env + suffix + '.cfg'
 
         if not os.path.isfile(filename):
             print('Unable to open config file ' + filename)
@@ -53,9 +53,9 @@ class _GymConfig(neat.Config):
             self.node_names = {}
 
     @staticmethod
-    def load(args, ext):
+    def load(args, suffix):
 
-        filename = args.cfgdir + '/' + args.env+'.' + ext
+        filename = args.cfgdir + '/' + args.env + suffix + '.cfg'
         if not os.path.isfile(filename):
             print('Cannot open config file ' + filename)
             exit(1)
@@ -79,7 +79,7 @@ class _GymHyperConfig(_GymConfig):
 
     def __init__(self, args, substrate, actfun):
 
-        _GymConfig.__init__(self, args, 'cppn')
+        _GymConfig.__init__(self, args, '-hyper')
 
         self.substrate = substrate
         self.actfun = actfun
