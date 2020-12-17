@@ -10,12 +10,14 @@ MIT License
 import numpy as np
 import multiprocessing as mp
 import os
-import neat
 import argparse
 import random
 
+import neat
+
 from pureples.shared.substrate import Substrate
 from pureples.hyperneat.hyperneat import create_phenotype_network
+from pureples.es_hyperneat.es_hyperneat import ESNetwork
 
 from neat_gym import eval_net, _GymConfig, _GymHyperConfig, _GymEsHyperConfig
 
@@ -61,6 +63,17 @@ def _eval_genome_hyper(genome, config):
 
     return _eval_genome(genome, config, net, activations)
 
+def _eval_genome_eshyper(genome, config):
+
+    cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+    #esnet = ESNetwork(config.substrate, cppn, params)
+    #net = esnet.create_phenotype_network()
+
+    #activations = len(config.substrate.hidden_coordinates) + 2
+
+    #return _eval_genome(genome, config, net, activations)
+    return 0
+
 def main():
 
     # Parse command-line arguments
@@ -94,7 +107,7 @@ def main():
         if args.hyperhid == 'es':
 
             substrate = Substrate(inp, out)
-            config = _GymEsHyperConfig(args, substrate, actfun)
+            cfg = _GymEsHyperConfig(args, substrate, actfun)
             exit(0)
 
         else:
