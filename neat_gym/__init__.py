@@ -231,12 +231,8 @@ class _GymEsHyperConfig(_GymHyperConfig):
 
         cppn = neat.nn.FeedForwardNetwork.create(genome, config)
         esnet = ESNetwork(config.substrate, cppn, config.params)
-        #net = esnet.create_phenotype_network()
-
-        #activations = len(config.substrate.hidden_coordinates) + 2
-
-        #return _Config.eval_genome(genome, config, net, activations)
-        return 0
+        net = esnet.create_phenotype_network()
+        return _Config.eval_genome(genome, config, net, esnet.activations)
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''
