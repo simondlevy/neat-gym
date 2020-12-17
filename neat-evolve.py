@@ -85,12 +85,12 @@ def main():
     # If HyperNEAT was requested, use it
     if args.hyperhid is not None:
 
-        cppncfg = _GymConfig.load(args, '-hyper')
-
         if args.hyperhid == 'es':
             pass
 
         else:
+
+            cppncfg = _GymConfig.load(args, '-hyper')
 
             subs =  cppncfg['Substrate']
             actfun = subs['function']
