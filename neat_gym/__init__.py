@@ -226,6 +226,15 @@ class _GymEsHyperConfig(_GymHyperConfig):
 
         _GymHyperConfig.__init__(self, args, substrate, actfun, suffix='-eshyper')
 
+    def save_genome(self, genome):
+
+        cppn = neat.nn.FeedForwardNetwork.create(genome, self)
+        esnet = ESNetwork(self.substrate, cppn, self.params)
+        net = esnet.create_phenotype_network()
+        pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-eshyper'), 'wb'))
+        draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'), node_names=self.cppn_node_names)
+        draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-eshyper'), node_names=self.node_names)
+
     @staticmethod
     def eval_genome(genome, config):
 
