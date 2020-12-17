@@ -34,7 +34,7 @@ class _Config(object):
                 ConfigParameter('reset_on_extinction', bool),
                 ConfigParameter('no_fitness_termination', bool, False)]
 
-    def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename, cppn_dict):
+    def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename, layout_dict):
 
         # Check that the provided types have the required methods.
         assert hasattr(genome_type, 'parse_config')
@@ -85,9 +85,9 @@ class _Config(object):
         # Parse type sections.
         genome_dict = dict(parameters.items(genome_type.__name__))
 
-        # Add CPPN inputs/output (always 5/1) if specified 
-        for key in cppn_dict:
-            genome_dict[key] = cppn_dict[key]
+        # Add layout (input/output) info
+        for key in layout_dict:
+            genome_dict[key] = layout_dict[key]
 
         self.genome_config = genome_type.parse_config(genome_dict)
 
@@ -113,7 +113,7 @@ class _Config(object):
 
 class _GymConfig(_Config):
 
-    def __init__(self, args, suffix='', cppn_dict={}):
+    def __init__(self, args, layout_dict, suffix=''):
 
         filename = args.cfgdir + '/' + args.env + suffix + '.cfg'
 
@@ -123,7 +123,7 @@ class _GymConfig(_Config):
 
         _Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                 neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-                filename, cppn_dict)
+                filename, layout_dict)
 
         self.env_name = args.env
         self.env = gym.make(args.env)
@@ -186,7 +186,7 @@ class _GymHyperConfig(_GymConfig):
 
     def __init__(self, args, substrate, actfun, suffix='-hyper'):
 
-        _GymConfig.__init__(self, args, suffix, {'num_inputs':5, 'num_outputs':1})
+        _GymConfig.__init__(self, args, {'num_inputs':5, 'num_outputs':1}, suffix)
 
         self.substrate = substrate
         self.actfun = actfun

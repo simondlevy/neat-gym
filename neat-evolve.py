@@ -13,6 +13,7 @@ import os
 import argparse
 import random
 
+import gym
 import neat
 
 from pureples.shared.substrate import Substrate
@@ -89,7 +90,12 @@ def main():
     # Otherwise, use NEAT
     else:
 
-        config = _GymConfig(args)
+        # Get input/output layout from environment
+        env = gym.make(args.env)
+        num_inputs, num_outputs = env.observation_space.shape[0], env.action_space.shape[0]
+
+        # Load rest of config from file
+        config = _GymConfig(args, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
         evalfun = _GymConfig.eval_genome
 
     # Create the population, which is the top-level object for a NEAT run.
@@ -112,6 +118,4 @@ def main():
     # Save winner
     config.save_genome(winner)
 
-if __name__ == '__main__':
-
-   main()
+main()

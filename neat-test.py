@@ -10,10 +10,8 @@ MIT License
 import gym
 from neat_gym import read_file, eval_net
 
-if __name__ == '__main__':
+# Load genome and configuration from pickled file
+net, env_name, record_dir, nodisplay = read_file(allow_record=True)
 
-    # Load genome and configuration from pickled file
-    net, env_name, record_dir, nodisplay = read_file(allow_record=True)
-
-    # Run the network on the environment
-    print('Reward = %6.6f.' % eval_net(net, gym.make(env_name), render=(not nodisplay), record_dir=record_dir))
+# Run the network on the environment
+print('Reward = %6.6f.' % eval_net(net, gym.make(env_name), render=(not nodisplay), record_dir=record_dir))
