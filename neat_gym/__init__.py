@@ -114,9 +114,6 @@ class _Config(object):
 class _GymConfig(_Config):
 
     def __init__(self, args, suffix='', cppn_dict={}):
-        '''
-        env_name names environment and config file
-        '''
 
         filename = args.cfgdir + '/' + args.env + suffix + '.cfg'
 
@@ -193,9 +190,12 @@ class _GymHyperConfig(_GymConfig):
     def save_genome(self, genome):
 
         cppn, net = _GymHyperConfig._make_nets(genome, self)
-        pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-hyper'), 'wb'))
+        self._save_nets(genome, cppn, net)
+
+    def _save_nets(self, genome, cppn, net, suffix='-hyper'):
+        pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix=suffix), 'wb'))
         draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'), node_names=self.cppn_node_names)
-        draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-hyper'), node_names=self.node_names)
+        draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix=suffix), node_names=self.node_names)
 
     @staticmethod
     def eval_genome(genome, config):
@@ -230,9 +230,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def save_genome(self, genome):
 
         cppn, _, net = _GymEsHyperConfig._make_nets(genome, self)
-        pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-eshyper'), 'wb'))
-        draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'), node_names=self.cppn_node_names)
-        draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-eshyper'), node_names=self.node_names)
+        _GymEsHyperConfig._save_nets(self, genome, cppn, net, suffix='-eshyper')
 
     @staticmethod
     def eval_genome(genome, config):
