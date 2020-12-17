@@ -12,13 +12,54 @@ import time
 import os
 import warnings
 from configparser import ConfigParser
+
 import numpy as np
+
 import neat
 from neat.config import ConfigParameter, UnknownConfigItemError
+
 import gym
 from gym import wrappers
+
 from pureples.hyperneat.hyperneat import create_phenotype_network
+#from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
+
+def _eval_genome(genome, config, net, activations):
+
+    fitness = 0
+
+    for _ in range(config.reps):
+
+        fitness += eval_net(net, config.env, activations=activations, seed=config.seed)
+
+    return fitness / config.reps
+
+def _eval_genome_neat(genome, config):
+
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+    return _eval_genome(genome, config, net, 1)
+
+def _eval_genome_hyper(genome, config):
+
+    cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+    net = create_phenotype_network(cppn, config.substrate, config.actfun)
+
+    activations = len(config.substrate.hidden_coordinates) + 2
+
+    return _eval_genome(genome, config, net, activations)
+
+def _eval_genome_eshyper(genome, config):
+
+    #cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+    #esnet = ESNetwork(config.substrate, cppn, params)
+    #net = esnet.create_phenotype_network()
+
+    #activations = len(config.substrate.hidden_coordinates) + 2
+
+    #return _eval_genome(genome, config, net, activations)
+    return 0
 
 class _Config(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py

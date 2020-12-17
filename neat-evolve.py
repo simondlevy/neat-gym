@@ -16,10 +16,9 @@ import random
 import neat
 
 from pureples.shared.substrate import Substrate
-from pureples.hyperneat.hyperneat import create_phenotype_network
-from pureples.es_hyperneat.es_hyperneat import ESNetwork
 
-from neat_gym import eval_net, _GymConfig, _GymHyperConfig, _GymEsHyperConfig
+from neat_gym import _GymConfig, _GymHyperConfig, _GymEsHyperConfig
+from neat_gym import _eval_genome_neat, _eval_genome_hyper, _eval_genome_eshyper
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -38,41 +37,6 @@ class _SaveReporter(neat.reporting.BaseReporter):
             print('############# Saving new best %f ##############' % self.best)
             config.save_genome(best_genome)
 
-def _eval_genome(genome, config, net, activations):
-
-    fitness = 0
-
-    for _ in range(config.reps):
-
-        fitness += eval_net(net, config.env, activations=activations, seed=config.seed)
-
-    return fitness / config.reps
-
-def _eval_genome_neat(genome, config):
-
-    net = neat.nn.FeedForwardNetwork.create(genome, config)
-
-    return _eval_genome(genome, config, net, 1)
-
-def _eval_genome_hyper(genome, config):
-
-    cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-    net = create_phenotype_network(cppn, config.substrate, config.actfun)
-
-    activations = len(config.substrate.hidden_coordinates) + 2
-
-    return _eval_genome(genome, config, net, activations)
-
-def _eval_genome_eshyper(genome, config):
-
-    cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-    #esnet = ESNetwork(config.substrate, cppn, params)
-    #net = esnet.create_phenotype_network()
-
-    #activations = len(config.substrate.hidden_coordinates) + 2
-
-    #return _eval_genome(genome, config, net, activations)
-    return 0
 
 def main():
 
