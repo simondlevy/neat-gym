@@ -220,7 +220,8 @@ class _GymEsHyperConfig(_GymHyperConfig):
                 'band_threshold'    : float(params['band_threshold']),  
                 'iteration_level'   : int(params['iteration_level']),  
                 'division_threshold': float(params['division_threshold']),  
-                'max_weight'        : float(params['max_weight'])  
+                'max_weight'        : float(params['max_weight']),
+                'activation'        : params['activation']  
                 }
 
         _GymHyperConfig.__init__(self, args, substrate, actfun, suffix='-eshyper')
@@ -229,8 +230,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def eval_genome(genome, config):
 
         cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-        print(config.params)
-        #esnet = ESNetwork(config.substrate, cppn, config.params)
+        esnet = ESNetwork(config.substrate, cppn, config.params)
         #net = esnet.create_phenotype_network()
 
         #activations = len(config.substrate.hidden_coordinates) + 2
