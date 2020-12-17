@@ -22,7 +22,7 @@ import gym
 from gym import wrappers
 
 from pureples.hyperneat.hyperneat import create_phenotype_network
-#from pureples.es_hyperneat.es_hyperneat import ESNetwork
+from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 
 class _Config(object):
@@ -211,10 +211,17 @@ class _GymHyperConfig(_GymConfig):
 
 class _GymEsHyperConfig(_GymHyperConfig):
 
-    def __init__(self, args, substrate, actfun, esparams):
+    def __init__(self, args, substrate, actfun, params):
 
-        for key in esparams.keys():
-            print(key, esparams[key])
+        self.params = {
+                'initial_depth'     : int(params['initial_depth']),
+                'max_depth'         : int(params['max_depth']),
+                'variance_threshold': float(params['variance_threshold']),  
+                'band_threshold'    : float(params['band_threshold']),  
+                'iteration_level'   : int(params['iteration_level']),  
+                'division_threshold': float(params['division_threshold']),  
+                'max_weight'        : float(params['max_weight'])  
+                }
 
         _GymHyperConfig.__init__(self, args, substrate, actfun, suffix='-eshyper')
 
@@ -222,7 +229,8 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def eval_genome(genome, config):
 
         cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-        #esnet = ESNetwork(config.substrate, cppn, params)
+        print(config.params)
+        #esnet = ESNetwork(config.substrate, cppn, config.params)
         #net = esnet.create_phenotype_network()
 
         #activations = len(config.substrate.hidden_coordinates) + 2
