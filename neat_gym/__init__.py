@@ -211,7 +211,10 @@ class _GymHyperConfig(_GymConfig):
 
 class _GymEsHyperConfig(_GymHyperConfig):
 
-    def __init__(self, args, substrate, actfun):
+    def __init__(self, args, substrate, actfun, esparams):
+
+        for key in esparams.keys():
+            print(key, esparams[key])
 
         _GymHyperConfig.__init__(self, args, substrate, actfun, suffix='-eshyper')
 

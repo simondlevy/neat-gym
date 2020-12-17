@@ -69,10 +69,9 @@ def main():
 
         if args.hyperhid == 'es':
 
-            print(cfg['ES'])
             evalfun = _GymEsHyperConfig.eval_genome
             substrate = Substrate(inp, out)
-            config = _GymEsHyperConfig(args, substrate, actfun)
+            config = _GymEsHyperConfig(args, substrate, actfun, cfg['ES'])
 
         else:
 
