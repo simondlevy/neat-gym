@@ -13,7 +13,7 @@ from neat_gym import read_file, eval_net
 if __name__ == '__main__':
 
     # Load genome and configuration from pickled file
-    net, env_name, record_dir = read_file(allow_record=True)
+    net, env_name, record_dir, nodisplay = read_file(allow_record=True)
 
     # Run the network on the environment
-    print('%6.6f' % eval_net(net, gym.make(env_name), render=True, record_dir=record_dir))
+    print('Reward = %6.6f.' % eval_net(net, gym.make(env_name), render=(not nodisplay), record_dir=record_dir))

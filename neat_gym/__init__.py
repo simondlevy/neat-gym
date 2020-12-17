@@ -306,6 +306,7 @@ def read_file(allow_record=False):
     # Parse command-line arguments
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('filename', metavar='FILENAME', help='.dat input file')
+    parser.add_argument('--nodisplay', dest='nodisplay', action='store_true', help='Suppress display')
     if allow_record:
         parser.add_argument('--record', default=None, help='If specified, sets the recording dir')
     args = parser.parse_args()
@@ -314,4 +315,4 @@ def read_file(allow_record=False):
     net, env_name = pickle.load(open(args.filename, 'rb'))
 
     # Return genome, config, and optional save flag
-    return net, env_name, args.record if allow_record else None
+    return net, env_name, args.record if allow_record else None, args.nodisplay
