@@ -155,9 +155,9 @@ class _GymConfig(_Config):
 
 class _GymHyperConfig(_GymConfig):
 
-    def __init__(self, args, substrate, actfun):
+    def __init__(self, args, substrate, actfun, suffix='-hyper'):
 
-        _GymConfig.__init__(self, args, '-hyper', {'num_inputs':5, 'num_outputs':1})
+        _GymConfig.__init__(self, args, suffix, {'num_inputs':5, 'num_outputs':1})
 
         self.substrate = substrate
         self.actfun = actfun
@@ -175,6 +175,12 @@ class _GymHyperConfig(_GymConfig):
         pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-hyper'), 'wb'))
         draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'), node_names=self.cppn_node_names)
         draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-hyper'), node_names=self.node_names)
+
+class _GymEsHyperConfig(_GymHyperConfig):
+
+    def __init__(self, args, substrate, actfun):
+
+        _GymHyperConfig.__init__(self, args, substrate, actfun, suffix='-eshyper')
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''

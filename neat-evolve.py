@@ -17,7 +17,7 @@ import random
 from pureples.shared.substrate import Substrate
 from pureples.hyperneat.hyperneat import create_phenotype_network
 
-from neat_gym import eval_net, _GymConfig, _GymHyperConfig
+from neat_gym import eval_net, _GymConfig, _GymHyperConfig, _GymEsHyperConfig
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -85,15 +85,21 @@ def main():
     # If HyperNEAT was requested, use it
     if args.hyperhid is not None:
 
+        cfg = _GymConfig.load(args, '-eshyper' if args.hyperhid == 'es' else '-hyper')
+        subs =  cfg['Substrate']
+        actfun = subs['function']
+        inp = eval(subs['input'])
+        out = eval(subs['output'])
+
         if args.hyperhid == 'es':
-            pass
+
+            substrate = Substrate(inp, out)
+            config = _GymEsHyperConfig(args, substrate, actfun)
+            exit(0)
 
         else:
 
-            cppncfg = _GymConfig.load(args, '-hyper')
-
-            subs =  cppncfg['Substrate']
-            actfun = subs['function']
+            cfg = _GymConfig.load(args, '-hyper')
 
             try:
                 nhids = [int(n) for n in args.hyperhid.split(',')]
@@ -101,9 +107,9 @@ def main():
                 print('Hidden-unit layout should be a number or tuple of numbers')
                 exit(1)
 
-            hidden = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
+            hid = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
             evalfun = _eval_genome_hyper
-            substrate = Substrate(eval(subs['input']), eval(subs['output']), hidden)
+            substrate = Substrate(inp, out, hid)
             config = _GymHyperConfig(args, substrate, actfun)
 
     # Otherwise, use NEAT
