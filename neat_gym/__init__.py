@@ -35,17 +35,6 @@ def _eval_genome(genome, config, net, activations):
 
     return fitness / config.reps
 
-def _eval_genome_eshyper(genome, config):
-
-    #cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-    #esnet = ESNetwork(config.substrate, cppn, params)
-    #net = esnet.create_phenotype_network()
-
-    #activations = len(config.substrate.hidden_coordinates) + 2
-
-    #return _eval_genome(genome, config, net, activations)
-    return 0
-
 class _Config(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
@@ -224,6 +213,18 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def __init__(self, args, substrate, actfun):
 
         _GymHyperConfig.__init__(self, args, substrate, actfun, suffix='-eshyper')
+
+    @staticmethod
+    def eval_genome(genome, config):
+
+        #cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+        #esnet = ESNetwork(config.substrate, cppn, params)
+        #net = esnet.create_phenotype_network()
+
+        #activations = len(config.substrate.hidden_coordinates) + 2
+
+        #return _eval_genome(genome, config, net, activations)
+        return 0
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''
