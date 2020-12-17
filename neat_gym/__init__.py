@@ -173,7 +173,6 @@ class _GymConfig(_Config):
     def eval_genome(genome, config):
 
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-
         return _Config.eval_genome(genome, config, net, 1)
 
 class _GymHyperConfig(_GymConfig):
@@ -193,8 +192,7 @@ class _GymHyperConfig(_GymConfig):
 
     def save_genome(self, genome):
 
-        cppn = neat.nn.FeedForwardNetwork.create(genome, self)
-        net = create_phenotype_network(cppn, self.substrate)
+        cppn, net = _GymHyperConfig._make_nets(genome, self)
         pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-hyper'), 'wb'))
         draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'), node_names=self.cppn_node_names)
         draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-hyper'), node_names=self.node_names)
@@ -202,12 +200,15 @@ class _GymHyperConfig(_GymConfig):
     @staticmethod
     def eval_genome(genome, config):
 
-        cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-        net = create_phenotype_network(cppn, config.substrate, config.actfun)
-
+        cppn, net = _GymHyperConfig._make_nets(genome, config)
         activations = len(config.substrate.hidden_coordinates) + 2
-
         return _Config.eval_genome(genome, config, net, activations)
+
+    @staticmethod
+    def _make_nets(genome, config):
+
+        cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+        return cppn, create_phenotype_network(cppn, config.substrate, config.actfun)
 
 class _GymEsHyperConfig(_GymHyperConfig):
 
@@ -228,9 +229,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
 
     def save_genome(self, genome):
 
-        cppn = neat.nn.FeedForwardNetwork.create(genome, self)
-        esnet = ESNetwork(self.substrate, cppn, self.params)
-        net = esnet.create_phenotype_network()
+        cppn, _, net = _GymEsHyperConfig._make_nets(genome, self)
         pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-eshyper'), 'wb'))
         draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'), node_names=self.cppn_node_names)
         draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-eshyper'), node_names=self.node_names)
@@ -238,10 +237,16 @@ class _GymEsHyperConfig(_GymHyperConfig):
     @staticmethod
     def eval_genome(genome, config):
 
+        _, esnet, net = _GymEsHyperConfig._make_nets(genome, config)
+        return _Config.eval_genome(genome, config, net, esnet.activations)
+
+    @staticmethod
+    def _make_nets(genome, config):
+
         cppn = neat.nn.FeedForwardNetwork.create(genome, config)
         esnet = ESNetwork(config.substrate, cppn, config.params)
         net = esnet.create_phenotype_network()
-        return _Config.eval_genome(genome, config, net, esnet.activations)
+        return cppn, esnet, net
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''
