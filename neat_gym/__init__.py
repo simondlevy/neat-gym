@@ -25,16 +25,6 @@ from pureples.hyperneat.hyperneat import create_phenotype_network
 #from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 
-def _eval_genome(genome, config, net, activations):
-
-    fitness = 0
-
-    for _ in range(config.reps):
-
-        fitness += eval_net(net, config.env, activations=activations, seed=config.seed)
-
-    return fitness / config.reps
-
 class _Config(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
@@ -110,6 +100,17 @@ class _Config(object):
         reproduction_dict = dict(parameters.items(reproduction_type.__name__))
         self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
 
+    @staticmethod
+    def eval_genome(genome, config, net, activations):
+
+        fitness = 0
+
+        for _ in range(config.reps):
+
+            fitness += eval_net(net, config.env, activations=activations, seed=config.seed)
+
+        return fitness / config.reps
+
 class _GymConfig(_Config):
 
     def __init__(self, args, suffix='', cppn_dict={}):
@@ -173,7 +174,7 @@ class _GymConfig(_Config):
 
         net = neat.nn.FeedForwardNetwork.create(genome, config)
 
-        return _eval_genome(genome, config, net, 1)
+        return _Config.eval_genome(genome, config, net, 1)
 
 class _GymHyperConfig(_GymConfig):
 
@@ -206,7 +207,7 @@ class _GymHyperConfig(_GymConfig):
 
         activations = len(config.substrate.hidden_coordinates) + 2
 
-        return _eval_genome(genome, config, net, activations)
+        return _Config.eval_genome(genome, config, net, activations)
 
 class _GymEsHyperConfig(_GymHyperConfig):
 
@@ -223,7 +224,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
 
         #activations = len(config.substrate.hidden_coordinates) + 2
 
-        #return _eval_genome(genome, config, net, activations)
+        #return _Config.eval_genome(genome, config, net, activations)
         return 0
 
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
