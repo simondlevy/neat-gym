@@ -143,6 +143,23 @@ class _GymConfig(_Config):
         except:
             self.node_names = {}
 
+    def save_genome(self, genome):
+
+        name = self._make_name(genome)
+        net = neat.nn.FeedForwardNetwork.create(genome, self)
+        pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
+        _GymConfig._draw_net(net, 'visuals/%s'%name, self.node_names)
+
+    def _make_name(self, genome, suffix=''):
+
+        return '%s%s%+010.3f' % (self.env_name, suffix, genome.fitness)
+
+    @staticmethod
+    def eval_genome(genome, config):
+
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        return _Config.eval_genome(genome, config, net, 1)
+
     @staticmethod
     def load(args, suffix):
 
@@ -155,22 +172,15 @@ class _GymConfig(_Config):
         parser.read(filename)
         return parser
 
-    def save_genome(self, genome):
+    @staticmethod 
+    def _draw_net(net, filename, node_names):
 
-        name = self._make_name(genome)
-        net = neat.nn.FeedForwardNetwork.create(genome, self)
-        pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
-        draw_net(net, filename='visuals/%s'%name, node_names=self.node_names)
 
-    def _make_name(self, genome, suffix=''):
+        # Create PDF
+        draw_net(net, filename=filename, node_names=node_names) 
 
-        return '%s%s%+010.3f' % (self.env_name, suffix, genome.fitness)
-
-    @staticmethod
-    def eval_genome(genome, config):
-
-        net = neat.nn.FeedForwardNetwork.create(genome, config)
-        return _Config.eval_genome(genome, config, net, 1)
+        # Delete text
+        os.remove(filename) 
 
 class _GymHyperConfig(_GymConfig):
 
@@ -194,8 +204,8 @@ class _GymHyperConfig(_GymConfig):
 
     def _save_nets(self, genome, cppn, net, suffix='-hyper'):
         pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix=suffix), 'wb'))
-        draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'), node_names=self.cppn_node_names)
-        draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix=suffix), node_names=self.node_names)
+        _GymConfig._draw_net(cppn, 'visuals/%s' % self._make_name(genome, suffix='-cppn'), self.cppn_node_names)
+        _GymConfig._draw_net(net, 'visuals/%s' % self._make_name(genome, suffix=suffix), self.node_names)
 
     @staticmethod
     def eval_genome(genome, config):
