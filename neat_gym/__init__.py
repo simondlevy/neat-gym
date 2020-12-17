@@ -35,12 +35,6 @@ def _eval_genome(genome, config, net, activations):
 
     return fitness / config.reps
 
-def _eval_genome_neat(genome, config):
-
-    net = neat.nn.FeedForwardNetwork.create(genome, config)
-
-    return _eval_genome(genome, config, net, 1)
-
 def _eval_genome_eshyper(genome, config):
 
     #cppn = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -184,6 +178,13 @@ class _GymConfig(_Config):
     def _make_name(self, genome, suffix=''):
 
         return '%s%s%+010.3f' % (self.env_name, suffix, genome.fitness)
+
+    @staticmethod
+    def eval_genome(genome, config):
+
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+        return _eval_genome(genome, config, net, 1)
 
 class _GymHyperConfig(_GymConfig):
 

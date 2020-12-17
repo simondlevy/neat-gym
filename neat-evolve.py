@@ -18,7 +18,6 @@ import neat
 from pureples.shared.substrate import Substrate
 
 from neat_gym import _GymConfig, _GymHyperConfig, _GymEsHyperConfig
-from neat_gym import _eval_genome_neat
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -93,7 +92,7 @@ def main():
     else:
 
         config = _GymConfig(args)
-        evalfun = _eval_genome_neat
+        evalfun = _GymConfig.eval_genome
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
