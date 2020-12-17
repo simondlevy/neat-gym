@@ -75,8 +75,6 @@ def main():
 
         else:
 
-            cfg = _GymConfig.load(args, '-hyper')
-
             try:
                 nhids = [int(n) for n in args.hyperhid.split(',')]
             except:
