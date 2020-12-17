@@ -218,7 +218,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     @staticmethod
     def eval_genome(genome, config):
 
-        #cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+        cppn = neat.nn.FeedForwardNetwork.create(genome, config)
         #esnet = ESNetwork(config.substrate, cppn, params)
         #net = esnet.create_phenotype_network()
 

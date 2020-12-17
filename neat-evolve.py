@@ -72,7 +72,6 @@ def main():
             evalfun = _GymEsHyperConfig.eval_genome
             substrate = Substrate(inp, out)
             config = _GymEsHyperConfig(args, substrate, actfun)
-            exit(0)
 
         else:
 
