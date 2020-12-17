@@ -304,8 +304,8 @@ def read_file(allow_record=False):
     '''
 
     # Parse command-line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('filename', metavar='FILENAME', help='input file')
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('filename', metavar='FILENAME', help='.dat input file')
     if allow_record:
         parser.add_argument('--record', default=None, help='If specified, sets the recording dir')
     args = parser.parse_args()
