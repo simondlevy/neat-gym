@@ -41,15 +41,6 @@ def _eval_genome_neat(genome, config):
 
     return _eval_genome(genome, config, net, 1)
 
-def _eval_genome_hyper(genome, config):
-
-    cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-    net = create_phenotype_network(cppn, config.substrate, config.actfun)
-
-    activations = len(config.substrate.hidden_coordinates) + 2
-
-    return _eval_genome(genome, config, net, activations)
-
 def _eval_genome_eshyper(genome, config):
 
     #cppn = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -216,6 +207,16 @@ class _GymHyperConfig(_GymConfig):
         pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix='-hyper'), 'wb'))
         draw_net(cppn, filename='visuals/%s' % self._make_name(genome, suffix='-cppn'), node_names=self.cppn_node_names)
         draw_net(net, filename='visuals/%s' % self._make_name(genome, suffix='-hyper'), node_names=self.node_names)
+
+    @staticmethod
+    def eval_genome(genome, config):
+
+        cppn = neat.nn.FeedForwardNetwork.create(genome, config)
+        net = create_phenotype_network(cppn, config.substrate, config.actfun)
+
+        activations = len(config.substrate.hidden_coordinates) + 2
+
+        return _eval_genome(genome, config, net, activations)
 
 class _GymEsHyperConfig(_GymHyperConfig):
 

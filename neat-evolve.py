@@ -18,7 +18,7 @@ import neat
 from pureples.shared.substrate import Substrate
 
 from neat_gym import _GymConfig, _GymHyperConfig, _GymEsHyperConfig
-from neat_gym import _eval_genome_neat, _eval_genome_hyper, _eval_genome_eshyper
+from neat_gym import _eval_genome_neat
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -85,7 +85,7 @@ def main():
                 exit(1)
 
             hid = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
-            evalfun = _eval_genome_hyper
+            evalfun = _GymHyperConfig.eval_genome
             substrate = Substrate(inp, out, hid)
             config = _GymHyperConfig(args, substrate, actfun)
 
