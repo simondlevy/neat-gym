@@ -27,7 +27,7 @@ sub = Substrate(input_coordinates, output_coordinates, hidden_coordinates)
 # Config for CPPN.
 config = neat.config.Config(neat.genome.DefaultGenome, neat.reproduction.DefaultReproduction,
                             neat.species.DefaultSpeciesSet, neat.stagnation.DefaultStagnation,
-                            'config/CartPole-v1.cfg')
+                            'config/CartPole-v1-hyper.cfg')
 
 
 # Use the gym_runner to run this experiment using HyperNEAT.

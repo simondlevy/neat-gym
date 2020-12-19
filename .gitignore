@@ -6,6 +6,7 @@ __pycache__/
 
 models/
 visuals/
+*cppn*
 *winner*
 *.pkl
 *.pdf
