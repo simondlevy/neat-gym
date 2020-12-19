@@ -25,6 +25,9 @@ from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 
+def _is_discrete(env):
+    return 'Discrete' in str(type(env.action_space))
+
 class _Config(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
@@ -276,7 +279,7 @@ def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     total_reward = 0
     steps = 0
 
-    is_discrete = 'Discrete' in str(type(env.action_space))
+    is_discrete = _is_discrete(env)
 
     while True:
         for k in range(activations): # Support recurrent nets

@@ -18,7 +18,7 @@ import neat
 
 from pureples.shared.substrate import Substrate
 
-from neat_gym import _GymConfig, _GymHyperConfig, _GymEsHyperConfig
+from neat_gym import _GymConfig, _GymHyperConfig, _GymEsHyperConfig, _is_discrete
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
@@ -61,9 +61,10 @@ def main():
     # Get input/output layout from environment
     env = gym.make(args.env)
 
+    num_inputs  = env.observation_space.shape[0]
+    num_outputs = env.action_space.n if _is_discrete(env) else env.action_space.shape[0]
 
-    print(env.observation_space)
-    print(env.action_space)
+    print(num_inputs, num_outputs)
     exit(0)
 
     #num_inputs, num_outputs = env.observation_space.shape[0], env.action_space.shape[0]
