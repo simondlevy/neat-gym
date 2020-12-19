@@ -43,7 +43,7 @@ def main():
     # Parse command-line arguments
 
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--env', default='Pendulum-v0', help='Environment id')
+    parser.add_argument('--env', default='CartPole-v1', help='Environment id')
     parser.add_argument('--checkpoint', dest='checkpoint', action='store_true', help='Save at each new best')
     parser.add_argument('--cfgdir', required=False, default='./config', help='Directory for config files')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
@@ -60,7 +60,13 @@ def main():
 
     # Get input/output layout from environment
     env = gym.make(args.env)
-    num_inputs, num_outputs = env.observation_space.shape[0], env.action_space.shape[0]
+
+
+    print(env.observation_space)
+    print(env.action_space)
+    exit(0)
+
+    #num_inputs, num_outputs = env.observation_space.shape[0], env.action_space.shape[0]
 
     # Load rest of config from file
     config = _GymConfig(args, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
