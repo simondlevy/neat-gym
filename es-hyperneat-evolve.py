@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-NEAT evolver script for OpenAI Gym environemnts
+(Hyper)NEAT evolver script for OpenAI Gym environemnts
 
 Copyright (C) 2020 Simon D. Levy
 
@@ -58,13 +58,30 @@ def main():
     os.makedirs('models', exist_ok=True)
     os.makedirs('visuals', exist_ok=True)
 
-    # Get input/output layout from environment
-    env = gym.make(args.env)
-    num_inputs, num_outputs = env.observation_space.shape[0], env.action_space.shape[0]
+    cfg = _GymConfig.load(args, '-eshyper' if args.hyperhid == 'es' else '-hyper')
+    subs =  cfg['Substrate']
+    actfun = subs['function']
+    inp = eval(subs['input'])
+    out = eval(subs['output'])
 
-    # Load rest of config from file
-    config = _GymConfig(args, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
-    evalfun = _GymConfig.eval_genome
+    if args.hyperhid == 'es':
+
+        evalfun = _GymEsHyperConfig.eval_genome
+        substrate = Substrate(inp, out)
+        config = _GymEsHyperConfig(args, substrate, actfun, cfg['ES'])
+
+    else:
+
+        try:
+            nhids = [int(n) for n in args.hyperhid.split(',')]
+        except:
+            print('Hidden-unit layout should be a number or tuple of numbers')
+            exit(1)
+
+        hid = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
+        evalfun = _GymHyperConfig.eval_genome
+        substrate = Substrate(inp, out, hid)
+        config = _GymHyperConfig(args, substrate, actfun)
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
