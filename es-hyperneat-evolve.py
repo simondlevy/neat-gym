@@ -58,30 +58,15 @@ def main():
     os.makedirs('models', exist_ok=True)
     os.makedirs('visuals', exist_ok=True)
 
-    cfg = _GymConfig.load(args, '-eshyper' if args.hyperhid == 'es' else '-hyper')
+    cfg = _GymConfig.load(args, '-eshyper')
     subs =  cfg['Substrate']
     actfun = subs['function']
     inp = eval(subs['input'])
     out = eval(subs['output'])
 
-    if args.hyperhid == 'es':
-
-        evalfun = _GymEsHyperConfig.eval_genome
-        substrate = Substrate(inp, out)
-        config = _GymEsHyperConfig(args, substrate, actfun, cfg['ES'])
-
-    else:
-
-        try:
-            nhids = [int(n) for n in args.hyperhid.split(',')]
-        except:
-            print('Hidden-unit layout should be a number or tuple of numbers')
-            exit(1)
-
-        hid = [list(zip(np.linspace(-1,+1,n), [0.]*n)) for n in nhids]
-        evalfun = _GymHyperConfig.eval_genome
-        substrate = Substrate(inp, out, hid)
-        config = _GymHyperConfig(args, substrate, actfun)
+    evalfun = _GymEsHyperConfig.eval_genome
+    substrate = Substrate(inp, out)
+    config = _GymEsHyperConfig(args, substrate, actfun, cfg['ES'])
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
