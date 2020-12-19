@@ -15,9 +15,7 @@ from pureples.shared.gym_runner import run_hyper
 from pureples.hyperneat.hyperneat import create_phenotype_network
 
 # Network input, hidden and output coordinates.
-input_coordinates = []
-for i in range(0,4):
-    input_coordinates.append((-1. +(2.*i/3.), -1.))
+input_coordinates = [(-1. +(2.*i/3.), -1.) for i in range(4)]
 hidden_coordinates = [[(-0.5, 0.5), (0.5, 0.5)], [(-0.5, -0.5), (0.5, -0.5)]]
 output_coordinates = [(-1., 1.), (1., 1.)]
 activations = len(hidden_coordinates) + 2
