@@ -64,11 +64,6 @@ def main():
     num_inputs  = env.observation_space.shape[0]
     num_outputs = env.action_space.n if _is_discrete(env) else env.action_space.shape[0]
 
-    print(num_inputs, num_outputs)
-    exit(0)
-
-    #num_inputs, num_outputs = env.observation_space.shape[0], env.action_space.shape[0]
-
     # Load rest of config from file
     config = _GymConfig(args, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
     evalfun = _GymConfig.eval_genome
