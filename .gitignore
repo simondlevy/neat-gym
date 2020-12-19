@@ -4,9 +4,6 @@ dist/
 *.egg-info
 __pycache__/
 
+tmp/
 models/
 visuals/
-*cppn*
-*winner*
-*.pkl
-*.pdf

@@ -2,6 +2,7 @@
 '''
 https://github.com/ukuleleplayer/pureples/blob/master/pureples/experiments/pole_balancing/hyperneat_pole_balancing.py
 '''
+import os
 import neat 
 import logging
 try:
@@ -48,7 +49,8 @@ if __name__ == '__main__':
     # Save CPPN if wished reused and draw it + winner to file.
     cppn = neat.nn.FeedForwardNetwork.create(winner, config)
     winner_net = create_phenotype_network(cppn, sub)
-    draw_net(cppn, filename="hyperneat_pole_balancing_cppn")
-    with open('hyperneat_pole_balancing_cppn.pkl', 'wb') as output:
+    os.makedirs('tmp', exist_ok=True)
+    draw_net(cppn, filename="tmp/hyperneat_pole_balancing_cppn")
+    with open('tmp/hyperneat_pole_balancing_cppn.pkl', 'wb') as output:
         pickle.dump(cppn, output, pickle.HIGHEST_PROTOCOL)
-    draw_net(winner_net, filename="hyperneat_pole_balancing_winner")
+    draw_net(winner_net, filename="tmp/hyperneat_pole_balancing_winner")
