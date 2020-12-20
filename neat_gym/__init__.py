@@ -25,6 +25,7 @@ from neat.config import ConfigParameter, UnknownConfigItemError
 from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
+from pureples.shared.substrate import Substrate
 
 def _is_discrete(env):
     return 'Discrete' in str(type(env.action_space))
@@ -237,6 +238,24 @@ class _GymHyperConfig(_GymConfig):
         cppn = neat.nn.FeedForwardNetwork.create(genome, config)
         return cppn, create_phenotype_network(cppn, config.substrate, config.actfun)
 
+    @staticmethod
+    def make_config(args):
+        
+        cfg = _GymConfig.load(args, '-hyper')
+        subs =  cfg['Substrate']
+        actfun = subs['function']
+        inp = eval(subs['input'])
+        hid = eval(subs['hidden'])
+        out = eval(subs['output'])
+        substrate = Substrate(inp, out, hid)
+
+        # Load rest of config from file
+        config = _GymHyperConfig(args, substrate, actfun)
+
+        evalfun = _GymHyperConfig.eval_genome
+
+        return config, evalfun
+     
 class _GymEsHyperConfig(_GymHyperConfig):
 
     def __init__(self, args, substrate, actfun, params):
