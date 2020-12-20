@@ -58,6 +58,7 @@ def main():
     os.makedirs('models', exist_ok=True)
     os.makedirs('visuals', exist_ok=True)
 
+    # Get substrate from -hyper.cfg file named by Gym environment
     cfg = _GymConfig.load(args, '-hyper')
     subs =  cfg['Substrate']
     actfun = subs['function']
