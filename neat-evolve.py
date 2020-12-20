@@ -7,7 +7,6 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-import numpy as np
 import multiprocessing as mp
 import os
 import argparse
@@ -16,9 +15,7 @@ import random
 import gym
 import neat
 
-from pureples.shared.substrate import Substrate
-
-from neat_gym import _GymConfig, _GymHyperConfig, _GymEsHyperConfig, _is_discrete
+from neat_gym import _GymConfig, _is_discrete
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
