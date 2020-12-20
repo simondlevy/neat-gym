@@ -21,7 +21,6 @@ from neat_gym import _GymConfig, _GymHyperConfig, _SaveReporter
 def main():
 
     # Parse command-line arguments
-
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--env', default='CartPole-v1', help='Environment id')
     parser.add_argument('--checkpoint', dest='checkpoint', action='store_true', help='Save at each new best')
@@ -38,6 +37,7 @@ def main():
     os.makedirs('models', exist_ok=True)
     os.makedirs('visuals', exist_ok=True)
 
+    # -------------------------------------------------------------
     # Get substrate from -hyper.cfg file named by Gym environment
     cfg = _GymConfig.load(args, '-hyper')
     subs =  cfg['Substrate']
@@ -45,10 +45,13 @@ def main():
     inp = eval(subs['input'])
     hid = eval(subs['hidden'])
     out = eval(subs['output'])
+    substrate = Substrate(inp, out, hid)
+
+    # Load rest of config from file
+    config = _GymHyperConfig(args, substrate, actfun)
 
     evalfun = _GymHyperConfig.eval_genome
-    substrate = Substrate(inp, out, hid)
-    config = _GymHyperConfig(args, substrate, actfun)
+    # -------------------------------------------------------------
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
