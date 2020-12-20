@@ -292,6 +292,26 @@ class _GymEsHyperConfig(_GymHyperConfig):
         net = esnet.create_phenotype_network()
         return cppn, esnet, net
 
+    @staticmethod
+    def make_config(args):
+
+        # Load config from file
+        cfg = _GymConfig.load(args, '-eshyper')
+        subs =  cfg['Substrate']
+        actfun = subs['function']
+        inp = eval(subs['input'])
+        out = eval(subs['output'])
+
+        # Get substrate from -hyper.cfg file named by Gym environment
+        substrate = Substrate(inp, out)
+
+        # Load rest of config from file
+        config = _GymEsHyperConfig(args, substrate, actfun, cfg['ES'])
+
+        evalfun = _GymEsHyperConfig.eval_genome
+
+        return config, evalfun
+
 class _SaveReporter(neat.reporting.BaseReporter):
 
     def __init__(self, env_name, checkpoint):

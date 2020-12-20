@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-(Hyper)NEAT evolver script for OpenAI Gym environemnts
+HyperNEAT evolver script for OpenAI Gym environemnts
 
 Copyright (C) 2020 Simon D. Levy
 
