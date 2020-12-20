@@ -259,6 +259,23 @@ class _GymEsHyperConfig(_GymHyperConfig):
         net = esnet.create_phenotype_network()
         return cppn, esnet, net
 
+class _SaveReporter(neat.reporting.BaseReporter):
+
+    def __init__(self, env_name, checkpoint):
+
+        neat.reporting.BaseReporter.__init__(self)
+
+        self.best = None
+        self.env_name = env_name
+        self.checkpoint = checkpoint
+
+    def post_evaluate(self, config, population, species, best_genome):
+
+        if self.checkpoint and (self.best is None or best_genome.fitness > self.best):
+            self.best = best_genome.fitness
+            print('############# Saving new best %f ##############' % self.best)
+            config.save_genome(best_genome)
+
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''
     Evaluates an evolved network

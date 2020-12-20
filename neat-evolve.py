@@ -15,24 +15,7 @@ import random
 import gym
 import neat
 
-from neat_gym import _GymConfig, _is_discrete
-
-class _SaveReporter(neat.reporting.BaseReporter):
-
-    def __init__(self, env_name, checkpoint):
-
-        neat.reporting.BaseReporter.__init__(self)
-
-        self.best = None
-        self.env_name = env_name
-        self.checkpoint = checkpoint
-
-    def post_evaluate(self, config, population, species, best_genome):
-
-        if self.checkpoint and (self.best is None or best_genome.fitness > self.best):
-            self.best = best_genome.fitness
-            print('############# Saving new best %f ##############' % self.best)
-            config.save_genome(best_genome)
+from neat_gym import _GymConfig, _SaveReporter, _is_discrete
 
 
 def main():
