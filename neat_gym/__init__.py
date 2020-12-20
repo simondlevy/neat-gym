@@ -6,24 +6,29 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
+import multiprocessing as mp
+import os
 import argparse
+import random
 import pickle
 import time
-import os
 import warnings
 from configparser import ConfigParser
 
-import numpy as np
-
-import neat
-from neat.config import ConfigParameter, UnknownConfigItemError
-
 import gym
 from gym import wrappers
+import neat
+import numpy as np
+
+from neat.config import ConfigParameter, UnknownConfigItemError
 
 from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
+from pureples.shared.substrate import Substrate
+
+def _is_discrete(env):
+    return 'Discrete' in str(type(env.action_space))
 
 class _Config(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
@@ -175,12 +180,25 @@ class _GymConfig(_Config):
     @staticmethod 
     def _draw_net(net, filename, node_names):
 
-
         # Create PDF
         draw_net(net, filename=filename, node_names=node_names) 
 
         # Delete text
         os.remove(filename) 
+
+    @staticmethod
+    def make_config(args):
+
+        # Get input/output layout from environment
+        env = gym.make(args.env)
+        num_inputs  = env.observation_space.shape[0]
+        num_outputs = env.action_space.n if _is_discrete(env) else env.action_space.shape[0]
+
+        # Load rest of config from file
+        config = _GymConfig(args, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
+        evalfun = _GymConfig.eval_genome
+     
+        return config, evalfun
 
 class _GymHyperConfig(_GymConfig):
 
@@ -220,6 +238,24 @@ class _GymHyperConfig(_GymConfig):
         cppn = neat.nn.FeedForwardNetwork.create(genome, config)
         return cppn, create_phenotype_network(cppn, config.substrate, config.actfun)
 
+    @staticmethod
+    def make_config(args):
+        
+        cfg = _GymConfig.load(args, '-hyper')
+        subs =  cfg['Substrate']
+        actfun = subs['function']
+        inp = eval(subs['input'])
+        hid = eval(subs['hidden'])
+        out = eval(subs['output'])
+        substrate = Substrate(inp, out, hid)
+
+        # Load rest of config from file
+        config = _GymHyperConfig(args, substrate, actfun)
+
+        evalfun = _GymHyperConfig.eval_genome
+
+        return config, evalfun
+     
 class _GymEsHyperConfig(_GymHyperConfig):
 
     def __init__(self, args, substrate, actfun, params):
@@ -256,6 +292,43 @@ class _GymEsHyperConfig(_GymHyperConfig):
         net = esnet.create_phenotype_network()
         return cppn, esnet, net
 
+    @staticmethod
+    def make_config(args):
+
+        # Load config from file
+        cfg = _GymConfig.load(args, '-eshyper')
+        subs =  cfg['Substrate']
+        actfun = subs['function']
+        inp = eval(subs['input'])
+        out = eval(subs['output'])
+
+        # Get substrate from -hyper.cfg file named by Gym environment
+        substrate = Substrate(inp, out)
+
+        # Load rest of config from file
+        config = _GymEsHyperConfig(args, substrate, actfun, cfg['ES'])
+
+        evalfun = _GymEsHyperConfig.eval_genome
+
+        return config, evalfun
+
+class _SaveReporter(neat.reporting.BaseReporter):
+
+    def __init__(self, env_name, checkpoint):
+
+        neat.reporting.BaseReporter.__init__(self)
+
+        self.best = None
+        self.env_name = env_name
+        self.checkpoint = checkpoint
+
+    def post_evaluate(self, config, population, species, best_genome):
+
+        if self.checkpoint and (self.best is None or best_genome.fitness > self.best):
+            self.best = best_genome.fitness
+            print('############# Saving new best %f ##############' % self.best)
+            config.save_genome(best_genome)
+
 def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     '''
     Evaluates an evolved network
@@ -276,7 +349,7 @@ def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     total_reward = 0
     steps = 0
 
-    is_discrete = 'Discrete' in str(type(env.action_space))
+    is_discrete = _is_discrete(env)
 
     while True:
         for k in range(activations): # Support recurrent nets
@@ -295,6 +368,49 @@ def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     env.close()
 
     return total_reward
+
+def _evolve(configfun):
+
+    # Parse command-line arguments
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--env', default='CartPole-v1', help='Environment id')
+    parser.add_argument('--checkpoint', dest='checkpoint', action='store_true', help='Save at each new best')
+    parser.add_argument('--cfgdir', required=False, default='./config', help='Directory for config files')
+    parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
+    parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
+    parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
+    args = parser.parse_args()
+
+    # Set random seed (including None)
+    random.seed(args.seed)
+
+    # Make directories for saving results
+    os.makedirs('models', exist_ok=True)
+    os.makedirs('visuals', exist_ok=True)
+
+    # Get configuration and genome evaluation function for a particular algorithm
+    config, evalfun = configfun(args) 
+
+    # Create the population, which is the top-level object for a NEAT run.
+    p = neat.Population(config)
+
+    # Add a stdout reporter to show progress in the terminal.
+    p.add_reporter(neat.StdOutReporter(show_species_detail=False))
+    stats = neat.StatisticsReporter()
+    p.add_reporter(stats)
+    
+    # Add a reporter (which can also checkpoint the best)
+    p.add_reporter(_SaveReporter(args.env, args.checkpoint))
+
+    # Create a parallel fitness evaluator
+    pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
+
+    # Run for number of generations specified in config file
+    winner = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
+
+    # Save winner
+    config.save_genome(winner)
 
 
 def read_file(allow_record=False):

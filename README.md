@@ -17,21 +17,22 @@ do the following:
 ```
 % python3 neat-evolve.py 
 ```
-This will run neat-python on the default [Pendulum-v0](https://gym.openai.com/envs/Pendulum-v0/) environment using the
+This will run neat-python on the default [CartPole-v1](https://gym.openai.com/envs/CartPole-v1/) environment using the
 [parallel fitness evaluator](https://neat-python.readthedocs.io/en/latest/module_summaries.html#parallel),
 so you can take advantage of all the cores on your computer.
 
 Once evolution finishes, you can test out your evolved network by doing:
 
 ```
-% python3 neat-test.py models/Pendulum-v0<fitness>.dat
+% python3 neat-test.py models/CartPole-v1<fitness>.dat
 ```
 
 where ```<fitness>``` is the fitness of your evolved network.
 
-## HyperNEAT support
+## HyperNEAT and ES-HyperNEAT support
 
-NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the ```--hyper``` option.
+NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the **hyperneat-evolve.py**
+and **es-hyperneat-evolve.py** scripts.
 
 ## Using NEAT-Gym in other projects
 
