@@ -329,46 +329,6 @@ class _SaveReporter(neat.reporting.BaseReporter):
             print('############# Saving new best %f ##############' % self.best)
             config.save_genome(best_genome)
 
-def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
-    '''
-    Evaluates an evolved network
-    @param net the network
-    @param env the Gym environment
-    @param render set to True for rendering
-    @param record_dir set to directory name for recording video
-    @param actviations number of times to repeat
-    @param seed seed for random number generator
-    @return total reward
-    '''
-
-    if record_dir is not None:
-        env = wrappers.Monitor(env, record_dir, force=True)
-
-    env.seed(seed)
-    state = env.reset()
-    total_reward = 0
-    steps = 0
-
-    is_discrete = _is_discrete(env)
-
-    while True:
-        for k in range(activations): # Support recurrent nets
-            action = net.activate(state)
-        if is_discrete:
-            action = np.argmax(action)
-        state, reward, done, _ = env.step(action)
-        if render:
-            env.render('rgb_array')
-            time.sleep(.02)
-        total_reward += reward
-        if done:
-            break
-        steps += 1
-
-    env.close()
-
-    return total_reward
-
 def _evolve(configfun):
 
     # Parse command-line arguments
@@ -432,3 +392,49 @@ def read_file(allow_record=False):
 
     # Return genome, config, and optional save flag
     return net, env_name, args.record if allow_record else None, args.nodisplay
+
+def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
+    '''
+    Evaluates an evolved network
+    @param net the network
+    @param env the Gym environment
+    @param render set to True for rendering
+    @param record_dir set to directory name for recording video
+    @param actviations number of times to repeat
+    @param seed seed for random number generator
+    @return total reward
+    '''
+
+    if record_dir is not None:
+        env = wrappers.Monitor(env, record_dir, force=True)
+
+    env.seed(seed)
+    state = env.reset()
+    total_reward = 0
+    steps = 0
+
+    is_discrete = _is_discrete(env)
+
+    while True:
+
+        # Support recurrent nets
+        for k in range(activations): 
+            action = net.activate(state)
+
+        # Support both discrete and continuous actions
+        action = np.argmax(action) if is_discrete else action * env.action_space.high
+
+        state, reward, done, _ = env.step(action)
+        if render:
+            env.render('rgb_array')
+            time.sleep(.02)
+        total_reward += reward
+        if done:
+            break
+        steps += 1
+
+    env.close()
+
+    return total_reward
+
+
