@@ -31,8 +31,8 @@ where ```<fitness>``` is the fitness of your evolved network.
 
 ## HyperNEAT and ES-HyperNEAT support
 
-NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the **hyperneat-evolve.py**
-and **es-hyperneat-evolve.py** scripts.
+NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the **hyperneat-evolve.py** script and
+and [ES-HyperNEAT](http://eplex.cs.ucf.edu/ESHyperNEAT/) via the **es-hyperneat-evolve.py** script.
 
 ## Using NEAT-Gym in other projects
 
