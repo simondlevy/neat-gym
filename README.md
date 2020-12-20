@@ -29,9 +29,10 @@ Once evolution finishes, you can test out your evolved network by doing:
 
 where ```<fitness>``` is the fitness of your evolved network.
 
-## HyperNEAT support
+## HyperNEAT and ES-HyperNEAT support
 
-NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the ```--hyper``` option.
+NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the **hyperneat-evolve.py**
+and **es-hyperneat-evolve.py** scripts.
 
 ## Using NEAT-Gym in other projects
 
