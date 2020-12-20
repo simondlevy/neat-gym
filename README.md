@@ -17,14 +17,14 @@ do the following:
 ```
 % python3 neat-evolve.py 
 ```
-This will run neat-python on the default [Pendulum-v0](https://gym.openai.com/envs/Pendulum-v0/) environment using the
+This will run neat-python on the default [CartPole-v1](https://gym.openai.com/envs/CartPole-v1/) environment using the
 [parallel fitness evaluator](https://neat-python.readthedocs.io/en/latest/module_summaries.html#parallel),
 so you can take advantage of all the cores on your computer.
 
 Once evolution finishes, you can test out your evolved network by doing:
 
 ```
-% python3 neat-test.py models/Pendulum-v0<fitness>.dat
+% python3 neat-test.py models/CartPole-v1<fitness>.dat
 ```
 
 where ```<fitness>``` is the fitness of your evolved network.
