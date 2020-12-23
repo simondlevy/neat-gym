@@ -143,6 +143,15 @@ def simple_test(seed=None):
     for p in [(0.5,0.5), (1.,1.), (2.,2.), (5.,5.)]:
         print(p, nov._sparseness(p))
 
+def xor_test(seed=None):
+
+    # Seed the random-number generator for reproducibility.
+    np.random.seed(seed)
+
+    # Create an instance of your Novelty class with a k of 10, a threshold of
+    # 0.3, and a limit of 150.
+    nov = Novelty(10, 0.3, 150)
+
 # Test 
 if __name__ == '__main__':
     simple_test()
