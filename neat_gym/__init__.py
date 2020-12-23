@@ -102,17 +102,6 @@ class _NeatConfig(object):
         reproduction_dict = dict(parameters.items(reproduction_type.__name__))
         self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
 
-    @staticmethod
-    def eval_genome(genome, config, net, activations): # _NeatConfig
-
-        fitness = 0
-
-        for _ in range(config.reps):
-
-            fitness += eval_net(net, config.env, activations=activations, seed=config.seed)
-
-        return fitness / config.reps
-
 class _GymNeatConfig(_NeatConfig):
 
     def __init__(self, args, layout_dict, suffix=''):
@@ -160,7 +149,18 @@ class _GymNeatConfig(_NeatConfig):
     def eval_genome(genome, config): # _GymNeatConfig
 
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        return _NeatConfig.eval_genome(genome, config, net, 1)
+        return _GymNeatConfig.eval_net(genome, config, net, 1)
+
+    @staticmethod
+    def eval_net(genome, config, net, activations): # _NeatConfig
+
+        fitness = 0
+
+        for _ in range(config.reps):
+
+            fitness += eval_net(net, config.env, activations=activations, seed=config.seed)
+
+        return fitness / config.reps
 
     @staticmethod
     def load(args, suffix):
@@ -231,7 +231,7 @@ class _GymHyperConfig(_GymNeatConfig):
 
         cppn, net = _GymHyperConfig._make_nets(genome, config)
         activations = len(config.substrate.hidden_coordinates) + 2
-        return _NeatConfig.eval_genome(genome, config, net, activations)
+        return _GymNeatConfig.eval_net(genome, config, net, activations)
 
     @staticmethod
     def _make_nets(genome, config):
@@ -283,7 +283,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def eval_genome(genome, config):
 
         _, esnet, net = _GymEsHyperConfig._make_nets(genome, config)
-        return _NeatConfig.eval_genome(genome, config, net, esnet.activations)
+        return _GymNeatConfig.eval_net(genome, config, net, esnet.activations)
 
     @staticmethod
     def _make_nets(genome, config):
