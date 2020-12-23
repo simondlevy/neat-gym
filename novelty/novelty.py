@@ -145,6 +145,13 @@ def simple_test(seed=None):
 
 def xor_test(seed=None):
 
+    import neat
+    from neat_gym import _Config
+
+    cfg = _Config(neat.DefaultGenome, neat.DefaultReproduction,
+            neat.DefaultSpeciesSet, neat.DefaultStagnation, 
+            'xor.cfg', {'num_inputs':3, 'num_outputs':1})
+ 
     # Seed the random-number generator for reproducibility.
     np.random.seed(seed)
 
