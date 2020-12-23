@@ -152,6 +152,7 @@ def xor_test(seed=None):
     # 0.3, and a limit of 150.
     nov = Novelty(10, 0.3, 150)
 
-# Test 
+# Tests
 if __name__ == '__main__':
     simple_test()
+    xor_test()
