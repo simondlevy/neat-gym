@@ -7,6 +7,6 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-from neat_gym import _GymNeatConfig, _evolve_cmdline
+from neat_gym import _GymNeatConfig, _evolve_gym
 
-_evolve_cmdline(_GymNeatConfig.make_config)
+_evolve_gym(_GymNeatConfig.make_config)

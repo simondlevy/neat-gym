@@ -331,6 +331,9 @@ class _SaveReporter(neat.reporting.BaseReporter):
             config.save_genome(best_genome)
 
 def _evolve(config, evalfun, seed, task_name, ngen, checkpoint):
+    '''
+    NEAT evolution with parallel evaluator
+    '''
 
     # Set random seed (including None)
     random.seed(seed)
@@ -359,7 +362,10 @@ def _evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     # Save winner
     config.save_genome(winner)
 
-def _evolve_cmdline(configfun):
+def _evolve_gym(configfun):
+    '''
+    Evolves solutions to Gym environments based on command-line arguments
+    '''
 
     # Parse command-line arguments
 
