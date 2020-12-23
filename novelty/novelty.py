@@ -191,7 +191,13 @@ def main():
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
 
-    if not args.task in tasks:
+    if args.task == 'simple':
+        simple_test()
+    elif args.task == 'xor-fitness':
+        xor_fitness()
+    elif args.task == 'xor-novelty':
+        pass
+    else:
         print('Task must be one of: ' + ', '.join(tasks))
         exit(0)
 
