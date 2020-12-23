@@ -27,9 +27,6 @@ from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 from pureples.shared.substrate import Substrate
 
-def _is_discrete(env):
-    return 'Discrete' in str(type(env.action_space))
-
 class _NeatConfig(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
@@ -106,7 +103,7 @@ class _NeatConfig(object):
         self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
 
     @staticmethod
-    def eval_genome(genome, config, net, activations):
+    def eval_genome(genome, config, net, activations): # _NeatConfig
 
         fitness = 0
 
@@ -160,7 +157,7 @@ class _GymNeatConfig(_NeatConfig):
         return '%s%s%+010.3f' % (self.env_name, suffix, genome.fitness)
 
     @staticmethod
-    def eval_genome(genome, config):
+    def eval_genome(genome, config): # _GymNeatConfig
 
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         return _NeatConfig.eval_genome(genome, config, net, 1)
@@ -192,13 +189,17 @@ class _GymNeatConfig(_NeatConfig):
         # Get input/output layout from environment
         env = gym.make(args.env)
         num_inputs  = env.observation_space.shape[0]
-        num_outputs = env.action_space.n if _is_discrete(env) else env.action_space.shape[0]
+        num_outputs = env.action_space.n if _GymNeatConfig._is_discrete(env) else env.action_space.shape[0]
 
         # Load rest of config from file
         config = _GymNeatConfig(args, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
         evalfun = _GymNeatConfig.eval_genome
      
         return config, evalfun
+
+    def _is_discrete(env):
+        return 'Discrete' in str(type(env.action_space))
+
 
 class _GymHyperConfig(_GymNeatConfig):
 
@@ -226,7 +227,7 @@ class _GymHyperConfig(_GymNeatConfig):
         _GymNeatConfig._draw_net(net, 'visuals/%s' % self._make_name(genome, suffix=suffix), self.node_names)
 
     @staticmethod
-    def eval_genome(genome, config):
+    def eval_genome(genome, config): # _GymHyperConfig
 
         cppn, net = _GymHyperConfig._make_nets(genome, config)
         activations = len(config.substrate.hidden_coordinates) + 2
@@ -413,7 +414,7 @@ def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     total_reward = 0
     steps = 0
 
-    is_discrete = _is_discrete(env)
+    is_discrete = _GymNeatConfig._is_discrete(env)
 
     while True:
 
