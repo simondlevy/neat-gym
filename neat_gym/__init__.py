@@ -36,7 +36,8 @@ class _NeatConfig(object):
                 ConfigParameter('reset_on_extinction', bool),
                 ConfigParameter('no_fitness_termination', bool, False)]
 
-    def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, filename, layout_dict):
+    def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, 
+            config_file_name, task_name, layout_dict):
 
         # Check that the provided types have the required methods.
         assert hasattr(genome_type, 'parse_config')
@@ -48,12 +49,13 @@ class _NeatConfig(object):
         self.reproduction_type = reproduction_type
         self.species_set_type = species_set_type
         self.stagnation_type = stagnation_type
+        self.task_name = task_name
 
-        if not os.path.isfile(filename):
-            raise Exception('No such config file: ' + os.path.abspath(filename))
+        if not os.path.isfile(config_file_name):
+            raise Exception('No such config file: ' + os.path.abspath(config_file_name))
 
         parameters = ConfigParser()
-        with open(filename) as f:
+        with open(config_file_name) as f:
             if hasattr(parameters, 'read_file'):
                 parameters.read_file(f)
             else:
@@ -102,6 +104,13 @@ class _NeatConfig(object):
         reproduction_dict = dict(parameters.items(reproduction_type.__name__))
         self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
 
+    def save_genome(self, genome):
+
+        name = self._make_name(genome)
+        net = neat.nn.FeedForwardNetwork.create(genome, self)
+        pickle.dump((net, self.task_name), open('models/%s.dat' % name, 'wb'))
+        _GymNeatConfig._draw_net(net, 'visuals/%s'%name, self.node_names)
+
 class _GymNeatConfig(_NeatConfig):
 
     def __init__(self, args, layout_dict, suffix=''):
@@ -114,9 +123,8 @@ class _GymNeatConfig(_NeatConfig):
 
         _NeatConfig.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                 neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-                filename, layout_dict)
+                filename, args.env, layout_dict)
 
-        self.env_name = args.env
         self.env = gym.make(args.env)
 
         self.reps = args.reps
@@ -134,16 +142,9 @@ class _GymNeatConfig(_NeatConfig):
         except:
             self.node_names = {}
 
-    def save_genome(self, genome):
-
-        name = self._make_name(genome)
-        net = neat.nn.FeedForwardNetwork.create(genome, self)
-        pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
-        _GymNeatConfig._draw_net(net, 'visuals/%s'%name, self.node_names)
-
     def _make_name(self, genome, suffix=''):
 
-        return '%s%s%+010.3f' % (self.env_name, suffix, genome.fitness)
+        return '%s%s%+010.3f' % (self.task_name, suffix, genome.fitness)
 
     @staticmethod
     def eval_genome(genome, config):
@@ -222,7 +223,7 @@ class _GymHyperConfig(_GymNeatConfig):
         self._save_nets(genome, cppn, net)
 
     def _save_nets(self, genome, cppn, net, suffix='-hyper'):
-        pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix=suffix), 'wb'))
+        pickle.dump((net, self.task_name), open('models/%s.dat' % self._make_name(genome, suffix=suffix), 'wb'))
         _GymNeatConfig._draw_net(cppn, 'visuals/%s' % self._make_name(genome, suffix='-cppn'), self.cppn_node_names)
         _GymNeatConfig._draw_net(net, 'visuals/%s' % self._make_name(genome, suffix=suffix), self.node_names)
 

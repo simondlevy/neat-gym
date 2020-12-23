@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import neat
 
 class Novelty(object):
     '''
@@ -143,14 +144,14 @@ def simple_test(seed=None):
     for p in [(0.5,0.5), (1.,1.), (2.,2.), (5.,5.)]:
         print(p, nov._sparseness(p))
 
+def _eval_xor(genome, config):
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+    return 0
+
 def xor_test_fitness(seed=None):
 
     import neat
     from neat_gym import _NeatConfig, _evolve
-
-    def evalfun(genome, config):
-        net = neat.nn.FeedForwardNetwork.create(genome, config)
-        return 0
 
     config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
             neat.DefaultSpeciesSet, neat.DefaultStagnation, 
@@ -161,7 +162,7 @@ def xor_test_fitness(seed=None):
     # Seed the random-number generator for reproducibility.
     np.random.seed(seed)
 
-    _evolve(config, evalfun, seed, ngen, checkpoint)
+    _evolve(config, _eval_xor, seed, 'xor', 1000, True)
 
 def xor_test_novelty(seed=None):
 
