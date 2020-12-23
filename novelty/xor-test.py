@@ -21,7 +21,8 @@ def main():
     net, _ = pickle.load(open(args.filename, 'rb'))
 
     # Run the network on the environment
-    #print('Reward = %6.6f.' % eval_net(net, gym.make(env_name), render=(not nodisplay), record_dir=record_dir))
+    for inp,tgt in zip(((0,0), (0,1), (1,0), (1,1)), (0,1,1,0)):
+        print(inp, net.activate(inp + (1,))[0])
 
 if __name__ == '__main__':
     main()

@@ -3,10 +3,19 @@
 import argparse
 import numpy as np
 import neat
-from xor import eval_xor
 #from neat_gym.novelty import Novelty
 from neat_gym import _NeatConfig, _evolve
 
+def _eval_xor(genome, config):
+    
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+    sse = 0
+
+    for inp,tgt in zip(((0,0), (0,1), (1,0), (1,1)), (0,1,1,0)):
+        sse += (tgt - net.activate(inp + (1,))[0])**2
+
+    return 1 - np.sqrt(sse/4)
 
 def xor_fitness(ngen, seed, checkpoint):
 
@@ -16,7 +25,7 @@ def xor_fitness(ngen, seed, checkpoint):
 
     np.random.seed(seed)
 
-    _evolve(config, eval_xor, seed, 'xor', ngen, checkpoint)
+    _evolve(config, _eval_xor, seed, 'xor', ngen, checkpoint)
 
 def xor_novelty(seed=None):
 
