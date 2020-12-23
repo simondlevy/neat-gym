@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import numpy as np
 import neat
 
@@ -157,7 +158,7 @@ def _eval_xor(genome, config):
 
     return 1 - np.sqrt(sse/4)
 
-def xor_test_fitness(ngen=1000, seed=None, checkpoint=True):
+def xor_fitness(ngen=1000, seed=None, checkpoint=True):
 
     import neat
     from neat_gym import _NeatConfig, _evolve
@@ -170,7 +171,7 @@ def xor_test_fitness(ngen=1000, seed=None, checkpoint=True):
 
     _evolve(config, _eval_xor, seed, 'xor', ngen, checkpoint)
 
-def xor_test_novelty(seed=None):
+def xor_novelty(seed=None):
 
     # Seed the random-number generator for reproducibility.
     np.random.seed(seed)
@@ -179,8 +180,17 @@ def xor_test_novelty(seed=None):
     # 0.3, and a limit of 150.
     #nov = Novelty(10, 0.3, 150)
 
-# Tests
+
+def main():
+
+    tasks = ['simple', 'xor-fitness', 'xor-novelty', 'xor-test']
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--task', default='simple-test', help=''.join(tasks))
+    parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
+    parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
+    args = parser.parse_args()
+
+
 if __name__ == '__main__':
-    #simple_test()
-    xor_test_fitness()
-    #xor_test_novelty()
+    main()
