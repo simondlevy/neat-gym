@@ -146,7 +146,7 @@ def simple_test(seed=None):
 def xor_test_fitness(seed=None):
 
     import neat
-    from neat_gym import _NeatConfig
+    from neat_gym import _NeatConfig, _evolve
 
     def evalfun(genome, config):
         net = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -160,6 +160,8 @@ def xor_test_fitness(seed=None):
 
     # Seed the random-number generator for reproducibility.
     np.random.seed(seed)
+
+    _evolve(config, evalfun, seed, ngen, checkpoint)
 
 def xor_test_novelty(seed=None):
 

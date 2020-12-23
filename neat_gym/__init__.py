@@ -315,12 +315,12 @@ class _GymEsHyperConfig(_GymHyperConfig):
 
 class _SaveReporter(neat.reporting.BaseReporter):
 
-    def __init__(self, env_name, checkpoint):
+    def __init__(self, task_name, checkpoint):
 
         neat.reporting.BaseReporter.__init__(self)
 
         self.best = None
-        self.env_name = env_name
+        self.task_name = task_name
         self.checkpoint = checkpoint
 
     def post_evaluate(self, config, population, species, best_genome):
