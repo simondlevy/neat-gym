@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+'''
+Novelty Search in Python
+
+Copyright (C) 2020 Simon D. Levy
+
+MIT License
+'''
+
 
 import numpy as np
 import neat

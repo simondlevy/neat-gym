@@ -3,25 +3,12 @@
 import argparse
 import numpy as np
 import neat
+from xor import eval_xor
 #from neat_gym.novelty import Novelty
+from neat_gym import _NeatConfig, _evolve
 
-def _eval_xor(genome, config):
-    '''
-    Must be global for pickling.
-    '''
-    net = neat.nn.FeedForwardNetwork.create(genome, config)
-
-    sse = 0
-
-    for inp,tgt in zip(((0,0), (0,1), (1,0), (1,1)), (0,1,1,0)):
-        sse += (tgt - net.activate(inp + (1,))[0])**2
-
-    return 1 - np.sqrt(sse/4)
 
 def xor_fitness(ngen, seed, checkpoint):
-
-    import neat
-    from neat_gym import _NeatConfig, _evolve
 
     config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
             neat.DefaultSpeciesSet, neat.DefaultStagnation, 
@@ -29,7 +16,7 @@ def xor_fitness(ngen, seed, checkpoint):
 
     np.random.seed(seed)
 
-    _evolve(config, _eval_xor, seed, 'xor', ngen, checkpoint)
+    _evolve(config, eval_xor, seed, 'xor', ngen, checkpoint)
 
 def xor_novelty(seed=None):
 
@@ -43,22 +30,18 @@ def xor_novelty(seed=None):
 
 def main():
 
-    tasks = ['fitness', 'novelty']
-
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--task', required=True, help='(' + ', '.join(tasks) + ')')
+    parser.add_argument('--novelty', dest='novelty', action='store_true', help='Use Novelty Search')
     parser.add_argument('--checkpoint', dest='checkpoint', action='store_true', help='Save at each new best')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
 
-    if args.task == 'fitness':
-        xor_fitness(args.ngen, args.seed, args.checkpoint)
-    elif args.task == 'novelty':
+    if args.novelty:
         pass
+
     else:
-        print('Task must be one of: ' + ', '.join(tasks))
-        exit(0)
+        xor_fitness(args.ngen, args.seed, args.checkpoint)
 
 if __name__ == '__main__':
     main()

@@ -17,10 +17,8 @@ def main():
     parser.add_argument('filename', metavar='FILENAME', help='.dat input file')
     args = parser.parse_args()
 
-    # Load net and environment name from pickled file
-    net, task_name = pickle.load(open(args.filename, 'rb'))
-
-    print(task_name)
+    # Load net name from pickled file
+    net, _ = pickle.load(open(args.filename, 'rb'))
 
     # Run the network on the environment
     #print('Reward = %6.6f.' % eval_net(net, gym.make(env_name), render=(not nodisplay), record_dir=record_dir))
