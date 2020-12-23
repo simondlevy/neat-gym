@@ -111,6 +111,10 @@ class _NeatConfig(object):
         pickle.dump((net, self.task_name), open('models/%s.dat' % name, 'wb'))
         _GymNeatConfig._draw_net(net, 'visuals/%s'%name, self.node_names)
 
+    def _make_name(self, genome, suffix=''):
+
+        return '%s%s%+010.3f' % (self.task_name, suffix, genome.fitness)
+
 class _GymNeatConfig(_NeatConfig):
 
     def __init__(self, args, layout_dict, suffix=''):
@@ -141,10 +145,6 @@ class _GymNeatConfig(_NeatConfig):
                 self.node_names[idx] = name
         except:
             self.node_names = {}
-
-    def _make_name(self, genome, suffix=''):
-
-        return '%s%s%+010.3f' % (self.task_name, suffix, genome.fitness)
 
     @staticmethod
     def eval_genome(genome, config):
