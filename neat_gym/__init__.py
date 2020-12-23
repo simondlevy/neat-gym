@@ -330,7 +330,7 @@ class _SaveReporter(neat.reporting.BaseReporter):
             print('############# Saving new best %f ##############' % self.best)
             config.save_genome(best_genome)
 
-def _evolve(config, evalfun, seed, env, ngen, checkpoint):
+def _evolve(config, evalfun, seed, task_name, ngen, checkpoint):
 
     # Set random seed (including None)
     random.seed(seed)
@@ -348,7 +348,7 @@ def _evolve(config, evalfun, seed, env, ngen, checkpoint):
     p.add_reporter(stats)
     
     # Add a reporter (which can also checkpoint the best)
-    p.add_reporter(_SaveReporter(env, checkpoint))
+    p.add_reporter(_SaveReporter(task_name, checkpoint))
 
     # Create a parallel fitness evaluator
     pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
