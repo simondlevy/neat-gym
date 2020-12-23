@@ -67,7 +67,6 @@ class Novelty(object):
         @parm filename
         '''
         with open(filename, 'w') as f:
-            print(self.archive)
             for p in self.archive:
                 for x in p:
                     f.write('%f ' % x)
