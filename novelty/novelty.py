@@ -145,24 +145,26 @@ def simple_test(seed=None):
         print(p, nov._sparseness(p))
 
 def _eval_xor(genome, config):
+    '''
+    Must be global for pickling.
+    '''
     net = neat.nn.FeedForwardNetwork.create(genome, config)
     return 0
 
-def xor_test_fitness(seed=None):
+def xor_test_fitness(ngen=1000, seed=None, checkpoint=True):
 
     import neat
     from neat_gym import _NeatConfig, _evolve
 
     config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
             neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-            'xor.cfg', 'xor', {'num_inputs':3, 'num_outputs':1}, None)
+            'xor.cfg', 'xor', {'num_inputs':3, 'num_outputs':1}, seed)
 
     p = neat.Population(config)
 
-    # Seed the random-number generator for reproducibility.
     np.random.seed(seed)
 
-    _evolve(config, _eval_xor, seed, 'xor', 1000, True)
+    _evolve(config, _eval_xor, seed, 'xor', ngen, checkpoint)
 
 def xor_test_novelty(seed=None):
 
