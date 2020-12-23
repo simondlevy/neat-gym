@@ -148,14 +148,17 @@ def xor_test_fitness(seed=None):
     import neat
     from neat_gym import _Config
 
-    cfg = _Config(neat.DefaultGenome, neat.DefaultReproduction,
+    config = _Config(neat.DefaultGenome, neat.DefaultReproduction,
             neat.DefaultSpeciesSet, neat.DefaultStagnation, 
             'xor.cfg', {'num_inputs':3, 'num_outputs':1})
- 
+
     # Seed the random-number generator for reproducibility.
     np.random.seed(seed)
 
 def xor_test_novelty(seed=None):
+
+    # Seed the random-number generator for reproducibility.
+    np.random.seed(seed)
 
     # Create an instance of your Novelty class with a k of 10, a threshold of
     # 0.3, and a limit of 150.
@@ -165,3 +168,4 @@ def xor_test_novelty(seed=None):
 if __name__ == '__main__':
     #simple_test()
     xor_test_fitness()
+    #xor_test_novelty()
