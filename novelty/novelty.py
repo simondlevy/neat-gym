@@ -186,7 +186,7 @@ def main():
     tasks = ['simple', 'xor-fitness', 'xor-novelty', 'xor-test']
 
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--task', default='simple-test', help=''.join(tasks))
+    parser.add_argument('--task', default='simple', help='(' + ', '.join(tasks) + ')')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
