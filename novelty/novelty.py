@@ -149,9 +149,13 @@ def _eval_xor(genome, config):
     Must be global for pickling.
     '''
     net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+    for inp in ((0,0), (0,1), (1,0), (1,1)):
+        net.activate(inp + (1,))
+
     return 0
 
-def xor_test_fitness(ngen=1000, seed=None, checkpoint=True):
+def xor_test_fitness(ngen=100, seed=None, checkpoint=True):
 
     import neat
     from neat_gym import _NeatConfig, _evolve
