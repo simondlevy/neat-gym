@@ -146,13 +146,13 @@ class _GymNeatConfig(_NeatConfig):
         return '%s%s%+010.3f' % (self.env_name, suffix, genome.fitness)
 
     @staticmethod
-    def eval_genome(genome, config): # _GymNeatConfig
+    def eval_genome(genome, config):
 
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        return _GymNeatConfig.eval_net(genome, config, net, 1)
+        return _GymNeatConfig.eval_net(config, net, 1)
 
     @staticmethod
-    def eval_net(genome, config, net, activations): # _NeatConfig
+    def eval_net(config, net, activations):
 
         fitness = 0
 
@@ -231,7 +231,7 @@ class _GymHyperConfig(_GymNeatConfig):
 
         cppn, net = _GymHyperConfig._make_nets(genome, config)
         activations = len(config.substrate.hidden_coordinates) + 2
-        return _GymNeatConfig.eval_net(genome, config, net, activations)
+        return _GymNeatConfig.eval_net(config, net, activations)
 
     @staticmethod
     def _make_nets(genome, config):
@@ -283,7 +283,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def eval_genome(genome, config):
 
         _, esnet, net = _GymEsHyperConfig._make_nets(genome, config)
-        return _GymNeatConfig.eval_net(genome, config, net, esnet.activations)
+        return _GymNeatConfig.eval_net(config, net, esnet.activations)
 
     @staticmethod
     def _make_nets(genome, config):
