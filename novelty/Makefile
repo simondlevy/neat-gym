@@ -1,2 +1,2 @@
 clean:
-	rm -rf models/ visuals/
+	rm -rf test.dat models/ visuals/
