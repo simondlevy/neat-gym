@@ -150,12 +150,14 @@ def _eval_xor(genome, config):
     '''
     net = neat.nn.FeedForwardNetwork.create(genome, config)
 
-    for inp in ((0,0), (0,1), (1,0), (1,1)):
-        net.activate(inp + (1,))
+    sse = 0
 
-    return 0
+    for inp,tgt in zip(((0,0), (0,1), (1,0), (1,1)), (0,1,1,0)):
+        sse += (tgt - net.activate(inp + (1,))[0])**2
 
-def xor_test_fitness(ngen=100, seed=None, checkpoint=True):
+    return 1 - np.sqrt(sse/4)
+
+def xor_test_fitness(ngen=1000, seed=None, checkpoint=True):
 
     import neat
     from neat_gym import _NeatConfig, _evolve
@@ -163,8 +165,6 @@ def xor_test_fitness(ngen=100, seed=None, checkpoint=True):
     config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
             neat.DefaultSpeciesSet, neat.DefaultStagnation, 
             'xor.cfg', 'xor', {'num_inputs':3, 'num_outputs':1}, seed)
-
-    p = neat.Population(config)
 
     np.random.seed(seed)
 
@@ -177,7 +177,7 @@ def xor_test_novelty(seed=None):
 
     # Create an instance of your Novelty class with a k of 10, a threshold of
     # 0.3, and a limit of 150.
-    nov = Novelty(10, 0.3, 150)
+    #nov = Novelty(10, 0.3, 150)
 
 # Tests
 if __name__ == '__main__':
