@@ -146,9 +146,9 @@ def simple_test(seed=None):
 def xor_test_fitness(seed=None):
 
     import neat
-    from neat_gym import _Config
+    from neat_gym import _NeatConfig
 
-    config = _Config(neat.DefaultGenome, neat.DefaultReproduction,
+    config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
             neat.DefaultSpeciesSet, neat.DefaultStagnation, 
             'xor.cfg', {'num_inputs':3, 'num_outputs':1})
 

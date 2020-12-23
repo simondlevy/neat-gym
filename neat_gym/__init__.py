@@ -30,7 +30,7 @@ from pureples.shared.substrate import Substrate
 def _is_discrete(env):
     return 'Discrete' in str(type(env.action_space))
 
-class _Config(object):
+class _NeatConfig(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
     __params = [ConfigParameter('pop_size', int),
@@ -116,7 +116,7 @@ class _Config(object):
 
         return fitness / config.reps
 
-class _GymConfig(_Config):
+class _GymNeatConfig(_NeatConfig):
 
     def __init__(self, args, layout_dict, suffix=''):
 
@@ -126,7 +126,7 @@ class _GymConfig(_Config):
             print('Unable to open config file ' + filename)
             exit(1)
 
-        _Config.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
+        _NeatConfig.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                 neat.DefaultSpeciesSet, neat.DefaultStagnation, 
                 filename, layout_dict)
 
@@ -136,7 +136,7 @@ class _GymConfig(_Config):
         self.reps = args.reps
         self.seed = args.seed
 
-        namescfg = _GymConfig.load(args, suffix)
+        namescfg = _GymNeatConfig.load(args, suffix)
 
         try:
             names =  namescfg['Names']
@@ -153,7 +153,7 @@ class _GymConfig(_Config):
         name = self._make_name(genome)
         net = neat.nn.FeedForwardNetwork.create(genome, self)
         pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
-        _GymConfig._draw_net(net, 'visuals/%s'%name, self.node_names)
+        _GymNeatConfig._draw_net(net, 'visuals/%s'%name, self.node_names)
 
     def _make_name(self, genome, suffix=''):
 
@@ -163,7 +163,7 @@ class _GymConfig(_Config):
     def eval_genome(genome, config):
 
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        return _Config.eval_genome(genome, config, net, 1)
+        return _NeatConfig.eval_genome(genome, config, net, 1)
 
     @staticmethod
     def load(args, suffix):
@@ -195,16 +195,16 @@ class _GymConfig(_Config):
         num_outputs = env.action_space.n if _is_discrete(env) else env.action_space.shape[0]
 
         # Load rest of config from file
-        config = _GymConfig(args, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
-        evalfun = _GymConfig.eval_genome
+        config = _GymNeatConfig(args, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
+        evalfun = _GymNeatConfig.eval_genome
      
         return config, evalfun
 
-class _GymHyperConfig(_GymConfig):
+class _GymHyperConfig(_GymNeatConfig):
 
     def __init__(self, args, substrate, actfun, suffix='-hyper'):
 
-        _GymConfig.__init__(self, args, {'num_inputs':5, 'num_outputs':1}, suffix)
+        _GymNeatConfig.__init__(self, args, {'num_inputs':5, 'num_outputs':1}, suffix)
 
         self.substrate = substrate
         self.actfun = actfun
@@ -222,15 +222,15 @@ class _GymHyperConfig(_GymConfig):
 
     def _save_nets(self, genome, cppn, net, suffix='-hyper'):
         pickle.dump((net, self.env_name), open('models/%s.dat' % self._make_name(genome, suffix=suffix), 'wb'))
-        _GymConfig._draw_net(cppn, 'visuals/%s' % self._make_name(genome, suffix='-cppn'), self.cppn_node_names)
-        _GymConfig._draw_net(net, 'visuals/%s' % self._make_name(genome, suffix=suffix), self.node_names)
+        _GymNeatConfig._draw_net(cppn, 'visuals/%s' % self._make_name(genome, suffix='-cppn'), self.cppn_node_names)
+        _GymNeatConfig._draw_net(net, 'visuals/%s' % self._make_name(genome, suffix=suffix), self.node_names)
 
     @staticmethod
     def eval_genome(genome, config):
 
         cppn, net = _GymHyperConfig._make_nets(genome, config)
         activations = len(config.substrate.hidden_coordinates) + 2
-        return _Config.eval_genome(genome, config, net, activations)
+        return _NeatConfig.eval_genome(genome, config, net, activations)
 
     @staticmethod
     def _make_nets(genome, config):
@@ -241,7 +241,7 @@ class _GymHyperConfig(_GymConfig):
     @staticmethod
     def make_config(args):
         
-        cfg = _GymConfig.load(args, '-hyper')
+        cfg = _GymNeatConfig.load(args, '-hyper')
         subs =  cfg['Substrate']
         actfun = subs['function']
         inp = eval(subs['input'])
@@ -282,7 +282,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def eval_genome(genome, config):
 
         _, esnet, net = _GymEsHyperConfig._make_nets(genome, config)
-        return _Config.eval_genome(genome, config, net, esnet.activations)
+        return _NeatConfig.eval_genome(genome, config, net, esnet.activations)
 
     @staticmethod
     def _make_nets(genome, config):
@@ -296,7 +296,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def make_config(args):
 
         # Load config from file
-        cfg = _GymConfig.load(args, '-eshyper')
+        cfg = _GymNeatConfig.load(args, '-eshyper')
         subs =  cfg['Substrate']
         actfun = subs['function']
         inp = eval(subs['input'])
