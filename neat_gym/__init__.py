@@ -37,7 +37,7 @@ class _NeatConfig(object):
                 ConfigParameter('no_fitness_termination', bool, False)]
 
     def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, 
-            config_file_name, task_name, layout_dict):
+            config_file_name, task_name, layout_dict, seed):
 
         # Check that the provided types have the required methods.
         assert hasattr(genome_type, 'parse_config')
@@ -50,6 +50,7 @@ class _NeatConfig(object):
         self.species_set_type = species_set_type
         self.stagnation_type = stagnation_type
         self.task_name = task_name
+        self.seed = seed
 
         if not os.path.isfile(config_file_name):
             raise Exception('No such config file: ' + os.path.abspath(config_file_name))
@@ -60,6 +61,16 @@ class _NeatConfig(object):
                 parameters.read_file(f)
             else:
                 parameters.readfp(f)
+
+            try:
+                names =  parameters['Names']
+                self.node_names = {}
+                for idx,name in enumerate(eval(names['input'])):
+                    self.node_names[-idx-1] = name
+                for idx,name in enumerate(eval(names['output'])):
+                    self.node_names[idx] = name
+            except:
+                self.node_names = {}
 
         # NEAT configuration
         if not parameters.has_section('NEAT'):
@@ -121,30 +132,13 @@ class _GymNeatConfig(_NeatConfig):
 
         filename = args.cfgdir + '/' + args.env + suffix + '.cfg'
 
-        if not os.path.isfile(filename):
-            print('Unable to open config file ' + filename)
-            exit(1)
-
         _NeatConfig.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                 neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-                filename, args.env, layout_dict)
+                filename, args.env, layout_dict, args.seed)
 
         self.env = gym.make(args.env)
 
         self.reps = args.reps
-        self.seed = args.seed
-
-        namescfg = _GymNeatConfig.load(args, suffix)
-
-        try:
-            names =  namescfg['Names']
-            self.node_names = {}
-            for idx,name in enumerate(eval(names['input'])):
-                self.node_names[-idx-1] = name
-            for idx,name in enumerate(eval(names['output'])):
-                self.node_names[idx] = name
-        except:
-            self.node_names = {}
 
     @staticmethod
     def eval_genome(genome, config):

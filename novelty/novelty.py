@@ -155,7 +155,7 @@ def xor_test_fitness(seed=None):
 
     config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
             neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-            'xor.cfg', 'xor', {'num_inputs':3, 'num_outputs':1})
+            'xor.cfg', 'xor', {'num_inputs':3, 'num_outputs':1}, None)
 
     p = neat.Population(config)
 
