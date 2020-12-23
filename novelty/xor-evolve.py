@@ -18,7 +18,7 @@ def _eval_xor(genome, config):
 
     return 1 - np.sqrt(sse/4)
 
-def xor_fitness(ngen=1000, seed=None, checkpoint=True):
+def xor_fitness(ngen, seed, checkpoint):
 
     import neat
     from neat_gym import _NeatConfig, _evolve
@@ -47,12 +47,13 @@ def main():
 
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--task', required=True, help='(' + ', '.join(tasks) + ')')
+    parser.add_argument('--checkpoint', dest='checkpoint', action='store_true', help='Save at each new best')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
 
     if args.task == 'fitness':
-        xor_fitness()
+        xor_fitness(args.ngen, args.seed, args.checkpoint)
     elif args.task == 'novelty':
         pass
     else:
