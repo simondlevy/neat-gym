@@ -330,7 +330,36 @@ class _SaveReporter(neat.reporting.BaseReporter):
             print('############# Saving new best %f ##############' % self.best)
             config.save_genome(best_genome)
 
-def _evolve(configfun):
+def _evolve(config, evalfun, seed, env, ngen, checkpoint):
+
+    # Set random seed (including None)
+    random.seed(seed)
+
+    # Make directories for saving results
+    os.makedirs('models', exist_ok=True)
+    os.makedirs('visuals', exist_ok=True)
+
+    # Create the population, which is the top-level object for a NEAT run.
+    p = neat.Population(config)
+
+    # Add a stdout reporter to show progress in the terminal.
+    p.add_reporter(neat.StdOutReporter(show_species_detail=False))
+    stats = neat.StatisticsReporter()
+    p.add_reporter(stats)
+    
+    # Add a reporter (which can also checkpoint the best)
+    p.add_reporter(_SaveReporter(env, checkpoint))
+
+    # Create a parallel fitness evaluator
+    pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
+
+    # Run for number of generations specified in config file
+    winner = p.run(pe.evaluate) if ngen is None else p.run(pe.evaluate, ngen) 
+
+    # Save winner
+    config.save_genome(winner)
+
+def _evolve_cmdline(configfun):
 
     # Parse command-line arguments
 
@@ -343,36 +372,11 @@ def _evolve(configfun):
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
 
-    # Set random seed (including None)
-    random.seed(args.seed)
-
-    # Make directories for saving results
-    os.makedirs('models', exist_ok=True)
-    os.makedirs('visuals', exist_ok=True)
-
     # Get configuration and genome evaluation function for a particular algorithm
     config, evalfun = configfun(args) 
 
-    # Create the population, which is the top-level object for a NEAT run.
-    p = neat.Population(config)
-
-    # Add a stdout reporter to show progress in the terminal.
-    p.add_reporter(neat.StdOutReporter(show_species_detail=False))
-    stats = neat.StatisticsReporter()
-    p.add_reporter(stats)
-    
-    # Add a reporter (which can also checkpoint the best)
-    p.add_reporter(_SaveReporter(args.env, args.checkpoint))
-
-    # Create a parallel fitness evaluator
-    pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
-
-    # Run for number of generations specified in config file
-    winner = p.run(pe.evaluate) if args.ngen is None else p.run(pe.evaluate, args.ngen) 
-
-    # Save winner
-    config.save_genome(winner)
-
+    # Evolve
+    _evolve(config, evalfun, args.seed, args.env, args.ngen, args.checkpoint)
 
 def read_file(allow_record=False):
     '''

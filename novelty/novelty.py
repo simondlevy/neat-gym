@@ -148,9 +148,15 @@ def xor_test_fitness(seed=None):
     import neat
     from neat_gym import _NeatConfig
 
+    def evalfun(genome, config):
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        return 0
+
     config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
             neat.DefaultSpeciesSet, neat.DefaultStagnation, 
             'xor.cfg', {'num_inputs':3, 'num_outputs':1})
+
+    p = neat.Population(config)
 
     # Seed the random-number generator for reproducibility.
     np.random.seed(seed)
