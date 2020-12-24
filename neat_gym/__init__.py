@@ -129,8 +129,6 @@ class _NeatConfig(object):
         if parameters.has_section('Novelty'):
             novelty = parameters['Novelty']
             self.novelty = Novelty(int(novelty['k']), float(novelty['threshold']), int(novelty['limit']))
-            print(self.novelty)
-            exit(0)
 
     def save_genome(self, genome):
 
