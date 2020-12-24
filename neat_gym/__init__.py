@@ -27,6 +27,8 @@ from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 from pureples.shared.substrate import Substrate
 
+from neat_gym.novelty import Novelty
+
 class _NeatConfig(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
@@ -123,8 +125,11 @@ class _NeatConfig(object):
         self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
 
         # Support novelty search
+        self.novelty = None
         if parameters.has_section('Novelty'):
-            print('novelty')
+            novelty = parameters['Novelty']
+            self.novelty = Novelty(int(novelty['k']), float(novelty['threshold']), int(novelty['limit']))
+            print(self.novelty)
             exit(0)
 
     def save_genome(self, genome):
