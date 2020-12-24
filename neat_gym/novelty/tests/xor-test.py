@@ -22,7 +22,7 @@ def main():
 
     # Run the network on the environment
     for inp,tgt in zip(((0,0), (0,1), (1,0), (1,1)), (0,1,1,0)):
-        print(inp, net.activate(inp + (1,))[0])
+        print(inp, net.activate(inp)[0])
 
 if __name__ == '__main__':
     main()

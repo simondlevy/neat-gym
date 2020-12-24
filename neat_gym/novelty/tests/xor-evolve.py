@@ -17,12 +17,13 @@ def _eval_xor(genome, config):
     
     net = neat.nn.FeedForwardNetwork.create(genome, config)
 
-    sse = 0
+    fitness = 4
 
     for inp,tgt in zip(((0,0), (0,1), (1,0), (1,1)), (0,1,1,0)):
-        sse += (tgt - net.activate(inp + (1,))[0])**2
+        out = net.activate(inp)[0]
+        fitness -= (out-tgt) ** 2
 
-    return 1 - np.sqrt(sse/4)
+    return fitness
 
 def main():
 
@@ -42,7 +43,7 @@ def main():
             neat.DefaultStagnation, 
             'xor-novelty.cfg' if args.novelty else 'xor.cfg', 
             'xor', 
-            {'num_inputs':3, 'num_outputs':1}, 
+            {'num_inputs':2, 'num_outputs':1}, 
             args.seed)
 
     _evolve(config, _eval_xor, args.seed, 'xor', args.ngen, args.checkpoint)
