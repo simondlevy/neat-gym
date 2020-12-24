@@ -62,7 +62,7 @@ class Novelty(object):
         if len(self.archive) < self.limit:
             self.archive.append(p)
 
-        elif s < self.threshold:
+        elif s > self.threshold:
             self.archive = self.archive[1:] + [p]
 
         return s
