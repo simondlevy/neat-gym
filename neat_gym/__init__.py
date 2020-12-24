@@ -125,7 +125,11 @@ class _NeatConfig(object):
         self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
 
         # Support novelty search
-        self.novelty = Novelty if novelty is not None else None  
+        self.novelty = None
+        if novelty:
+            novelty_params = p['Novelty']
+            print(novelty_params)
+            exit(0)
 
     def save_genome(self, genome):
 

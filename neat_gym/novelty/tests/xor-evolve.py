@@ -35,15 +35,17 @@ def main():
 
     np.random.seed(args.seed)
 
-    if args.novelty:
-        pass
+    config = _NeatConfig(
+            neat.DefaultGenome, 
+            neat.DefaultReproduction,
+            neat.DefaultSpeciesSet, 
+            neat.DefaultStagnation, 
+            'xor-novelty.cfg' if args.novelty else 'xor.cfg', 
+            'xor', 
+            {'num_inputs':3, 'num_outputs':1}, 
+            args.seed)
 
-    else:
-        config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
-            neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-            'xor.cfg', 'xor', {'num_inputs':3, 'num_outputs':1}, args.seed)
-
-        _evolve(config, _eval_xor, args.seed, 'xor', args.ngen, args.checkpoint)
+    _evolve(config, _eval_xor, args.seed, 'xor', args.ngen, args.checkpoint)
 
 if __name__ == '__main__':
     main()
