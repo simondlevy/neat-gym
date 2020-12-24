@@ -17,26 +17,6 @@ def _eval_xor(genome, config):
 
     return 1 - np.sqrt(sse/4)
 
-def xor_fitness(ngen, seed, checkpoint):
-
-    config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
-            neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-            'xor.cfg', 'xor', {'num_inputs':3, 'num_outputs':1}, seed)
-
-    np.random.seed(seed)
-
-    _evolve(config, _eval_xor, seed, 'xor', ngen, checkpoint)
-
-def xor_novelty(seed=None):
-
-    # Seed the random-number generator for reproducibility.
-    np.random.seed(seed)
-
-    # Create an instance of your Novelty class with a k of 10, a threshold of
-    # 0.3, and a limit of 150.
-    #nov = Novelty(10, 0.3, 150)
-
-
 def main():
 
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -46,11 +26,17 @@ def main():
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
     args = parser.parse_args()
 
+    np.random.seed(args.seed)
+
     if args.novelty:
         pass
 
     else:
-        xor_fitness(args.ngen, args.seed, args.checkpoint)
+        config = _NeatConfig(neat.DefaultGenome, neat.DefaultReproduction,
+            neat.DefaultSpeciesSet, neat.DefaultStagnation, 
+            'xor.cfg', 'xor', {'num_inputs':3, 'num_outputs':1}, args.seed)
+
+        _evolve(config, _eval_xor, args.seed, 'xor', args.ngen, args.checkpoint)
 
 if __name__ == '__main__':
     main()
