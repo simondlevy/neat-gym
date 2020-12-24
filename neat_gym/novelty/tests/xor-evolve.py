@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+'''
+Compare Novelty Search with fitness-based search for XOR
+
+Copyright (C) 2020 Simon D. Levy
+
+MIT License
+'''
 
 import argparse
 import numpy as np

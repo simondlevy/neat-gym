@@ -27,6 +27,8 @@ from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 from pureples.shared.substrate import Substrate
 
+from neat_gym.novelty import Novelty
+
 class _NeatConfig(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
@@ -36,8 +38,15 @@ class _NeatConfig(object):
                 ConfigParameter('reset_on_extinction', bool),
                 ConfigParameter('no_fitness_termination', bool, False)]
 
-    def __init__(self, genome_type, reproduction_type, species_set_type, stagnation_type, 
-            config_file_name, task_name, layout_dict, seed):
+    def __init__(self, 
+            genome_type, 
+            reproduction_type, 
+            species_set_type, 
+            stagnation_type, 
+            config_file_name, 
+            task_name, 
+            layout_dict, 
+            seed, novelty=False):
 
         # Check that the provided types have the required methods.
         assert hasattr(genome_type, 'parse_config')
@@ -114,6 +123,9 @@ class _NeatConfig(object):
 
         reproduction_dict = dict(parameters.items(reproduction_type.__name__))
         self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
+
+        # Support novelty search
+        self.novelty = Novelty if novelty is not None else None  
 
     def save_genome(self, genome):
 
