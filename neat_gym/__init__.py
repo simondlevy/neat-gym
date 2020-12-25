@@ -23,6 +23,8 @@ import numpy as np
 from neat.config import ConfigParameter, UnknownConfigItemError
 from neat.population import Population, CompleteExtinctionException
 from neat.genome import DefaultGenome
+from neat.reporting import StdOutReporter, BaseReporter
+from neat.math_util import mean, stdev
 
 from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.es_hyperneat.es_hyperneat import ESNetwork
@@ -418,11 +420,11 @@ class _GymEsHyperConfig(_GymHyperConfig):
 
         return config, evalfun
 
-class _SaveReporter(neat.reporting.BaseReporter):
+class _SaveReporter(BaseReporter):
 
     def __init__(self, task_name, checkpoint):
 
-        neat.reporting.BaseReporter.__init__(self)
+        BaseReporter.__init__(self)
 
         self.best = None
         self.task_name = task_name
@@ -434,6 +436,27 @@ class _SaveReporter(neat.reporting.BaseReporter):
             self.best = best_genome.fitness
             print('############# Saving new best %f ##############' % self.best)
             config.save_genome(best_genome)
+
+class _StdOutReporter(StdOutReporter):
+
+    def __init__(self, show_species_detail):
+
+        StdOutReporter.__init__(self, show_species_detail)
+
+    def post_evaluate(self, config, population, species, best_genome):
+        if config.novelty is None:
+            StdOutReporter.post_evaluate(self, config, population, species, best_genome)
+            return
+        print('Best actual fitness: %f ' % best_genome.actual_fitness)
+        fitnesses = [c.fitness for c in population.values()]
+        fit_mean = mean(fitnesses)
+        fit_std = stdev(fitnesses)
+        best_species_id = species.get_species_id(best_genome.key)
+        print('Population\'s average fitness: {0:3.5f} stdev: {1:3.5f}'.format(fit_mean, fit_std))
+        print('Best fitness: {0:3.5f} - size: {1!r} - species {2} - id {3}'.format(best_genome.fitness,
+            best_genome.size(),
+            best_species_id,
+            best_genome.key))
 
 def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     '''
@@ -451,7 +474,7 @@ def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     pop = _NoveltyPopulation(config) if config.novelty is not None else neat.Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
-    pop.add_reporter(neat.StdOutReporter(show_species_detail=False))
+    pop.add_reporter(_StdOutReporter(show_species_detail=False))
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
     
