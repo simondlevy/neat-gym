@@ -33,7 +33,10 @@ from pureples.shared.substrate import Substrate
 
 from neat_gym.novelty import Novelty
 
-class NoveltyGenome(DefaultGenome):
+class AugmentedGenome(DefaultGenome):
+    '''
+    Supports both ordinary NEAT and Novelty Search.
+    '''
 
     def __init__(self, key):
 
@@ -154,6 +157,10 @@ class NeatConfig(object):
         pickle.dump((net, self.task_name), open('models/%s.dat' % name, 'wb'))
         _GymNeatConfig._draw_net(net, 'visuals/%s'%name, self.node_names)
 
+    def is_novelty(self):
+
+        return self.novelty is not None
+
     def _make_name(self, genome, suffix=''):
 
         return '%s%s%+010.3f' % (self.task_name, suffix, genome.fitness)
@@ -163,12 +170,11 @@ class _NoveltyPopulation(Population):
 
     def __init__(self, config):
 
-        neat.Population.__init__(self, config)
+        Population.__init__(self, config)
 
     def run(self, fitness_function, n=None):
 
         k = 0
-        #best_actual_fitness = -np.inf
 
         while n is None or k < n:
             k += 1
@@ -191,10 +197,6 @@ class _NoveltyPopulation(Population):
                 if best is None or g.actual_fitness > best.actual_fitness:
                     best = g
             
-                #if g.actual_fitness > best_actual_fitness:
-                #    best_actual_fitness = g.actual_fitness
-                #    print('******************************************** ', best_actual_fitness)
-
             self.reporters.post_evaluate(self.config, self.population, self.species, best)
 
             # Track the best genome ever seen.
@@ -432,7 +434,7 @@ class _SaveReporter(BaseReporter):
 
     def post_evaluate(self, config, population, species, best_genome):
 
-        best_genome_fitness = best_genome.actual_fitness if config.novelty is not None else best_genome.fitness
+        best_genome_fitness = best_genome.actual_fitness if config.is_novelty() else best_genome.fitness
 
         if self.checkpoint and best_genome_fitness > self.best_fitness:
             self.best_fitness = best_genome_fitness
@@ -473,7 +475,7 @@ def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     os.makedirs('visuals', exist_ok=True)
 
     # Create an ordinary population or a population for NoveltySearch
-    pop = _NoveltyPopulation(config) if config.novelty is not None else neat.Population(config)
+    pop = _NoveltyPopulation(config) if config.is_novelty() else Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
     pop.add_reporter(_StdOutReporter(show_species_detail=False))
