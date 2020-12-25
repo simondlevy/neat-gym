@@ -447,16 +447,16 @@ class _StdOutReporter(StdOutReporter):
         if config.novelty is None:
             StdOutReporter.post_evaluate(self, config, population, species, best_genome)
             return
-        print('Best actual fitness: %f ' % best_genome.actual_fitness)
         fitnesses = [c.fitness for c in population.values()]
         fit_mean = mean(fitnesses)
         fit_std = stdev(fitnesses)
         best_species_id = species.get_species_id(best_genome.key)
-        print('Population\'s average fitness: {0:3.5f} stdev: {1:3.5f}'.format(fit_mean, fit_std))
-        print('Best fitness: {0:3.5f} - size: {1!r} - species {2} - id {3}'.format(best_genome.fitness,
+        print('Population\'s average novelty: {0:3.5f} stdev: {1:3.5f}'.format(fit_mean, fit_std))
+        print('Best novelty: {0:3.5f} - size: {1!r} - species {2} - id {3}'.format(best_genome.fitness,
             best_genome.size(),
             best_species_id,
             best_genome.key))
+        print('Best actual fitness: %f ' % best_genome.actual_fitness)
 
 def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     '''
