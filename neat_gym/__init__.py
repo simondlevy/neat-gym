@@ -37,8 +37,8 @@ class NoveltyGenome(DefaultGenome):
 
         DefaultGenome.__init__(self, key)
 
-        # Since sparsity is used as fitness, we need a separate variable to store success
-        self.success = None
+        # Since sparsity is used as fitness, we need a separate variable to store actual fitness
+        self.actual_fitness = None
 
 class NeatConfig(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
@@ -180,21 +180,23 @@ class _NoveltyPopulation(Population):
                 if g.fitness is None:
                     raise RuntimeError("Fitness not assigned to genome {}".format(g.key))
 
-                # Use success to encode actual fitness, and replace genome's fitnss with its novelty
-                behavior, g.success = g.fitness
+                # Use actual_fitness to encode actual fitness, and replace genome's fitnss with its novelty
+                behavior, g.actual_fitness = g.fitness
                 g.fitness = self.config.novelty.add(behavior)                
 
-                if best is None or g.fitness > best.fitness:
+                if best is None or g.actual_fitness > best.actual_fitness:
                     best = g
             self.reporters.post_evaluate(self.config, self.population, self.species, best)
 
+            print(best.actual_fitness)
+
             # Track the best genome ever seen.
-            if self.best_genome is None or best.fitness > self.best_genome.fitness:
+            if self.best_genome is None or best.actual_fitness > self.best_genome.actual_fitness:
                 self.best_genome = best
 
             if not self.config.no_fitness_termination:
                 # End if the fitness threshold is reached.
-                fv = self.fitness_criterion(g.fitness for g in self.population.values())
+                fv = self.fitness_criterion(g.actual_fitness for g in self.population.values())
                 if fv >= self.config.fitness_threshold:
                     self.reporters.found_solution(self.config, self.generation, best)
                     break
