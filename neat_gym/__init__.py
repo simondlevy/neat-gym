@@ -426,13 +426,13 @@ class _SaveReporter(BaseReporter):
 
         BaseReporter.__init__(self)
 
-        self.best = None
+        self.best_fitness = -np.inf
         self.task_name = task_name
         self.checkpoint = checkpoint
 
     def post_evaluate(self, config, population, species, best_genome):
 
-        if self.checkpoint and (self.best is None or best_genome.fitness > self.best):
+        if self.checkpoint and best_genome.fitness > self.best_fitness:
             self.best = best_genome.fitness
             print('############# Saving new best %f ##############' % self.best)
             config.save_genome(best_genome)
