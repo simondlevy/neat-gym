@@ -9,39 +9,42 @@ MIT License
 
 
 import numpy as np
-import neat
 
 class Novelty(object):
     '''
     Implementation of Novelty Search as described in
 
         @article{article,
-        author = {Lehman, Joel and Stanley, Kenneth},
-        year = {2011},
-        month = {06},
-        pages = {189-223},
-        title = {Abandoning Objectives: Evolution Through the Search for Novelty Alone},
-        volume = {19},
-        journal = {Evolutionary computation},
-        doi = {10.1162/EVCO_a_00025}
-        }
+            author = {Lehman, Joel and Stanley, Kenneth},
+            year = {2011},
+            month = {06},
+            pages = {189-223},
+            title = {Abandoning Objectives: Evolution Through the Search for Novelty Alone},
+            volume = {19},
+            journal = {Evolutionary computation},
+            doi = {10.1162/EVCO_a_00025}
+         }
 
     Copyright (C) 2020 Simon D. Levy
 
     MIT License
     '''
 
-    def __init__(self, k, threshold, limit):
+    def __init__(self, k, threshold, limit, ndims):
         '''
         Creates an object supporting Novelty Search.
         @param k k for k-nearest-neighbors
         @param threshold threshold for how novel an example has to be before it will be added the archive
         @param limit maximum size of the archive.
+        @param ndims dimensionality of archive elements
         '''
         self.k = k
         self.threshold = threshold
         self.limit = limit
-        self.archive = []
+
+        # Archive implemented as a circular buffer
+        self.archive = np.zeros((limit,ndims))
+        self.count = 0
 
     def __str__(self):
 
@@ -58,12 +61,10 @@ class Novelty(object):
         '''
 
         s = self._sparseness(p)
-       
-        if len(self.archive) < self.limit:
-            self.archive.append(p)
 
-        elif s > self.threshold:
-            self.archive = self.archive[1:] + [p]
+        if self.count < self.limit or s > self.threshold:
+            self.archive[self.count] = np.array(p)
+            self.count += 1
 
         return s
 

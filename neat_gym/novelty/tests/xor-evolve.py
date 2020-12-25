@@ -33,11 +33,7 @@ def _eval_xor_fitness(genome, config):
 
 def _eval_xor_novelty(genome, config):
 
-    outputs = _eval_xor(genome, config)[0]
-
-    sparsity = config.novelty.add(outputs)
-
-    return sparsity
+    return _eval_xor(genome, config)[0]
 
 def main():
 

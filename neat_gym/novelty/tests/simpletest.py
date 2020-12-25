@@ -16,8 +16,8 @@ def main(seed=None):
     np.random.seed(seed)
 
     # Create an instance of your Novelty class with a k of 10, a threshold of
-    # 0.3, and a limit of 100.
-    nov = Novelty(10, 0.3, 100)
+    # 0.3, a limit of 100, and  a dimensionality of 2.
+    nov = Novelty(10, 0.3, 100, 2)
 
     # Use a for loop to generate 1000 random 2d points, where each value is in the
     # range [0.0, 0.3], and add them to the archive.
