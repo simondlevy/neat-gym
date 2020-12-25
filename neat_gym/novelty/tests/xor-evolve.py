@@ -60,7 +60,9 @@ def main():
             {'num_inputs':2, 'num_outputs':1}, 
             args.seed)
 
-    _evolve(config, _eval_xor_novelty if args.novelty else _eval_xor_fitness, args.seed, 'xor', args.ngen, args.checkpoint)
+    evalfun = _eval_xor_novelty if args.novelty else _eval_xor_fitness
+
+    _evolve(config, evalfun, args.seed, 'xor', args.ngen, args.checkpoint)
 
 if __name__ == '__main__':
     main()
