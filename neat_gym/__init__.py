@@ -40,78 +40,6 @@ class NoveltyGenome(DefaultGenome):
         # Since sparsity is used as fitness, we need a separate variable to store success
         self.success = None
 
-class _NoveltyPopulation(Population):
-
-    def __init__(self, config):
-
-        neat.Population.__init__(self, config)
-
-    def run(self, fitness_function, n=None):
-
-        k = 0
-        while n is None or k < n:
-            k += 1
-
-            self.reporters.start_generation(self.generation)
-
-            # Evaluate all genomes using the user-provided function.
-            fitness_function(list(self.population.items()), self.config)
-
-            # Gather and report statistics.
-            best = None
-            for g in self.population.values():
-                if g.fitness is None:
-                    raise RuntimeError("Fitness not assigned to genome {}".format(g.key))
-
-                behavior, fitness = g.fitness
-
-                # Replace genome's fitnss with its novelty
-                g.fitness = self.config.novelty.add(behavior)                
-
-                if best is None or g.fitness > best.fitness:
-                    best = g
-            self.reporters.post_evaluate(self.config, self.population, self.species, best)
-
-            # Track the best genome ever seen.
-            if self.best_genome is None or best.fitness > self.best_genome.fitness:
-                self.best_genome = best
-
-            if not self.config.no_fitness_termination:
-                # End if the fitness threshold is reached.
-                fv = self.fitness_criterion(g.fitness for g in self.population.values())
-                if fv >= self.config.fitness_threshold:
-                    self.reporters.found_solution(self.config, self.generation, best)
-                    break
-
-            # Create the next generation from the current generation.
-            self.population = self.reproduction.reproduce(self.config, self.species,
-                                                          self.config.pop_size, self.generation)
-
-            # Check for complete extinction.
-            if not self.species.species:
-                self.reporters.complete_extinction()
-
-                # If requested by the user, create a completely new population,
-                # otherwise raise an exception.
-                if self.config.reset_on_extinction:
-                    self.population = self.reproduction.create_new(self.config.genome_type,
-                                                                   self.config.genome_config,
-                                                                   self.config.pop_size)
-                else:
-                    raise CompleteExtinctionException()
-
-            # Divide the new population into species.
-            self.species.speciate(self.config, self.population, self.generation)
-
-            self.reporters.end_generation(self.config, self.population, self.species)
-
-            self.generation += 1
-
-        if self.config.no_fitness_termination:
-            self.reporters.found_solution(self.config, self.generation, self.best_genome)
-
-        return self.best_genome
-
 class NeatConfig(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
@@ -227,6 +155,79 @@ class NeatConfig(object):
     def _make_name(self, genome, suffix=''):
 
         return '%s%s%+010.3f' % (self.task_name, suffix, genome.fitness)
+
+class _NoveltyPopulation(Population):
+    #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/population.py
+
+    def __init__(self, config):
+
+        neat.Population.__init__(self, config)
+
+    def run(self, fitness_function, n=None):
+
+        k = 0
+        while n is None or k < n:
+            k += 1
+
+            self.reporters.start_generation(self.generation)
+
+            # Evaluate all genomes using the user-provided function.
+            fitness_function(list(self.population.items()), self.config)
+
+            # Gather and report statistics.
+            best = None
+            for g in self.population.values():
+                if g.fitness is None:
+                    raise RuntimeError("Fitness not assigned to genome {}".format(g.key))
+
+                # Use success to encode actual fitness, and replace genome's fitnss with its novelty
+                behavior, g.success = g.fitness
+                g.fitness = self.config.novelty.add(behavior)                
+
+                if best is None or g.fitness > best.fitness:
+                    best = g
+            self.reporters.post_evaluate(self.config, self.population, self.species, best)
+
+            # Track the best genome ever seen.
+            if self.best_genome is None or best.fitness > self.best_genome.fitness:
+                self.best_genome = best
+
+            if not self.config.no_fitness_termination:
+                # End if the fitness threshold is reached.
+                fv = self.fitness_criterion(g.fitness for g in self.population.values())
+                if fv >= self.config.fitness_threshold:
+                    self.reporters.found_solution(self.config, self.generation, best)
+                    break
+
+            # Create the next generation from the current generation.
+            self.population = self.reproduction.reproduce(self.config, self.species,
+                                                          self.config.pop_size, self.generation)
+
+            # Check for complete extinction.
+            if not self.species.species:
+                self.reporters.complete_extinction()
+
+                # If requested by the user, create a completely new population,
+                # otherwise raise an exception.
+                if self.config.reset_on_extinction:
+                    self.population = self.reproduction.create_new(self.config.genome_type,
+                                                                   self.config.genome_config,
+                                                                   self.config.pop_size)
+                else:
+                    raise CompleteExtinctionException()
+
+            # Divide the new population into species.
+            self.species.speciate(self.config, self.population, self.generation)
+
+            self.reporters.end_generation(self.config, self.population, self.species)
+
+            self.generation += 1
+
+        if self.config.no_fitness_termination:
+            self.reporters.found_solution(self.config, self.generation, self.best_genome)
+
+        return self.best_genome
+
 
 class _GymNeatConfig(NeatConfig):
 
