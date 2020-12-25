@@ -11,7 +11,7 @@ import argparse
 import numpy as np
 import neat
 #from neat_gym.novelty import Novelty
-from neat_gym import _NeatConfig, _evolve
+from neat_gym import NeatConfig, evolve
 
 def _eval_xor_both(genome, config):
     
@@ -42,7 +42,7 @@ def main():
 
     np.random.seed(args.seed)
 
-    config = _NeatConfig(
+    config = NeatConfig(
             neat.DefaultGenome, 
             neat.DefaultReproduction,
             neat.DefaultSpeciesSet, 
@@ -54,7 +54,7 @@ def main():
 
     evalfun = _eval_xor_both if args.novelty else _eval_xor_fitness
 
-    _evolve(config, evalfun, args.seed, 'xor', args.ngen, args.checkpoint)
+    evolve(config, evalfun, args.seed, 'xor', args.ngen, args.checkpoint)
 
 if __name__ == '__main__':
     main()

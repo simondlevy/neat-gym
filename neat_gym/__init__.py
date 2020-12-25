@@ -22,6 +22,7 @@ import numpy as np
 
 from neat.config import ConfigParameter, UnknownConfigItemError
 from neat.population import Population, CompleteExtinctionException
+from neat.genome import DefaultGenome
 
 from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.es_hyperneat.es_hyperneat import ESNetwork
@@ -102,7 +103,7 @@ class _NoveltyPopulation(Population):
 
         return self.best_genome
 
-class _NeatConfig(object):
+class NeatConfig(object):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
     __params = [ConfigParameter('pop_size', int),
@@ -218,13 +219,13 @@ class _NeatConfig(object):
 
         return '%s%s%+010.3f' % (self.task_name, suffix, genome.fitness)
 
-class _GymNeatConfig(_NeatConfig):
+class _GymNeatConfig(NeatConfig):
 
     def __init__(self, args, layout_dict, suffix=''):
 
         filename = args.cfgdir + '/' + args.env + suffix + '.cfg'
 
-        _NeatConfig.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
+        NeatConfig.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                 neat.DefaultSpeciesSet, neat.DefaultStagnation, 
                 filename, args.env, layout_dict, args.seed)
 
@@ -417,7 +418,7 @@ class _SaveReporter(neat.reporting.BaseReporter):
             print('############# Saving new best %f ##############' % self.best)
             config.save_genome(best_genome)
 
-def _evolve(config, evalfun, seed, task_name, ngen, checkpoint):
+def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     '''
     NEAT evolution with parallel evaluator
     '''
@@ -469,7 +470,7 @@ def _evolve_gym(configfun):
     config, evalfun = configfun(args) 
 
     # Evolve
-    _evolve(config, evalfun, args.seed, args.env, args.ngen, args.checkpoint)
+    evolve(config, evalfun, args.seed, args.env, args.ngen, args.checkpoint)
 
 def read_file(allow_record=False):
     '''
