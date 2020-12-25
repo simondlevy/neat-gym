@@ -161,9 +161,13 @@ class NeatConfig(object):
 
         return self.novelty is not None
 
+    def get_actual_fitness(self, genome):
+
+        return genome.actual_fitness if self.is_novelty() else genome.fitness
+
     def _make_name(self, genome, suffix=''):
 
-        return '%s%s%+010.3f' % (self.task_name, suffix, genome.fitness)
+        return '%s%s%+010.3f' % (self.task_name, suffix, self.get_actual_fitness(genome))
 
 class _NoveltyPopulation(Population):
     #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/population.py
@@ -434,7 +438,7 @@ class _SaveReporter(BaseReporter):
 
     def post_evaluate(self, config, population, species, best_genome):
 
-        best_genome_fitness = best_genome.actual_fitness if config.is_novelty() else best_genome.fitness
+        best_genome_fitness = config.get_actual_fitness(best_genome)
 
         if self.checkpoint and best_genome_fitness > self.best_fitness:
             self.best_fitness = best_genome_fitness
