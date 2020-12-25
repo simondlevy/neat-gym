@@ -432,9 +432,11 @@ class _SaveReporter(BaseReporter):
 
     def post_evaluate(self, config, population, species, best_genome):
 
-        if self.checkpoint and best_genome.fitness > self.best_fitness:
-            self.best = best_genome.fitness
-            print('############# Saving new best %f ##############' % self.best)
+        best_genome_fitness = best_genome.actual_fitness if config.novelty is not None else best_genome.fitness
+
+        if self.checkpoint and best_genome_fitness > self.best_fitness:
+            self.best_fitness = best_genome_fitness
+            print('############# Saving new best %f ##############' % self.best_fitness)
             config.save_genome(best_genome)
 
 class _StdOutReporter(StdOutReporter):
