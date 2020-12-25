@@ -63,7 +63,7 @@ class Novelty(object):
         s = self._sparseness(p)
 
         if self.count < self.limit or s > self.threshold:
-            self.archive[self.count] = np.array(p)
+            self.archive[self.count%self.limit] = np.array(p)
             self.count += 1
 
         return s
