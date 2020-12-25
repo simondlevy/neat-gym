@@ -166,7 +166,7 @@ class _NoveltyPopulation(Population):
     def run(self, fitness_function, n=None):
 
         k = 0
-        best_actual_fitness = -np.inf
+        #best_actual_fitness = -np.inf
 
         while n is None or k < n:
             k += 1
@@ -189,9 +189,9 @@ class _NoveltyPopulation(Population):
                 if best is None or g.actual_fitness > best.actual_fitness:
                     best = g
             
-                if g.actual_fitness > best_actual_fitness:
-                    best_actual_fitness = g.actual_fitness
-                    print('******************************************** ', best_actual_fitness)
+                #if g.actual_fitness > best_actual_fitness:
+                #    best_actual_fitness = g.actual_fitness
+                #    print('******************************************** ', best_actual_fitness)
 
             self.reporters.post_evaluate(self.config, self.population, self.species, best)
 
