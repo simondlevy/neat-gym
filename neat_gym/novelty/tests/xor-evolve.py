@@ -13,7 +13,7 @@ import neat
 #from neat_gym.novelty import Novelty
 from neat_gym import _NeatConfig, _evolve
 
-def _eval_xor(genome, config):
+def _eval_xor_both(genome, config):
     
     net = neat.nn.FeedForwardNetwork.create(genome, config)
 
@@ -29,11 +29,7 @@ def _eval_xor(genome, config):
 
 def _eval_xor_fitness(genome, config):
 
-    return _eval_xor(genome, config)[1]
-
-def _eval_xor_novelty(genome, config):
-
-    return _eval_xor(genome, config)[0]
+    return _eval_xor_both(genome, config)[1]
 
 def main():
 
@@ -56,7 +52,7 @@ def main():
             {'num_inputs':2, 'num_outputs':1}, 
             args.seed)
 
-    evalfun = _eval_xor_novelty if args.novelty else _eval_xor_fitness
+    evalfun = _eval_xor_both if args.novelty else _eval_xor_fitness
 
     _evolve(config, evalfun, args.seed, 'xor', args.ngen, args.checkpoint)
 
