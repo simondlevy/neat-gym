@@ -10,8 +10,7 @@ MIT License
 import argparse
 import numpy as np
 import neat
-#from neat_gym.novelty import Novelty
-from neat_gym import NeatConfig, evolve
+from neat_gym import NoveltyGenome, NeatConfig, evolve
 
 def _eval_xor_both(genome, config):
     
@@ -43,7 +42,7 @@ def main():
     np.random.seed(args.seed)
 
     config = NeatConfig(
-            neat.DefaultGenome, 
+            NoveltyGenome if args.novelty else neat.DefaultGenome, 
             neat.DefaultReproduction,
             neat.DefaultSpeciesSet, 
             neat.DefaultStagnation, 

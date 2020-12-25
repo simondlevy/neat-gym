@@ -31,6 +31,15 @@ from pureples.shared.substrate import Substrate
 
 from neat_gym.novelty import Novelty
 
+class NoveltyGenome(DefaultGenome):
+
+    def __init__(self, key):
+
+        DefaultGenome.__init__(self, key)
+
+        # Since sparsity is used as fitness, we need a separate variable to store success
+        self.success = None
+
 class _NoveltyPopulation(Population):
 
     def __init__(self, config):
