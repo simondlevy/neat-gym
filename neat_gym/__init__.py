@@ -195,8 +195,6 @@ class _NoveltyPopulation(Population):
 
             self.reporters.post_evaluate(self.config, self.population, self.species, best)
 
-            print(best.actual_fitness)
-
             # Track the best genome ever seen.
             if self.best_genome is None or best.actual_fitness > self.best_genome.actual_fitness:
                 self.best_genome = best
