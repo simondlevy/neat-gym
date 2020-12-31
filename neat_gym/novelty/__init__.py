@@ -9,6 +9,7 @@ MIT License
 
 
 import numpy as np
+from rtree import index
 
 class Novelty(object):
     '''
@@ -46,6 +47,11 @@ class Novelty(object):
         self.archive = np.zeros((limit,ndims))
         self.count = 0
 
+        # Create an Rtree Index for inserting the points
+        p = index.Property()
+        p.dimension = ndims
+        self.knn = index.Index(properties=p, interleaved=False)
+
     def __str__(self):
 
         return 'Novelty k = %d  threshold = %f  limit = %d' % (self.k, self.threshold, self.limit)
@@ -61,9 +67,28 @@ class Novelty(object):
         '''
 
         s = self._sparseness(p)
+ 
+        if self.count < self.limit:
 
-        if self.count < self.limit or s > self.threshold:
-            self.archive[self.count%self.limit] = np.array(p)
+            self.archive[self.count] = np.array(p)
+
+            # With interleaved=False, the order of input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, ...)
+            self.knn.insert(self.count, tuple(item for sublist in [(x,x) for x in p] for item in sublist))
+
+            self.count += 1
+
+        elif s > self.threshold:
+
+            idx = self.count % self.limit
+
+            old = self.archive[idx]
+
+            self.knn.delete(idx, old)
+
+            self.knn.insert(idx, tuple(item for sublist in [(x,x) for x in p] for item in sublist))
+
+            self.archive[idx] = np.array(p)
+
             self.count += 1
 
         return s
@@ -101,6 +126,12 @@ class Novelty(object):
         # is to calculate the distance of p from every point in the archive, sort
         # these distances, and then sum up and return the first k (which will be
         # the closest).  
+
+        print(self.archive)
+        n = min(self.limit, self.count)
+        print(sorted(np.argsort([self._distance(p, q) for q in self.archive[:n,]])[:self.k]))
+        print(sorted(list(self.knn.nearest(p, self.k))))
+        print()
 
         return np.sum(np.sort([self._distance(p, q) for q in self.archive])[:self.k])
 
