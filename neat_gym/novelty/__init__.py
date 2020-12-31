@@ -34,14 +34,15 @@ class Novelty(object):
     def __init__(self, k, threshold, limit, ndims):
         '''
         Creates an object supporting Novelty Search.
-        @param k k for k-nearest-neighbors
-        @param threshold threshold for how novel an example has to be before it will be added the archive
+        @param k for k-nearest-neighbors
+        @param threshold how novel an example has to be before it will be added the archive
         @param limit maximum size of the archive.
         @param ndims dimensionality of archive elements
         '''
         self.k = k
         self.threshold = threshold
         self.limit = limit
+        self.ndims = ndims
 
         # Archive implemented as a circular buffer
         self.archive = np.zeros((limit,ndims))
@@ -66,30 +67,42 @@ class Novelty(object):
         @return sparseness of point in archive
         '''
 
-        s = self._sparseness(p)
+        # Start with 'infinity' as sparseness
+        s = np.inf
  
+        # Below limit, fill archive and ignore actual sparseness
         if self.count < self.limit:
 
             self.archive[self.count] = np.array(p)
 
-            # With interleaved=False, the order of input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, ...)
+            # Insert new point in kNN.  With interleaved=False, the order of
+            # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
             self.knn.insert(self.count, tuple(item for sublist in [(x,x) for x in p] for item in sublist))
 
             self.count += 1
 
-        elif s > self.threshold:
+        else: 
 
-            idx = self.count % self.limit
+            # Compute sparseness of new point
+            s = self._sparseness(p)
+            
+            # If sparseness excedes threshold, ...
+            if s > self.threshold:
 
-            old = self.archive[idx]
+                # Implement a circular buffer
+                idx = self.count % self.limit
 
-            self.knn.delete(idx, old)
+                # Remove old point from kNN
+                self.knn.delete(idx, self.archive[idx])
 
-            self.knn.insert(idx, tuple(item for sublist in [(x,x) for x in p] for item in sublist))
+                # Insert new point in kNN.  With interleaved=False, the order of
+                # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
+                self.knn.insert(idx, tuple(item for sublist in [(x,x) for x in p] for item in sublist))
 
-            self.archive[idx] = np.array(p)
+                # Store new point in archive
+                self.archive[idx] = np.array(p)
 
-            self.count += 1
+                self.count += 1
 
         return s
 
@@ -105,42 +118,21 @@ class Novelty(object):
                     f.write('%f ' % x)
                 f.write('\n')
 
-    def _distance(self, p1, p2):
-        '''
-        Returns the L2 distance between points p1 and p2 which are assumed to be
-        lists or tuples of equal length. 
-        '''
-
-        assert(len(p1) == len(p2))
-
-        return np.sqrt(np.sum((np.array(p1)-np.array(p2))**2))
-
-    def _distFromkNearest(self, p):
-        '''
-        Returns the distance of a point p from its k-nearest neighbors in the
-        archive.
-        '''
-
-        # XXX
-        # The simplest, though very inefficient, way to implement this
-        # is to calculate the distance of p from every point in the archive, sort
-        # these distances, and then sum up and return the first k (which will be
-        # the closest).  
-
-        print(self.archive)
-        n = min(self.limit, self.count)
-        print(sorted(np.argsort([self._distance(p, q) for q in self.archive[:n,]])[:self.k]))
-        print(sorted(list(self.knn.nearest(p, self.k))))
-        print()
-
-        return np.sum(np.sort([self._distance(p, q) for q in self.archive])[:self.k])
 
     def _sparseness(self, p):
         '''
         Returns the sparseness of the given point p as defined by equation 1 on
         page 13 of Lehman & Stanley 2011. Recall that sparseness is a measure
         of how unique this point is relative to the archive of saved examples.
-        Use the method distFromkNearest as a helper in calculating this value.  
         '''
 
-        return 1./self.k * self._distFromkNearest(p)
+        # Get k nearest neighbors
+        nbrs = list(self.knn.nearest(p, self.k))
+
+        # Compute the distance of the point from these neighbors
+        dst = 0
+        for j in range(self.ndims):
+            dst += np.sum((p[j] - self.archive[nbrs,j])**2)
+
+        # Apply the equation to get the point's sparseness
+        return 1./self.k * np.sqrt(dst)
