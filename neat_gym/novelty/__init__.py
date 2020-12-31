@@ -125,16 +125,10 @@ class Novelty(object):
         of how unique this point is relative to the archive of saved examples.
         '''
 
-        nbrs_old = list(np.argsort([Novelty._distance(p, q) for q in self.archive])[:self.k])
-        nbrs_new = list(self.knn.nearest(p, self.k))
+        #nbrs = list(np.argsort([Novelty._distance(p, q) for q in self.archive])[:self.k])
+        nbrs = list(self.knn.nearest(p, self.k))
 
-        if np.any(nbrs_old != nbrs_new):
-            print('p: ', p)
-            print('nbrs_old: ', sorted(nbrs_old))
-            print('nbrs_new: ', sorted(nbrs_new))
-            exit(0)
-
-        return 1./self.k * np.sqrt(np.sum(np.sum((self.archive[nbrs_old,:] - p)**2, axis=1)))
+        return 1./self.k * np.sqrt(np.sum(np.sum((self.archive[nbrs,:] - p)**2, axis=1)))
 
     @staticmethod
     def _distance(p1, p2):
