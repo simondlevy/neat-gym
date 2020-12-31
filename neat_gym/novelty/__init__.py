@@ -125,41 +125,25 @@ class Novelty(object):
         of how unique this point is relative to the archive of saved examples.
         '''
 
-        d_old = self._distFromkNearest_old(p)
-        d_new = self._distFromkNearest_new(p)
+        nbrs_old = list(np.argsort([Novelty._distance(p, q) for q in self.archive])[:self.k])
+        nbrs_new = list(self.knn.nearest(p, self.k))
 
-        if d_old != d_new:
-            print('Archive:\n',  self.archive, '\n\nkNN:\n', self.knn)
+        if np.any(nbrs_old != nbrs_new):
+            print('p: ', p)
+            print('nbrs_old: ', sorted(nbrs_old))
+            print('nbrs_new: ', sorted(nbrs_new))
             exit(0)
 
-        return 1./self.k * d_old
+        return 1./self.k * np.sqrt(np.sum(np.sum((self.archive[nbrs_old,:] - p)**2, axis=1)))
 
-    def _distFromkNearest_old(self, p):
-        '''
-        Returns the distance of a point p from its k-nearest neighbors in the archive.
-        '''
-        return np.sum(np.sort([self._distance_old(p, q) for q in self.archive])[:self.k])
-
-    def _distFromkNearest_new(self, p):
-
-        # Get k nearest neighbors
-        nbrs = list(self.knn.nearest(p, self.k))
-
-        # Compute the distance of the point from these neighbors
-        dst = 0
-        for j in range(self.ndims):
-            dst += np.sum((p[j] - self.archive[nbrs,j])**2)
-
-        # Apply the equation to get the point's sparseness
-        return np.sqrt(dst)
-
-    def _distance_old(self, p1, p2):
+    @staticmethod
+    def _distance(p1, p2):
         '''
         Returns the L2 distance between points p1 and p2 which are assumed to be
         lists or tuples of equal length. 
         '''
         return np.sqrt(np.sum((np.array(p1)-np.array(p2))**2))
-                
+
     @staticmethod
     def _expand_point(pt):
         return tuple(item for sublist in [(x,x) for x in pt] for item in sublist)
