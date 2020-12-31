@@ -77,7 +77,7 @@ class Novelty(object):
 
             # Insert new point in kNN.  With interleaved=False, the order of
             # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
-            self.knn.insert(self.count, Novelty._convert_point_to_rtree(p))
+            self.knn.insert(self.count, Novelty._expand_point(p))
 
             self.count += 1
 
@@ -93,11 +93,11 @@ class Novelty(object):
                 idx = self.count % self.limit
 
                 # Remove old point from kNN
-                self.knn.delete(idx, Novelty._convert_point_to_rtree(self.archive[idx]))
+                self.knn.delete(idx, Novelty._expand_point(self.archive[idx]))
 
                 # Insert new point in kNN.  With interleaved=False, the order of
                 # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
-                self.knn.insert(idx, Novelty._convert_point_to_rtree(p))
+                self.knn.insert(idx, Novelty._expand_point(p))
 
                 # Store new point in archive
                 self.archive[idx] = np.array(p)
@@ -161,5 +161,5 @@ class Novelty(object):
         return np.sqrt(np.sum((np.array(p1)-np.array(p2))**2))
                 
     @staticmethod
-    def _convert_point_to_rtree(pt):
+    def _expand_point(pt):
         return tuple(item for sublist in [(x,x) for x in pt] for item in sublist)
