@@ -67,8 +67,8 @@ class Novelty(object):
         @return sparseness of point in archive
         '''
 
-        # Start with 'infinity' as sparseness
-        s = np.inf
+        # Start with zero as sparseness
+        s = 0
  
         # Below limit, fill archive and ignore actual sparseness
         if self.count < self.limit:

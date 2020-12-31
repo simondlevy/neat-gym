@@ -194,9 +194,9 @@ class _NoveltyPopulation(Population):
                 if g.fitness is None:
                     raise RuntimeError("Fitness not assigned to genome {}".format(g.key))
 
-                # Use actual_fitness to encode actual fitness, and replace genome's fitnss with its novelty
-                behavior, g.actual_fitness = g.fitness
-                g.fitness = self.config.novelty.add(behavior)                
+                # Use actual_fitness to encode ignored objective, and replace genome's fitness with its novelty
+                nov, g.actual_fitness = g.fitness
+                g.fitness = self.config.novelty.add(nov)                
 
                 if best is None or g.actual_fitness > best.actual_fitness:
                     best = g
