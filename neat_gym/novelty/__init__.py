@@ -77,7 +77,7 @@ class Novelty(object):
 
             # Insert new point in kNN.  With interleaved=False, the order of
             # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
-            self.knn.insert(self.count, tuple(item for sublist in [(x,x) for x in p] for item in sublist))
+            self.knn.insert(self.count, Novelty._convert_point_to_rtree(p))
 
             self.count += 1
 
@@ -93,11 +93,11 @@ class Novelty(object):
                 idx = self.count % self.limit
 
                 # Remove old point from kNN
-                self.knn.delete(idx, self.archive[idx])
+                self.knn.delete(idx, Novelty._convert_point_to_rtree(self.archive[idx]))
 
                 # Insert new point in kNN.  With interleaved=False, the order of
                 # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
-                self.knn.insert(idx, tuple(item for sublist in [(x,x) for x in p] for item in sublist))
+                self.knn.insert(idx, Novelty._convert_point_to_rtree(p))
 
                 # Store new point in archive
                 self.archive[idx] = np.array(p)
@@ -118,13 +118,29 @@ class Novelty(object):
                     f.write('%f ' % x)
                 f.write('\n')
 
-
     def _sparseness(self, p):
         '''
         Returns the sparseness of the given point p as defined by equation 1 on
         page 13 of Lehman & Stanley 2011. Recall that sparseness is a measure
         of how unique this point is relative to the archive of saved examples.
         '''
+
+        d_old = self._distFromkNearest_old(p)
+        d_new = self._distFromkNearest_new(p)
+
+        if d_old != d_new:
+            print('Archive:\n',  self.archive, '\n\nkNN:\n', self.knn)
+            exit(0)
+
+        return 1./self.k * d_old
+
+    def _distFromkNearest_old(self, p):
+        '''
+        Returns the distance of a point p from its k-nearest neighbors in the archive.
+        '''
+        return np.sum(np.sort([self._distance_old(p, q) for q in self.archive])[:self.k])
+
+    def _distFromkNearest_new(self, p):
 
         # Get k nearest neighbors
         nbrs = list(self.knn.nearest(p, self.k))
@@ -135,4 +151,15 @@ class Novelty(object):
             dst += np.sum((p[j] - self.archive[nbrs,j])**2)
 
         # Apply the equation to get the point's sparseness
-        return 1./self.k * np.sqrt(dst)
+        return np.sqrt(dst)
+
+    def _distance_old(self, p1, p2):
+        '''
+        Returns the L2 distance between points p1 and p2 which are assumed to be
+        lists or tuples of equal length. 
+        '''
+        return np.sqrt(np.sum((np.array(p1)-np.array(p2))**2))
+                
+    @staticmethod
+    def _convert_point_to_rtree(pt):
+        return tuple(item for sublist in [(x,x) for x in pt] for item in sublist)
