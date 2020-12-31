@@ -9,7 +9,6 @@ MIT License
 
 
 import numpy as np
-from rtree import index
 
 class Novelty(object):
     '''
@@ -48,10 +47,17 @@ class Novelty(object):
         self.archive = np.zeros((limit,ndims))
         self.count = 0
 
+        # Default to naive kNN (no R*-tree)
+        self.rtree_index = None
+
         # Create an Rtree Index for inserting the points
-        p = index.Property()
-        p.dimension = ndims
-        self.knn = index.Index(properties=p, interleaved=False)
+        try:
+            from rtree import index
+            p = index.Property()
+            p.dimension = ndims
+            self.rtree_index = index.Index(properties=p, interleaved=False)
+        except:
+            pass
 
     def __str__(self):
 
@@ -77,7 +83,8 @@ class Novelty(object):
 
             # Insert new point in kNN.  With interleaved=False, the order of
             # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
-            self.knn.insert(self.count, Novelty._expand_point(p))
+            if self.rtree_index is not None:
+                self.rtree_index.insert(self.count, Novelty._expand_point(p))
 
             self.count += 1
 
@@ -93,11 +100,13 @@ class Novelty(object):
                 idx = self.count % self.limit
 
                 # Remove old point from kNN
-                self.knn.delete(idx, Novelty._expand_point(self.archive[idx]))
+                if self.rtree_index is not None:
 
-                # Insert new point in kNN.  With interleaved=False, the order of
-                # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
-                self.knn.insert(idx, Novelty._expand_point(p))
+                    self.rtree_index.delete(idx, Novelty._expand_point(self.archive[idx]))
+
+                    # Insert new point in kNN.  With interleaved=False, the order of
+                    # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
+                    self.rtree_index.insert(idx, Novelty._expand_point(p))
 
                 # Store new point in archive
                 self.archive[idx] = np.array(p)
@@ -125,10 +134,10 @@ class Novelty(object):
         of how unique this point is relative to the archive of saved examples.
         '''
 
-        #nbrs = list(np.argsort([Novelty._distance(p, q) for q in self.archive])[:self.k])
-        nbrs = list(self.knn.nearest(p, self.k))
+        nbrs = (self.rtree_index.nearest(p, self.k) if self.rtree_index is not None else 
+                np.argsort([Novelty._distance(p, q) for q in self.archive])[:self.k])
 
-        return 1./self.k * np.sqrt(np.sum(np.sum((self.archive[nbrs,:] - p)**2, axis=1)))
+        return 1./self.k * np.sqrt(np.sum(np.sum((self.archive[list(nbrs),:] - p)**2, axis=1)))
 
     @staticmethod
     def _distance(p1, p2):
