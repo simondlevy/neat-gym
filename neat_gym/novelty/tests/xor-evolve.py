@@ -8,9 +8,11 @@ MIT License
 '''
 
 import argparse
+from configparser import ConfigParser
 import numpy as np
 import neat
 from neat_gym import AugmentedGenome, NeatConfig, evolve
+from neat_gym.novelty import Novelty
 
 def _eval_xor_both(genome, config):
     
@@ -37,19 +39,38 @@ def main():
     parser.add_argument('--checkpoint', dest='checkpoint', action='store_true', help='Save at each new best')
     parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
     parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
+    parser.add_argument('--config', default='xor.cfg', help='Config file')
     args = parser.parse_args()
 
     np.random.seed(args.seed)
+
+    novelty = None
+
+    if args.novelty:
+        parameters = ConfigParser()
+        with open(args.config) as f:
+            if hasattr(parameters, 'read_file'):
+                parameters.read_file(f)
+            else:
+                parameters.readfp(f)
+
+            try:
+                names =  parameters['Novelty']
+                novelty = Novelty(eval(names['k']), eval(names['threshold']), eval(names['limit']), 4)
+            except:
+                print('File %s has no [Novelty] section' % args.config)
+                exit(1)
 
     config = NeatConfig(
             AugmentedGenome,
             neat.DefaultReproduction,
             neat.DefaultSpeciesSet, 
             neat.DefaultStagnation, 
-            'xor-novelty.cfg' if args.novelty else 'xor.cfg', 
+            args.config, 
             'xor', 
             {'num_inputs':2, 'num_outputs':1}, 
-            args.seed)
+            args.seed, 
+            novelty)
 
     evalfun = _eval_xor_both if args.novelty else _eval_xor_fitness
 
