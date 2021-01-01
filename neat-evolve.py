@@ -9,13 +9,15 @@ MIT License
 
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
-from neat_gym import _GymNeatConfig, _GymHyperConfig, evolve
+from neat_gym import _GymNeatConfig, _GymHyperConfig, _GymEsHyperConfig, evolve
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument('--env', default='CartPole-v1', help='Environment id')
 parser.add_argument('--hyper', dest='hyper', action='store_true',
                     help='Use HyperNEAT')
+parser.add_argument('--eshyper', dest='eshyper', action='store_true',
+                    help='Use ES-HyperNEAT')
 parser.add_argument('--checkpoint', dest='checkpoint', action='store_true',
                     help='Save at each new best')
 parser.add_argument('--cfgdir', required=False,
@@ -34,6 +36,9 @@ configfun = _GymNeatConfig.make_config
 # Check for HyperNEAT, ES-HyperNEAT
 if args.hyper:
     configfun = _GymHyperConfig.make_config
+if args.eshyper:
+    configfun = _GymEsHyperConfig.make_config
+
 
 config, evalfun = configfun(args)
 
