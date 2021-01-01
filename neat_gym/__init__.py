@@ -462,7 +462,7 @@ class _StdOutReporter(StdOutReporter):
             best_genome.key))
         print('Best actual fitness: %f ' % best_genome.actual_fitness)
 
-def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
+def _evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     '''
     NEAT evolution with parallel evaluator
     '''
