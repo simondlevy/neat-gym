@@ -11,18 +11,21 @@ import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 from neat_gym import _GymNeatConfig, _GymHyperConfig, _GymEsHyperConfig, evolve
 
+
 def main():
 
-    # Parse command-line arguments, making --hyper and --eshyper mutuall exclusive
-    parser = argparse.ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+            formatter_class=ArgumentDefaultsHelpFormatter)
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--hyper', action='store_true', help='Use HyperNEAT')
-    group.add_argument('--eshyper', action='store_true', help='Use ES-HyperNEAT')
+    group.add_argument('--eshyper', action='store_true',
+                       help='Use ES-HyperNEAT')
     parser.add_argument('--env', default='CartPole-v1', help='Environment id')
     parser.add_argument('--checkpoint', dest='checkpoint', action='store_true',
                         help='Save at each new best')
     parser.add_argument('--config', required=False, default=None,
-                        help='Config file; if None, uses config/<env-name>.cfg')
+                        help='Config file; if None, config/<env-name>.cfg')
     parser.add_argument('--ngen', type=int, required=False,
                         help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False,
@@ -32,7 +35,8 @@ def main():
     args = parser.parse_args()
 
     # Default to environment name for config file
-    cfgfile = 'config/' + args.env + '.cfg' if args.config is None else args.config
+    cfgfile = ('config/' + args.env + '.cfg'
+               if args.config is None else args.config)
 
     # Default to original NEAT
     configfun = _GymNeatConfig.make_config
@@ -47,6 +51,7 @@ def main():
 
     # Evolve
     evolve(config, evalfun, args.seed, args.env, args.ngen, args.checkpoint)
+
 
 if __name__ == '__main__':
     main()
