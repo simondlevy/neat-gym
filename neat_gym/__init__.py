@@ -31,6 +31,7 @@ from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 from pureples.shared.substrate import Substrate
 
+
 class AugmentedGenome(DefaultGenome):
     '''
     Supports both ordinary NEAT and Novelty Search.
@@ -40,11 +41,11 @@ class AugmentedGenome(DefaultGenome):
 
         DefaultGenome.__init__(self, key)
 
-        # Since sparsity is used as fitness, we need a separate variable to store actual fitness
+        # Sparsity is used as fitness; need anoter variable for actual fitness
         self.actual_fitness = None
 
+
 class NeatConfig(object):
-    #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/config.py
 
     __params = [ConfigParameter('pop_size', int),
                 ConfigParameter('fitness_criterion', str),
@@ -52,16 +53,16 @@ class NeatConfig(object):
                 ConfigParameter('reset_on_extinction', bool),
                 ConfigParameter('no_fitness_termination', bool, False)]
 
-    def __init__(self, 
-            genome_type, 
-            reproduction_type, 
-            species_set_type, 
-            stagnation_type, 
-            config_file_name, 
-            task_name, 
-            layout_dict, 
-            seed, 
-            novelty=None):
+    def __init__(self,
+                 genome_type,
+                 reproduction_type,
+                 species_set_type,
+                 stagnation_type,
+                 config_file_name,
+                 task_name,
+                 layout_dict,
+                 seed,
+                 novelty=None):
 
         # Check that the provided types have the required methods.
         assert hasattr(genome_type, 'parse_config')
@@ -77,7 +78,8 @@ class NeatConfig(object):
         self.seed = seed
 
         if not os.path.isfile(config_file_name):
-            raise Exception('No such config file: ' + os.path.abspath(config_file_name))
+            raise Exception('No such config file: %s' %
+                            os.path.abspath(config_file_name))
 
         parameters = ConfigParser()
         with open(config_file_name) as f:
@@ -87,18 +89,18 @@ class NeatConfig(object):
                 parameters.readfp(f)
 
             try:
-                names =  parameters['Names']
+                names = parameters['Names']
                 self.node_names = {}
-                for idx,name in enumerate(eval(names['input'])):
+                for idx, name in enumerate(eval(names['input'])):
                     self.node_names[-idx-1] = name
-                for idx,name in enumerate(eval(names['output'])):
+                for idx, name in enumerate(eval(names['output'])):
                     self.node_names[idx] = name
-            except:
+            except Exception:
                 self.node_names = {}
 
         # NEAT configuration
         if not parameters.has_section('NEAT'):
-            raise RuntimeError("'NEAT' section not found in NEAT configuration file.")
+            raise RuntimeError('NEAT section missing from configuration file.')
 
         param_list_names = []
         for p in self.__params:
@@ -109,17 +111,19 @@ class NeatConfig(object):
                     setattr(self, p.name, p.parse('NEAT', parameters))
                 except Exception:
                     setattr(self, p.name, p.default)
-                    warnings.warn("Using default %s for %s'" % (p.default, p.name),
-                                  DeprecationWarning)
+                    warnings.warn('Using default %s for %s' %
+                                  (p.default, p.name), DeprecationWarning)
             param_list_names.append(p.name)
         param_dict = dict(parameters.items('NEAT'))
         unknown_list = [x for x in param_dict if x not in param_list_names]
         if unknown_list:
             if len(unknown_list) > 1:
-                raise UnknownConfigItemError("Unknown (section 'NEAT') configuration items:\n" +
-                                             "\n\t".join(unknown_list))
+                raise UnknownConfigItemError(
+                        'Unknown (section NEAT) configuration items:\n' +
+                        '\n\t'.join(unknown_list))
             raise UnknownConfigItemError(
-                "Unknown (section 'NEAT') configuration item {!s}".format(unknown_list[0]))
+                'Unknown (section NEAT) configuration item %s' %
+                format(unknown_list[0]))
 
         # Parse type sections.
         genome_dict = dict(parameters.items(genome_type.__name__))
@@ -131,13 +135,15 @@ class NeatConfig(object):
         self.genome_config = genome_type.parse_config(genome_dict)
 
         species_set_dict = dict(parameters.items(species_set_type.__name__))
-        self.species_set_config = species_set_type.parse_config(species_set_dict)
+        self.species_set_config = \
+            species_set_type.parse_config(species_set_dict)
 
         stagnation_dict = dict(parameters.items(stagnation_type.__name__))
         self.stagnation_config = stagnation_type.parse_config(stagnation_dict)
 
         reproduction_dict = dict(parameters.items(reproduction_type.__name__))
-        self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
+        self.reproduction_config = \
+            reproduction_type.parse_config(reproduction_dict)
 
         # Support novelty search
         self.novelty = novelty
@@ -147,7 +153,7 @@ class NeatConfig(object):
         name = self._make_name(genome)
         net = neat.nn.FeedForwardNetwork.create(genome, self)
         pickle.dump((net, self.task_name), open('models/%s.dat' % name, 'wb'))
-        _GymNeatConfig._draw_net(net, 'visuals/%s'%name, self.node_names)
+        _GymNeatConfig._draw_net(net, 'visuals/%s' % name, self.node_names)
 
     def is_novelty(self):
 
@@ -159,10 +165,11 @@ class NeatConfig(object):
 
     def _make_name(self, genome, suffix=''):
 
-        return '%s%s%+010.3f' % (self.task_name, suffix, self.get_actual_fitness(genome))
+        return '%s%s%+010.3f' % \
+               (self.task_name, suffix, self.get_actual_fitness(genome))
+
 
 class _NoveltyPopulation(Population):
-    #Adapted from https://github.com/CodeReclaimers/neat-python/blob/master/neat/population.py
 
     def __init__(self, config):
 
@@ -184,26 +191,35 @@ class _NoveltyPopulation(Population):
             best = None
             for g in self.population.values():
                 if g.fitness is None:
-                    raise RuntimeError("Fitness not assigned to genome {}".format(g.key))
+                    raise RuntimeError('Fitness not assigned to genome %d' %
+                                       g.key)
 
-                # Use actual_fitness to encode ignored objective, and replace genome's fitness with its novelty
+                # Use actual_fitness to encode ignored objective,
+                # and replace genome's fitness with its novelty
                 nov, g.actual_fitness = g.fitness
-                g.fitness = self.config.novelty.add(nov)                
+                g.fitness = self.config.novelty.add(nov)
 
                 if best is None or g.actual_fitness > best.actual_fitness:
                     best = g
-            
-            self.reporters.post_evaluate(self.config, self.population, self.species, best)
+
+            self.reporters.post_evaluate(self.config,
+                                         self.population,
+                                         self.species,
+                                         best)
 
             # Track the best genome ever seen.
-            if self.best_genome is None or best.actual_fitness > self.best_genome.actual_fitness:
+            if (self.best_genome is None or
+                    best.actual_fitness > self.best_genome.actual_fitness):
                 self.best_genome = best
 
             if not self.config.no_fitness_termination:
                 # End if the fitness threshold is reached.
-                fv = self.fitness_criterion(g.actual_fitness for g in self.population.values())
+                fv = self.fitness_criterion(g.actual_fitness
+                                            for g in self.population.values())
                 if fv >= self.config.fitness_threshold:
-                    self.reporters.found_solution(self.config, self.generation, best)
+                    self.reporters.found_solution(self.config,
+                                                  self.generation,
+                                                  best)
                     break
 
             # Create the next generation from the current generation.
