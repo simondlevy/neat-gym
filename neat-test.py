@@ -14,4 +14,8 @@ from neat_gym import read_file, eval_net
 net, env_name, record_dir, nodisplay = read_file(allow_record=True)
 
 # Run the network on the environment
-print('Reward = %6.6f.' % eval_net(net, gym.make(env_name), render=(not nodisplay), record_dir=record_dir))
+print('Reward = %6.6f.' % eval_net(
+                            net,
+                            gym.make(env_name),
+                            render=(not nodisplay),
+                            record_dir=record_dir))

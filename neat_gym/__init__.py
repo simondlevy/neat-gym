@@ -360,7 +360,6 @@ class _GymHyperConfig(_GymNeatConfig):
         out = eval(subs['output'])
         substrate = Substrate(inp, out, hid)
 
-        
         config = _GymHyperConfig(args, cfgfile, substrate, actfun)
 
         evalfun = _GymHyperConfig.eval_genome
