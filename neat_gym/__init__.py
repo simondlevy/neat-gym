@@ -246,13 +246,11 @@ class _NoveltyPopulation(Population):
 
 class _GymNeatConfig(NeatConfig):
 
-    def __init__(self, args, layout_dict, suffix=''):
-
-        filename = args.cfgdir + '/' + args.env + '.cfg'
+    def __init__(self, args, cfgfile, layout_dict, suffix=''):
 
         NeatConfig.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                 neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-                filename, args.env, layout_dict, args.seed)
+                cfgfile, args.env, layout_dict, args.seed)
 
         self.env = gym.make(args.env)
 
@@ -276,9 +274,8 @@ class _GymNeatConfig(NeatConfig):
         return fitness / config.reps
 
     @staticmethod
-    def load(args, suffix):
+    def load(filename, suffix):
 
-        filename = args.cfgdir + '/' + args.env + '.cfg'
         if not os.path.isfile(filename):
             print('Cannot open config file ' + filename)
             exit(1)
@@ -297,7 +294,7 @@ class _GymNeatConfig(NeatConfig):
         os.remove(filename) 
 
     @staticmethod
-    def make_config(args):
+    def make_config(args, cfgfile):
 
         # Get input/output layout from environment
         env = gym.make(args.env)
@@ -305,7 +302,7 @@ class _GymNeatConfig(NeatConfig):
         num_outputs = env.action_space.n if _GymNeatConfig._is_discrete(env) else env.action_space.shape[0]
 
         # Load rest of config from file
-        config = _GymNeatConfig(args, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
+        config = _GymNeatConfig(args, cfgfile, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
         evalfun = _GymNeatConfig.eval_genome
      
         return config, evalfun
@@ -316,9 +313,9 @@ class _GymNeatConfig(NeatConfig):
 
 class _GymHyperConfig(_GymNeatConfig):
 
-    def __init__(self, args, substrate, actfun, suffix='-hyper'):
+    def __init__(self, args, cfgfile, substrate, actfun, suffix='-hyper'):
 
-        _GymNeatConfig.__init__(self, args, {'num_inputs':5, 'num_outputs':1}, suffix)
+        _GymNeatConfig.__init__(self, args, cfgfile, {'num_inputs':5, 'num_outputs':1}, suffix)
 
         self.substrate = substrate
         self.actfun = actfun
@@ -353,9 +350,9 @@ class _GymHyperConfig(_GymNeatConfig):
         return cppn, create_phenotype_network(cppn, config.substrate, config.actfun)
 
     @staticmethod
-    def make_config(args):
-        
-        cfg = _GymNeatConfig.load(args, '-hyper')
+    def make_config(args, cfgfile):
+
+        cfg = _GymNeatConfig.load(cfgfile, '-hyper')
         subs =  cfg['Substrate']
         actfun = subs['function']
         inp = eval(subs['input'])
@@ -363,8 +360,8 @@ class _GymHyperConfig(_GymNeatConfig):
         out = eval(subs['output'])
         substrate = Substrate(inp, out, hid)
 
-        # Load rest of config from file
-        config = _GymHyperConfig(args, substrate, actfun)
+        
+        config = _GymHyperConfig(args, cfgfile, substrate, actfun)
 
         evalfun = _GymHyperConfig.eval_genome
 
@@ -372,7 +369,7 @@ class _GymHyperConfig(_GymNeatConfig):
      
 class _GymEsHyperConfig(_GymHyperConfig):
 
-    def __init__(self, args, substrate, actfun, params):
+    def __init__(self, args, cfgfile, substrate, actfun, params):
 
         self.params = {
                 'initial_depth'     : int(params['initial_depth']),
@@ -385,7 +382,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
                 'activation'        : params['activation']  
                 }
 
-        _GymHyperConfig.__init__(self, args, substrate, actfun, suffix='-eshyper')
+        _GymHyperConfig.__init__(self, args, cfgfile, substrate, actfun, suffix='-eshyper')
 
     def save_genome(self, genome):
 
@@ -407,10 +404,10 @@ class _GymEsHyperConfig(_GymHyperConfig):
         return cppn, esnet, net
 
     @staticmethod
-    def make_config(args):
+    def make_config(args, cfgfile):
 
         # Load config from file
-        cfg = _GymNeatConfig.load(args, '-eshyper')
+        cfg = _GymNeatConfig.load(cfgfile, '-eshyper')
         subs =  cfg['Substrate']
         actfun = subs['function']
         inp = eval(subs['input'])
@@ -420,7 +417,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
         substrate = Substrate(inp, out)
 
         # Load rest of config from file
-        config = _GymEsHyperConfig(args, substrate, actfun, cfg['ES'])
+        config = _GymEsHyperConfig(args, cfgfile, substrate, actfun, cfg['ES'])
 
         evalfun = _GymEsHyperConfig.eval_genome
 
