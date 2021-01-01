@@ -498,28 +498,6 @@ def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     # Save winner
     config.save_genome(winner)
 
-def _evolve_gym(configfun):
-    '''
-    Evolves solutions to Gym environments based on command-line arguments
-    '''
-
-    # Parse command-line arguments
-
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--env', default='CartPole-v1', help='Environment id')
-    parser.add_argument('--checkpoint', dest='checkpoint', action='store_true', help='Save at each new best')
-    parser.add_argument('--cfgdir', required=False, default='./config', help='Directory for config files')
-    parser.add_argument('--ngen', type=int, required=False, help='Number of generations to run')
-    parser.add_argument('--reps', type=int, default=10, required=False, help='Number of repetitions per genome')
-    parser.add_argument('--seed', type=int, required=False, help='Seed for random number generator')
-    args = parser.parse_args()
-
-    # Get configuration and genome evaluation function for a particular algorithm
-    config, evalfun = configfun(args) 
-
-    # Evolve
-    evolve(config, evalfun, args.seed, args.env, args.ngen, args.checkpoint)
-
 def read_file(allow_record=False):
     '''
     Reads a genome/config file based on command-line argument
