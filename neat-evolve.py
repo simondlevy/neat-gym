@@ -11,13 +11,12 @@ import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 from neat_gym import _GymNeatConfig, _GymHyperConfig, _GymEsHyperConfig, evolve
 
-# Parse command-line arguments
+# Parse command-line arguments, making --hyper and --eshyper mutuall exclusive
 parser = argparse.ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+group = parser.add_mutually_exclusive_group()
+group.add_argument('--hyper', action='store_true', help='Use HyperNEAT')
+group.add_argument('--eshyper', action='store_true', help='Use ES-HyperNEAT')
 parser.add_argument('--env', default='CartPole-v1', help='Environment id')
-parser.add_argument('--hyper', dest='hyper', action='store_true',
-                    help='Use HyperNEAT')
-parser.add_argument('--eshyper', dest='eshyper', action='store_true',
-                    help='Use ES-HyperNEAT')
 parser.add_argument('--checkpoint', dest='checkpoint', action='store_true',
                     help='Save at each new best')
 parser.add_argument('--cfgdir', required=False,
