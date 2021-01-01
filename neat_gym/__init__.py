@@ -248,7 +248,7 @@ class _GymNeatConfig(NeatConfig):
 
     def __init__(self, args, layout_dict, suffix=''):
 
-        filename = args.cfgdir + '/' + args.env + suffix + '.cfg'
+        filename = args.cfgdir + '/' + args.env + '.cfg'
 
         NeatConfig.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
                 neat.DefaultSpeciesSet, neat.DefaultStagnation, 
@@ -278,7 +278,7 @@ class _GymNeatConfig(NeatConfig):
     @staticmethod
     def load(args, suffix):
 
-        filename = args.cfgdir + '/' + args.env + suffix + '.cfg'
+        filename = args.cfgdir + '/' + args.env + '.cfg'
         if not os.path.isfile(filename):
             print('Cannot open config file ' + filename)
             exit(1)
