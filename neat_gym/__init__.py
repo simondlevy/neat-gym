@@ -31,8 +31,6 @@ from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 from pureples.shared.substrate import Substrate
 
-from neat_gym.novelty import Novelty
-
 class AugmentedGenome(DefaultGenome):
     '''
     Supports both ordinary NEAT and Novelty Search.
@@ -62,7 +60,8 @@ class NeatConfig(object):
             config_file_name, 
             task_name, 
             layout_dict, 
-            seed):
+            seed, 
+            novelty=None):
 
         # Check that the provided types have the required methods.
         assert hasattr(genome_type, 'parse_config')
@@ -141,14 +140,7 @@ class NeatConfig(object):
         self.reproduction_config = reproduction_type.parse_config(reproduction_dict)
 
         # Support novelty search
-        self.novelty = None
-        if parameters.has_section('Novelty'):
-            novelty = parameters['Novelty']
-            self.novelty = Novelty(
-                    int(novelty['k']), 
-                    float(novelty['threshold']), 
-                    int(novelty['limit']), 
-                    int(novelty['ndims']))
+        self.novelty = novelty
 
     def save_genome(self, genome):
 
@@ -462,7 +454,9 @@ class _StdOutReporter(StdOutReporter):
             best_genome.key))
         print('Best actual fitness: %f ' % best_genome.actual_fitness)
 
-def _evolve(config, evalfun, seed, task_name, ngen, checkpoint):
+# Public functions -------------------------------------------------------------------
+
+def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     '''
     NEAT evolution with parallel evaluator
     '''

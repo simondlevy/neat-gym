@@ -9,7 +9,7 @@ MIT License
 
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
-from neat_gym import _GymNeatConfig, _GymHyperConfig, _GymEsHyperConfig, _evolve
+from neat_gym import _GymNeatConfig, _GymHyperConfig, _GymEsHyperConfig, evolve
 
 # Parse command-line arguments, making --hyper and --eshyper mutuall exclusive
 parser = argparse.ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
@@ -44,4 +44,4 @@ if args.eshyper:
 config, evalfun = configfun(args, cfgfile)
 
 # Evolve
-_evolve(config, evalfun, args.seed, args.env, args.ngen, args.checkpoint)
+evolve(config, evalfun, args.seed, args.env, args.ngen, args.checkpoint)
