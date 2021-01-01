@@ -109,7 +109,7 @@ class NeatConfig(object):
                     setattr(self, p.name, p.parse('NEAT', parameters))
                 except Exception:
                     setattr(self, p.name, p.default)
-                    warnings.warn("Using default {!r} for '{!s}'".format(p.default, p.name),
+                    warnings.warn("Using default %s for %s'" % (p.default, p.name),
                                   DeprecationWarning)
             param_list_names.append(p.name)
         param_dict = dict(parameters.items('NEAT'))
@@ -207,8 +207,7 @@ class _NoveltyPopulation(Population):
                     break
 
             # Create the next generation from the current generation.
-            self.population = self.reproduction.reproduce(self.config, self.species,
-                                                          self.config.pop_size, self.generation)
+            self._reproduce()
 
             # Check for complete extinction.
             if not self.species.species:
@@ -217,32 +216,54 @@ class _NoveltyPopulation(Population):
                 # If requested by the user, create a completely new population,
                 # otherwise raise an exception.
                 if self.config.reset_on_extinction:
-                    self.population = self.reproduction.create_new(self.config.genome_type,
-                                                                   self.config.genome_config,
-                                                                   self.config.pop_size)
+                    self.create_new_pop()
                 else:
                     raise CompleteExtinctionException()
 
             # Divide the new population into species.
-            self.species.speciate(self.config, self.population, self.generation)
+            self.species.speciate(self.config,
+                                  self.population,
+                                  self.generation)
 
-            self.reporters.end_generation(self.config, self.population, self.species)
+            self.reporters.end_generation(self.config,
+                                          self.population,
+                                          self.species)
 
             self.generation += 1
 
         if self.config.no_fitness_termination:
-            self.reporters.found_solution(self.config, self.generation, self.best_genome)
+            self.reporters.found_solution(self.config,
+                                          self.generation,
+                                          self.best_genome)
 
         return self.best_genome
+
+    def _reproduce(self):
+        self.population = \
+                 self.reproduction.reproduce(self.config, self.species,
+                                             self.config.pop_size,
+                                             self.generation)
+
+    def _create_new_pop(self):
+        self.population = \
+                self.reproduction.create_new(self.config.genome_type,
+                                             self.config.genome_config,
+                                             self.config.pop_size)
 
 
 class _GymNeatConfig(NeatConfig):
 
     def __init__(self, args, cfgfile, layout_dict, suffix=''):
 
-        NeatConfig.__init__(self, neat.DefaultGenome, neat.DefaultReproduction,
-                neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-                cfgfile, args.env, layout_dict, args.seed)
+        NeatConfig.__init__(self,
+                            neat.DefaultGenome,
+                            neat.DefaultReproduction,
+                            neat.DefaultSpeciesSet,
+                            neat.DefaultStagnation,
+                            cfgfile,
+                            args.env,
+                            layout_dict,
+                            args.seed)
 
         self.env = gym.make(args.env)
 
@@ -261,7 +282,10 @@ class _GymNeatConfig(NeatConfig):
 
         for _ in range(config.reps):
 
-            fitness += eval_net(net, config.env, activations=activations, seed=config.seed)
+            fitness += eval_net(net,
+                                config.env,
+                                activations=activations,
+                                seed=config.seed)
 
         return fitness / config.reps
 
@@ -276,27 +300,32 @@ class _GymNeatConfig(NeatConfig):
         parser.read(filename)
         return parser
 
-    @staticmethod 
+    @staticmethod
     def _draw_net(net, filename, node_names):
 
         # Create PDF
-        draw_net(net, filename=filename, node_names=node_names) 
+        draw_net(net, filename=filename, node_names=node_names)
 
         # Delete text
-        os.remove(filename) 
+        os.remove(filename)
 
     @staticmethod
     def make_config(args, cfgfile):
 
         # Get input/output layout from environment
         env = gym.make(args.env)
-        num_inputs  = env.observation_space.shape[0]
-        num_outputs = env.action_space.n if _GymNeatConfig._is_discrete(env) else env.action_space.shape[0]
+        num_inputs = env.observation_space.shape[0]
+        num_outputs = (env.action_space.n
+                       if _GymNeatConfig._is_discrete(env)
+                       else env.action_space.shape[0])
 
         # Load rest of config from file
-        config = _GymNeatConfig(args, cfgfile, {'num_inputs':num_inputs, 'num_outputs':num_outputs})
+        config = _GymNeatConfig(args,
+                                cfgfile,
+                                {'num_inputs': num_inputs,
+                                 'num_outputs': num_outputs})
         evalfun = _GymNeatConfig.eval_genome
-     
+
         return config, evalfun
 
     def _is_discrete(env):
@@ -307,16 +336,26 @@ class _GymHyperConfig(_GymNeatConfig):
 
     def __init__(self, args, cfgfile, substrate, actfun, suffix='-hyper'):
 
-        _GymNeatConfig.__init__(self, args, cfgfile, {'num_inputs':5, 'num_outputs':1}, suffix)
+        _GymNeatConfig.__init__(self,
+                                args,
+                                cfgfile,
+                                {'num_inputs': 5, 'num_outputs': 1},
+                                suffix)
 
         self.substrate = substrate
         self.actfun = actfun
 
         # Output of CPPN is recurrent, so negate indices
-        self.node_names = {j:self.node_names[k] for j,k in enumerate(self.node_names)} 
+        self.node_names = {j: self.node_names[k]
+                           for j, k in enumerate(self.node_names)}
 
-        # CPPN itself always has the same input and output nodes XXX are these correct?
-        self.cppn_node_names = {-1:'x1', -2:'y1', -3:'x2', -4:'y2', -5:'bias', 0:'weight'}
+        # CPPN itself always has the same input and output nodes
+        self.cppn_node_names = {-1: 'x1',
+                                -2: 'y1',
+                                -3: 'x2',
+                                -4: 'y2',
+                                -5: 'bias',
+                                0: 'weight'}
 
     def save_genome(self, genome):
 
@@ -324,12 +363,20 @@ class _GymHyperConfig(_GymNeatConfig):
         self._save_nets(genome, cppn, net)
 
     def _save_nets(self, genome, cppn, net, suffix='-hyper'):
-        pickle.dump((net, self.task_name), open('models/%s.dat' % self._make_name(genome, suffix=suffix), 'wb'))
-        _GymNeatConfig._draw_net(cppn, 'visuals/%s' % self._make_name(genome, suffix='-cppn'), self.cppn_node_names)
-        _GymNeatConfig._draw_net(net, 'visuals/%s' % self._make_name(genome, suffix=suffix), self.node_names)
+        pickle.dump((net, self.task_name),
+                    open('models/%s.dat' %
+                         self._make_name(genome, suffix=suffix), 'wb'))
+        _GymNeatConfig._draw_net(cppn,
+                                 'visuals/%s' %
+                                 self._make_name(genome, suffix='-cppn'),
+                                 self.cppn_node_names)
+        _GymNeatConfig._draw_net(net,
+                                 'visuals/%s' %
+                                 self._make_name(genome, suffix=suffix),
+                                 self.node_names)
 
     @staticmethod
-    def eval_genome(genome, config): # _GymHyperConfig
+    def eval_genome(genome, config):
 
         cppn, net = _GymHyperConfig._make_nets(genome, config)
         activations = len(config.substrate.hidden_coordinates) + 2
@@ -339,13 +386,16 @@ class _GymHyperConfig(_GymNeatConfig):
     def _make_nets(genome, config):
 
         cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-        return cppn, create_phenotype_network(cppn, config.substrate, config.actfun)
+        return (cppn,
+                create_phenotype_network(cppn,
+                                         config.substrate,
+                                         config.actfun))
 
     @staticmethod
     def make_config(args, cfgfile):
 
         cfg = _GymNeatConfig.load(cfgfile, '-hyper')
-        subs =  cfg['Substrate']
+        subs = cfg['Substrate']
         actfun = subs['function']
         inp = eval(subs['input'])
         hid = eval(subs['hidden'])
@@ -357,28 +407,31 @@ class _GymHyperConfig(_GymNeatConfig):
         evalfun = _GymHyperConfig.eval_genome
 
         return config, evalfun
-     
+
+
 class _GymEsHyperConfig(_GymHyperConfig):
 
     def __init__(self, args, cfgfile, substrate, actfun, params):
 
         self.params = {
-                'initial_depth'     : int(params['initial_depth']),
-                'max_depth'         : int(params['max_depth']),
-                'variance_threshold': float(params['variance_threshold']),  
-                'band_threshold'    : float(params['band_threshold']),  
-                'iteration_level'   : int(params['iteration_level']),  
-                'division_threshold': float(params['division_threshold']),  
-                'max_weight'        : float(params['max_weight']),
-                'activation'        : params['activation']  
+                'initial_depth': int(params['initial_depth']),
+                'max_depth': int(params['max_depth']),
+                'variance_threshold': float(params['variance_threshold']),
+                'band_threshold': float(params['band_threshold']),
+                'iteration_level': int(params['iteration_level']),
+                'division_threshold': float(params['division_threshold']),
+                'max_weight': float(params['max_weight']),
+                'activation': params['activation']
                 }
 
-        _GymHyperConfig.__init__(self, args, cfgfile, substrate, actfun, suffix='-eshyper')
+        _GymHyperConfig.__init__(self, args, cfgfile, substrate, actfun,
+                                 suffix='-eshyper')
 
     def save_genome(self, genome):
 
         cppn, _, net = _GymEsHyperConfig._make_nets(genome, self)
-        _GymEsHyperConfig._save_nets(self, genome, cppn, net, suffix='-eshyper')
+        _GymEsHyperConfig._save_nets(self, genome, cppn, net,
+                                     suffix='-eshyper')
 
     @staticmethod
     def eval_genome(genome, config):
@@ -399,7 +452,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
 
         # Load config from file
         cfg = _GymNeatConfig.load(cfgfile, '-eshyper')
-        subs =  cfg['Substrate']
+        subs = cfg['Substrate']
         actfun = subs['function']
         inp = eval(subs['input'])
         out = eval(subs['output'])
@@ -413,6 +466,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
         evalfun = _GymEsHyperConfig.eval_genome
 
         return config, evalfun
+
 
 class _SaveReporter(BaseReporter):
 
@@ -430,8 +484,10 @@ class _SaveReporter(BaseReporter):
 
         if self.checkpoint and best_genome_fitness > self.best_fitness:
             self.best_fitness = best_genome_fitness
-            print('############# Saving new best %f ##############' % self.best_fitness)
+            print('############# Saving new best %f ##############' %
+                  self.best_fitness)
             config.save_genome(best_genome)
+
 
 class _StdOutReporter(StdOutReporter):
 
@@ -441,20 +497,28 @@ class _StdOutReporter(StdOutReporter):
 
     def post_evaluate(self, config, population, species, best_genome):
         if config.novelty is None:
-            StdOutReporter.post_evaluate(self, config, population, species, best_genome)
+            StdOutReporter.post_evaluate(
+                    self,
+                    config,
+                    population,
+                    species,
+                    best_genome)
             return
         fitnesses = [c.fitness for c in population.values()]
         fit_mean = mean(fitnesses)
         fit_std = stdev(fitnesses)
         best_species_id = species.get_species_id(best_genome.key)
-        print('Population\'s average novelty: {0:3.5f} stdev: {1:3.5f}'.format(fit_mean, fit_std))
-        print('Best novelty: {0:3.5f} - size: {1!r} - species {2} - id {3}'.format(best_genome.fitness,
-            best_genome.size(),
-            best_species_id,
-            best_genome.key))
+        print('Population\'s average novelty: %3.5f stdev: %3.5f' %
+              (fit_mean, fit_std))
+        print('Best novelty: %3.5f - size: %d - species %d - id %d' %
+              (best_genome.fitness,
+               best_genome.size(),
+               best_species_id,
+               best_genome.key))
         print('Best actual fitness: %f ' % best_genome.actual_fitness)
 
-# Public functions -------------------------------------------------------------------
+# Public functions ===================================================
+
 
 def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     '''
@@ -469,13 +533,14 @@ def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     os.makedirs('visuals', exist_ok=True)
 
     # Create an ordinary population or a population for NoveltySearch
-    pop = _NoveltyPopulation(config) if config.is_novelty() else Population(config)
+    pop = (_NoveltyPopulation(config)
+           if config.is_novelty() else Population(config))
 
     # Add a stdout reporter to show progress in the terminal.
     pop.add_reporter(_StdOutReporter(show_species_detail=False))
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
-    
+
     # Add a reporter (which can also checkpoint the best)
     pop.add_reporter(_SaveReporter(task_name, checkpoint))
 
@@ -483,10 +548,12 @@ def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
 
     # Run for number of generations specified in config file
-    winner = pop.run(pe.evaluate) if ngen is None else pop.run(pe.evaluate, ngen) 
+    winner = (pop.run(pe.evaluate)
+              if ngen is None else pop.run(pe.evaluate, ngen))
 
     # Save winner
     config.save_genome(winner)
+
 
 def read_file(allow_record=False):
     '''
@@ -495,11 +562,14 @@ def read_file(allow_record=False):
     '''
 
     # Parse command-line arguments
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+                        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('filename', metavar='FILENAME', help='.dat input file')
-    parser.add_argument('--nodisplay', dest='nodisplay', action='store_true', help='Suppress display')
+    parser.add_argument('--nodisplay', dest='nodisplay', action='store_true',
+                        help='Suppress display')
     if allow_record:
-        parser.add_argument('--record', default=None, help='If specified, sets the recording dir')
+        parser.add_argument('--record', default=None,
+                            help='If specified, sets the recording dir')
     args = parser.parse_args()
 
     # Load net and environment name from pickled file
@@ -508,7 +578,14 @@ def read_file(allow_record=False):
     # Return genome, config, and optional save flag
     return net, env_name, args.record if allow_record else None, args.nodisplay
 
-def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
+
+def eval_net(
+        net,
+        env,
+        render=False,
+        record_dir=None,
+        activations=1,
+        seed=None):
     '''
     Evaluates an evolved network
     @param net the network
@@ -533,11 +610,12 @@ def eval_net(net, env, render=False, record_dir=None, activations=1, seed=None):
     while True:
 
         # Support recurrent nets
-        for k in range(activations): 
+        for k in range(activations):
             action = net.activate(state)
 
         # Support both discrete and continuous actions
-        action = np.argmax(action) if is_discrete else action * env.action_space.high
+        action = (np.argmax(action)
+                  if is_discrete else action * env.action_space.high)
 
         state, reward, done, _ = env.step(action)
         if render:
