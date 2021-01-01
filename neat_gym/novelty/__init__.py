@@ -38,6 +38,7 @@ class Novelty(object):
         @param limit maximum size of the archive.
         @param ndims dimensionality of archive elements
         '''
+
         self.k = k
         self.threshold = threshold
         self.limit = limit
@@ -62,6 +63,23 @@ class Novelty(object):
     def __str__(self):
 
         return 'Novelty k = %d  threshold = %f  limit = %d' % (self.k, self.threshold, self.limit)
+
+    def __setstate__(self, state):
+        '''
+        Automagically called by pickle.load()
+        '''
+
+        self.k = state['k']
+        self.threshold = state['threshold']
+        self.limit = state['limit']
+        self.ndims = state['ndims']
+        self.archive = state['archive']
+        self.rtree_index = state['rtree_index']
+
+        # Reconstruct R*-tree index from archive
+        if self.rtree_index is not None:
+            for idx,pt in enumerate(self.archive):
+                self.rtree_index.insert(idx, Novelty._expand_point(pt))
 
     def add(self, p):
         '''
@@ -114,18 +132,6 @@ class Novelty(object):
                 self.count += 1
 
         return s
-
-    def saveArchive(self, filename):
-        '''
-        Saves the entire archive to the given filename by writing each archived
-        point on a single line in the file, with spaces separating each value.
-        @parm filename
-        '''
-        with open(filename, 'w') as f:
-            for p in self.archive:
-                for x in p:
-                    f.write('%f ' % x)
-                f.write('\n')
 
     def _sparseness(self, p):
         '''
