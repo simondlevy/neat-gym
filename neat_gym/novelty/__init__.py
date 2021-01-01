@@ -7,8 +7,8 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-
 import numpy as np
+
 
 class Novelty(object):
     '''
@@ -19,7 +19,8 @@ class Novelty(object):
             year = {2011},
             month = {06},
             pages = {189-223},
-            title = {Abandoning Objectives: Evolution Through the Search for Novelty Alone},
+            title = {Abandoning Objectives: Evolution Through the
+                     Search for Novelty Alone},
             volume = {19},
             journal = {Evolutionary computation},
             doi = {10.1162/EVCO_a_00025}
@@ -34,7 +35,7 @@ class Novelty(object):
         '''
         Creates an object supporting Novelty Search.
         @param k for k-nearest-neighbors
-        @param threshold how novel an example has to be before it will be added the archive
+        @param threshold minimum novelty for adding to archive
         @param limit maximum size of the archive.
         @param ndims dimensionality of archive elements
         '''
@@ -45,7 +46,7 @@ class Novelty(object):
         self.ndims = ndims
 
         # Archive implemented as a circular buffer
-        self.archive = np.zeros((limit,ndims))
+        self.archive = np.zeros((limit, ndims))
         self.count = 0
 
         # Default to naive kNN (no R*-tree)
@@ -57,12 +58,13 @@ class Novelty(object):
             p = index.Property()
             p.dimension = ndims
             self.rtree_index = index.Index(properties=p, interleaved=False)
-        except:
+        except Exception:
             pass
 
     def __str__(self):
 
-        return 'Novelty k = %d  threshold = %f  limit = %d' % (self.k, self.threshold, self.limit)
+        return ('Novelty k = %d  threshold = %f  limit = %d' %
+                (self.k, self.threshold, self.limit))
 
     def __setstate__(self, state):
         '''
@@ -78,7 +80,7 @@ class Novelty(object):
 
         # Reconstruct R*-tree index from archive
         if self.rtree_index is not None:
-            for idx,pt in enumerate(self.archive):
+            for idx, pt in enumerate(self.archive):
                 self.rtree_index.insert(idx, Novelty._expand_point(pt))
 
     def add(self, p):
@@ -93,7 +95,7 @@ class Novelty(object):
 
         # Start with zero as sparseness
         s = 0
- 
+
         # Below limit, fill archive and ignore actual sparseness
         if self.count < self.limit:
 
@@ -106,11 +108,11 @@ class Novelty(object):
 
             self.count += 1
 
-        else: 
+        else:
 
             # Compute sparseness of new point
             s = self._sparseness(p)
-            
+
             # If sparseness excedes threshold, ...
             if s > self.threshold:
 
@@ -120,10 +122,13 @@ class Novelty(object):
                 # Remove old point from kNN
                 if self.rtree_index is not None:
 
-                    self.rtree_index.delete(idx, Novelty._expand_point(self.archive[idx]))
+                    pt = Novelty._expand_point(self.archive[idx])
 
-                    # Insert new point in kNN.  With interleaved=False, the order of
-                    # input and output is: (xmin, xmax, ymin, ymax, zmin, zmax, # ...)
+                    self.rtree_index.delete(idx, pt)
+
+                    # Insert new point in kNN.  With interleaved=False, the
+                    # order of input and output is: (xmin, xmax, ymin, ymax,
+                    # zmin, zmax, # ...)
                     self.rtree_index.insert(idx, Novelty._expand_point(p))
 
                 # Store new point in archive
@@ -140,19 +145,26 @@ class Novelty(object):
         of how unique this point is relative to the archive of saved examples.
         '''
 
-        nbrs = (self.rtree_index.nearest(p, self.k) if self.rtree_index is not None else 
-                np.argsort([Novelty._distance(p, q) for q in self.archive])[:self.k])
+        nbrs = (self.rtree_index.nearest(p, self.k)
+                if self.rtree_index is not None
+                else np.argsort([Novelty._distance(p, q)
+                                 for q in self.archive])[:self.k])
 
-        return 1./self.k * np.sqrt(np.sum(np.sum((self.archive[list(nbrs),:] - p)**2, axis=1)))
+        nbrs = list(nbrs)
+
+        dst = np.sqrt(np.sum(np.sum((self.archive[nbrs, :] - p)**2, axis=1)))
+
+        return 1./self.k * dst
 
     @staticmethod
     def _distance(p1, p2):
         '''
-        Returns the L2 distance between points p1 and p2 which are assumed to be
-        lists or tuples of equal length. 
+        Returns the L2 distance between points p1 and p2 which are assumed to
+        be lists or tuples of equal length.
         '''
         return np.sqrt(np.sum((np.array(p1)-np.array(p2))**2))
 
     @staticmethod
     def _expand_point(pt):
-        return tuple(item for sublist in [(x,x) for x in pt] for item in sublist)
+        return tuple(item for sublist
+                     in [(x, x) for x in pt] for item in sublist)
