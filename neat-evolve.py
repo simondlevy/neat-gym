@@ -9,11 +9,13 @@ MIT License
 
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
-from neat_gym import _GymNeatConfig, evolve
+from neat_gym import _GymNeatConfig, _GymHyperConfig, evolve
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument('--env', default='CartPole-v1', help='Environment id')
+parser.add_argument('--hyper', dest='hyper', action='store_true',
+                    help='Use HyperNEAT')
 parser.add_argument('--checkpoint', dest='checkpoint', action='store_true',
                     help='Save at each new best')
 parser.add_argument('--cfgdir', required=False,
@@ -26,8 +28,12 @@ parser.add_argument('--seed', type=int, required=False,
                     help='Seed for random number generator')
 args = parser.parse_args()
 
-# Get configuration and genome evaluation function for a particular algorithm
+# Default to original NEAT
 configfun = _GymNeatConfig.make_config
+
+# Check for HyperNEAT, ES-HyperNEAT
+if args.hyper:
+    configfun = _GymHyperConfig.make_config
 
 config, evalfun = configfun(args)
 
