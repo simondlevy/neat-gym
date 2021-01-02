@@ -38,6 +38,31 @@ def _eval_xor_fitness(genome, config):
     return _eval_xor_both(genome, config)[1]
 
 
+def parse_novelty(cfgfilename):
+
+    novelty = None
+
+    parameters = ConfigParser()
+
+    with open(cfgfilename) as f:
+        if hasattr(parameters, 'read_file'):
+            parameters.read_file(f)
+        else:
+            parameters.readfp(f)
+
+        try:
+            names = parameters['Novelty']
+            novelty = Novelty(eval(names['k']),
+                              eval(names['threshold']),
+                              eval(names['limit']),
+                              4)
+        except Exception:
+            print('File %s has no [Novelty] section' % cfgfilename)
+            exit(1)
+
+    return novelty
+
+
 def main():
 
     fmtr = argparse.ArgumentDefaultsHelpFormatter
@@ -55,25 +80,7 @@ def main():
 
     np.random.seed(args.seed)
 
-    novelty = None
-
-    if args.novelty:
-        parameters = ConfigParser()
-        with open(args.config) as f:
-            if hasattr(parameters, 'read_file'):
-                parameters.read_file(f)
-            else:
-                parameters.readfp(f)
-
-            try:
-                names = parameters['Novelty']
-                novelty = Novelty(eval(names['k']),
-                                  eval(names['threshold']),
-                                  eval(names['limit']),
-                                  4)
-            except Exception:
-                print('File %s has no [Novelty] section' % args.config)
-                exit(1)
+    novelty = parse_novelty(args.config) if args.novelty else None
 
     config = NeatConfig(
             AugmentedGenome,
