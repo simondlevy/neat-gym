@@ -184,12 +184,10 @@ class _GymNeatConfig(NeatConfig):
         # Make gym environment form name in command-line arguments
         env = gym_make(args.env)
 
-        # Tell environment to use novelty if indicated in command-line args
+        # Make sure environment supports novelty
         if args.novelty:
             unenv = env.unwrapped
-            if hasattr(unenv, 'use_novelty'):
-                unenv.use_novelty()
-            else:
+            if not hasattr(unenv, 'step_novelty'):
                 print('Error: environment %s does not support novelty search' % args.env)
                 exit(1)
 
@@ -590,13 +588,14 @@ def eval_net(
         seed=None,
         novelty=False):
     '''
-    Evaluates an evolved network
+    Evaluates a network
     @param net the network
     @param env the Gym environment
     @param render set to True for rendering
     @param record_dir set to directory name for recording video
     @param actviations number of times to repeat
     @param seed seed for random number generator
+    @param novelty flag for computing novelty as well as reward
     @return total reward
     '''
 
@@ -620,7 +619,13 @@ def eval_net(
         action = (np.argmax(action)
                   if is_discrete else action * env.action_space.high)
 
-        state, reward, done, _ = env.step(action)
+        if novelty:
+            state, result, done, _ = env.step_novelty(action)
+            reward, novelty = result
+            print(reward, novelty)
+            exit(0)
+        else:
+            state, reward, done, _ = env.step(action)
 
         if render:
             env.render('rgb_array')
