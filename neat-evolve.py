@@ -22,7 +22,7 @@ def main():
     group.add_argument('--hyper', action='store_true', help='Use HyperNEAT')
     group.add_argument('--eshyper', action='store_true',
                        help='Use ES-HyperNEAT')
-    group.add_argument('--novelty', action='store_true',
+    parser.add_argument('--novelty', action='store_true',
                        help='Use Novelty Search')
     parser.add_argument('--env', default='CartPole-v1', help='Environment id')
     parser.add_argument('--checkpoint', dest='checkpoint', action='store_true',

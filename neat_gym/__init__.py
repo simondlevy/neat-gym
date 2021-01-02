@@ -184,6 +184,15 @@ class _GymNeatConfig(NeatConfig):
         # Make gym environment form name in command-line arguments
         env = gym_make(args.env)
 
+        # Tell environment to use novelty if indicated in command-line args
+        if args.novelty:
+            unenv = env.unwrapped
+            if hasattr(unenv, 'use_novelty'):
+                unenv.use_novelty()
+            else:
+                print('Error: environment %s does not support novelty search' % args.env)
+                exit(1)
+
         # Get input/output layout from environment, or from layout for Hyper
         num_inputs, num_outputs = (
             (env.observation_space.shape[0],
@@ -209,9 +218,8 @@ class _GymNeatConfig(NeatConfig):
                             args.seed,
                             args.novelty)
 
-        # Store environment for later
+        # Store environment, number or repetitions for later
         self.env = env
-
         self.reps = args.reps
 
     @staticmethod
