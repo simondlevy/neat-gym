@@ -8,6 +8,7 @@ MIT License
 '''
 
 import numpy as np
+from configparser import ConfigParser
 
 
 class Novelty(object):
@@ -168,3 +169,28 @@ class Novelty(object):
     def _expand_point(pt):
         return tuple(item for sublist
                      in [(x, x) for x in pt] for item in sublist)
+
+    @staticmethod
+    def parse(cfgfilename):
+
+        novelty = None
+
+        parameters = ConfigParser()
+
+        with open(cfgfilename) as f:
+            if hasattr(parameters, 'read_file'):
+                parameters.read_file(f)
+            else:
+                parameters.readfp(f)
+
+            try:
+                names = parameters['Novelty']
+                novelty = Novelty(eval(names['k']),
+                                  eval(names['threshold']),
+                                  eval(names['limit']),
+                                  4)
+            except Exception:
+                print('File %s has no [Novelty] section' % cfgfilename)
+                exit(1)
+
+        return novelty

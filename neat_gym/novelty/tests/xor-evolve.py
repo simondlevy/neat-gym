@@ -8,7 +8,6 @@ MIT License
 '''
 
 import argparse
-from configparser import ConfigParser
 import numpy as np
 import neat
 from neat_gym import AugmentedGenome, NeatConfig, evolve
@@ -38,30 +37,6 @@ def _eval_xor_fitness(genome, config):
     return _eval_xor_both(genome, config)[1]
 
 
-def parse_novelty(cfgfilename):
-
-    novelty = None
-
-    parameters = ConfigParser()
-
-    with open(cfgfilename) as f:
-        if hasattr(parameters, 'read_file'):
-            parameters.read_file(f)
-        else:
-            parameters.readfp(f)
-
-        try:
-            names = parameters['Novelty']
-            novelty = Novelty(eval(names['k']),
-                              eval(names['threshold']),
-                              eval(names['limit']),
-                              4)
-        except Exception:
-            print('File %s has no [Novelty] section' % cfgfilename)
-            exit(1)
-
-    return novelty
-
 
 def main():
 
@@ -80,7 +55,7 @@ def main():
 
     np.random.seed(args.seed)
 
-    novelty = parse_novelty(args.config) if args.novelty else None
+    novelty = Novelty.parse(args.config) if args.novelty else None
 
     config = NeatConfig(
             AugmentedGenome,
