@@ -323,18 +323,18 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def __init__(self, args):
 
         _GymHyperConfig.__init__(self, args, substrate=())
+ 
+        es = self.params['ES']
 
-        exit(0)
-
-        self.es_config = {
-                'initial_depth': int(self.params['initial_depth']),
-                'max_depth': int(self.params['max_depth']),
-                'variance_threshold': float(self.params['variance_threshold']),
-                'band_threshold': float(self.params['band_threshold']),
-                'iteration_level': int(self.params['iteration_level']),
-                'division_threshold': float(self.params['division_threshold']),
-                'max_weight': float(self.params['max_weight']),
-                'activation': self.params['activation']
+        self.es_params = {
+                'initial_depth': int(es['initial_depth']),
+                'max_depth': int(es['max_depth']),
+                'variance_threshold': float(es['variance_threshold']),
+                'band_threshold': float(es['band_threshold']),
+                'iteration_level': int(es['iteration_level']),
+                'division_threshold': float(es['division_threshold']),
+                'max_weight': float(es['max_weight']),
+                'activation': es['activation']
                 }
 
     def save_genome(self, genome):
@@ -353,7 +353,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def _make_nets(genome, config):
 
         cppn = neat.nn.FeedForwardNetwork.create(genome, config)
-        esnet = ESNetwork(config.substrate, cppn, config.params)
+        esnet = ESNetwork(config.substrate, cppn, config.es_params)
         net = esnet.create_phenotype_network()
         return cppn, esnet, net
 
