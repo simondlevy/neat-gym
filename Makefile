@@ -7,6 +7,9 @@ edit:
 clean:
 	rm -rf models/ visuals/
 
+commit:
+	git commit -a
+
 flake:
 	flake8 neat_gym/__init__.py
 	flake8 neat_gym/novelty/__init__.py

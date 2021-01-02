@@ -556,9 +556,6 @@ def gym_make(envname):
         print('Unable to make environment %s [check name or __init__()]' % envname)
         exit(1)
 
-    print(dir(env.unwrapped))
-    exit(0)
-
     return env
 
 
@@ -661,9 +658,6 @@ def eval_net(
                   if is_discrete else action * env.action_space.high)
 
         state, reward, done, _ = env.step(action)
-
-        print(reward)
-        exit(0)
 
         if render:
             env.render('rgb_array')
