@@ -326,7 +326,7 @@ class _GymNeatConfig(NeatConfig):
         os.remove(filename)
 
     @staticmethod
-    def make_config(args, cfgfile):
+    def make_config(args, cfgfile, novelty=None):
 
         # Get input/output layout from environment
         env = gym.make(args.env)
@@ -408,7 +408,7 @@ class _GymHyperConfig(_GymNeatConfig):
                                          config.actfun))
 
     @staticmethod
-    def make_config(args, cfgfile):
+    def make_config(args, cfgfile, novelty=None):
 
         cfg = _GymNeatConfig.load(cfgfile, '-hyper')
         subs = cfg['Substrate']
@@ -464,7 +464,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
         return cppn, esnet, net
 
     @staticmethod
-    def make_config(args, cfgfile):
+    def make_config(args, cfgfile, novelty=None):
 
         # Load config from file
         cfg = _GymNeatConfig.load(cfgfile, '-eshyper')
