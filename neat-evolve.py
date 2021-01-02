@@ -37,27 +37,20 @@ def main():
                         help='Seed for random number generator')
     args = parser.parse_args()
 
-    # Default to environment name for config file
-    cfgfilename = ('config/' + args.env + '.cfg'
-                   if args.config is None else args.config)
-
     # Default to original NEAT
-    configfun = _GymNeatConfig.make_config
+    config = _GymNeatConfig(args)
 
     # Check for HyperNEAT, ES-HyperNEAT
     if args.hyper:
-        configfun = _GymHyperConfig.make_config
+        config = _GymHyperConfig(args)
     if args.eshyper:
-        configfun = _GymEsHyperConfig.make_config
+        config = _GymEsHyperConfig(args)
 
     # Support novelty search
     novelty = Novelty.parse(cfgfilename) if args.novelty else None
 
-    # Get appropriate configuration and evaluation function
-    config, evalfun = configfun(args, cfgfilename, novelty)
-
     # Evolve
-    evolve(config, evalfun, args.seed, args.env, args.ngen, args.checkpoint)
+    evolve(config, config.eval_genome, args.seed, args.env, args.ngen, args.checkpoint)
 
 
 if __name__ == '__main__':
