@@ -181,6 +181,7 @@ class _GymNeatConfig(NeatConfig):
 
     def __init__(self, args, layout=None):
 
+        # Make gym environment form name in command-line arguments
         env = gym_make(args.env)
 
         # Get input/output layout from environment, or from layout for Hyper
@@ -208,7 +209,8 @@ class _GymNeatConfig(NeatConfig):
                             args.seed,
                             args.novelty)
 
-        self.env = gym_make(args.env)
+        # Store environment for later
+        self.env = env
 
         self.reps = args.reps
 

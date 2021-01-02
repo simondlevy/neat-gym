@@ -46,9 +46,6 @@ def main():
     if args.eshyper:
         config = _GymEsHyperConfig(args)
 
-    # Support novelty search
-    novelty = Novelty.parse(cfgfilename) if args.novelty else None
-
     # Evolve
     evolve(config, config.eval_genome, args.seed, args.env, args.ngen, args.checkpoint)
 
