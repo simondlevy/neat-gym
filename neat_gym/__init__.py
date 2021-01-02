@@ -526,9 +526,10 @@ class _StdOutReporter(StdOutReporter):
         best_species_id = species.get_species_id(best_genome.key)
         print('Population\'s average novelty: %3.5f stdev: %3.5f' %
               (fit_mean, fit_std))
-        print('Best novelty: %3.5f - size: %d - species %d - id %d' %
+        print('Best novelty: %3.5f - size: (%d,%d) - species %d - id %d' %
               (best_genome.fitness,
-               best_genome.size(),
+               best_genome.size()[0],
+               best_genome.size()[1],
                best_species_id,
                best_genome.key))
         print('Best actual fitness: %f ' % best_genome.actual_fitness)
