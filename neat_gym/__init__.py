@@ -319,19 +319,9 @@ class _GymHyperConfig(_GymNeatConfig):
                                          config.substrate,
                                          config.actfun))
 
-    @staticmethod
-    def make_config(args, cfgfile, novelty=None):
-
-        config = _GymHyperConfig(args, cfgfile, substrate, actfun)
-
-        evalfun = _GymHyperConfig.eval_genome
-
-        return config, evalfun
-
-
 class _GymEsHyperConfig(_GymHyperConfig):
 
-    def __init__(self, args, cfgfile, substrate, actfun, params):
+    def __init__(self, args):
 
         self.params = {
                 'initial_depth': int(params['initial_depth']),
