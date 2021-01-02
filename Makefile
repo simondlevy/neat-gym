@@ -1,6 +1,9 @@
 install:
 	sudo python3 setup.py install
 
+edit:
+	vim neat_gym/__init__.py
+
 clean:
 	rm -rf models/ visuals/
 

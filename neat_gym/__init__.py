@@ -31,6 +31,8 @@ from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 from pureples.shared.substrate import Substrate
 
+from neat_gym.novelty import Novelty
+
 
 class AugmentedGenome(DefaultGenome):
     '''
@@ -47,7 +49,7 @@ class AugmentedGenome(DefaultGenome):
 
 class NeatConfig(object):
     '''
-    Replaces net.Config to support Novelty Search.
+    Replaces neat.Config to support Novelty Search.
     '''
 
     __params = [ConfigParameter('pop_size', int),
@@ -65,7 +67,7 @@ class NeatConfig(object):
                  task_name,
                  layout_dict,
                  seed,
-                 novelty=None):
+                 novelty=False):
 
         # Check that the provided types have the required methods.
         assert hasattr(genome_type, 'parse_config')
@@ -149,7 +151,7 @@ class NeatConfig(object):
             reproduction_type.parse_config(reproduction_dict)
 
         # Support novelty search
-        self.novelty = novelty
+        self.novelty = Novelty.parse(config_file_name) if novelty else None
 
     def save_genome(self, genome):
 
@@ -174,7 +176,7 @@ class NeatConfig(object):
 
 class _GymNeatConfig(NeatConfig):
 
-    def __init__(self, args, cfgfile, layout_dict, suffix='', novelty=None):
+    def __init__(self, args, cfgfile, layout_dict, suffix=''):
 
         NeatConfig.__init__(self,
                             neat.DefaultGenome,
@@ -185,7 +187,7 @@ class _GymNeatConfig(NeatConfig):
                             args.env,
                             layout_dict,
                             args.seed,
-                            novelty=novelty)
+                            args.novelty)
 
         self.env = gym_make(args.env)
 
@@ -207,7 +209,8 @@ class _GymNeatConfig(NeatConfig):
             fitness += eval_net(net,
                                 config.env,
                                 activations=activations,
-                                seed=config.seed)
+                                seed=config.seed,
+                                novelty=config.novelty is not None)
 
         return fitness / config.reps
 
@@ -245,7 +248,8 @@ class _GymNeatConfig(NeatConfig):
         config = _GymNeatConfig(args,
                                 cfgfile,
                                 {'num_inputs': num_inputs,
-                                 'num_outputs': num_outputs})
+                                 'num_outputs': num_outputs},
+                                novelty)
         evalfun = _GymNeatConfig.eval_genome
 
         return config, evalfun
@@ -256,15 +260,13 @@ class _GymNeatConfig(NeatConfig):
 
 class _GymHyperConfig(_GymNeatConfig):
 
-    def __init__(self, args, cfgfile, substrate, actfun,
-                 suffix='-hyper', novelty=None):
+    def __init__(self, args, cfgfile, substrate, actfun, suffix='-hyper'):
 
         _GymNeatConfig.__init__(self,
                                 args,
                                 cfgfile,
                                 {'num_inputs': 5, 'num_outputs': 1},
-                                suffix,
-                                novelty=novelty)
+                                suffix)
 
         self.substrate = substrate
         self.actfun = actfun
@@ -335,7 +337,7 @@ class _GymHyperConfig(_GymNeatConfig):
 
 class _GymEsHyperConfig(_GymHyperConfig):
 
-    def __init__(self, args, cfgfile, substrate, actfun, params, novelty=None):
+    def __init__(self, args, cfgfile, substrate, actfun, params):
 
         self.params = {
                 'initial_depth': int(params['initial_depth']),
@@ -349,7 +351,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
                 }
 
         _GymHyperConfig.__init__(self, args, cfgfile, substrate, actfun,
-                                 suffix='-eshyper', novelty=novelty)
+                                 suffix='-eshyper')
 
     def save_genome(self, genome):
 
@@ -551,8 +553,11 @@ def gym_make(envname):
         env = gym.make(envname)
 
     except Exception:
-        print('Environment %s not recognized' % envname)
+        print('Unable to make environment %s [check name or __init__()]' % envname)
         exit(1)
+
+    print(dir(env.unwrapped))
+    exit(0)
 
     return env
 
@@ -622,7 +627,8 @@ def eval_net(
         render=False,
         record_dir=None,
         activations=1,
-        seed=None):
+        seed=None,
+        novelty=False):
     '''
     Evaluates an evolved network
     @param net the network
@@ -655,6 +661,10 @@ def eval_net(
                   if is_discrete else action * env.action_space.high)
 
         state, reward, done, _ = env.step(action)
+
+        print(reward)
+        exit(0)
+
         if render:
             env.render('rgb_array')
             time.sleep(.02)
