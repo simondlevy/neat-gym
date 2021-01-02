@@ -154,7 +154,7 @@ class NeatConfig(object):
         self.novelty = Novelty.parse(config_file_name) if novelty else None
 
         # Store config parameters for subclasses
-        self.parameters = parameters
+        self.params = parameters
 
     def save_genome(self, genome):
 
@@ -259,18 +259,17 @@ class _GymNeatConfig(NeatConfig):
 
 class _GymHyperConfig(_GymNeatConfig):
 
-    def __init__(self, args):
+    def __init__(self, args, substrate=None):
 
         _GymNeatConfig.__init__(self, args, layout=(5,1))
 
-        subs = self.parameters['Substrate']
+        subs = self.params['Substrate']
         actfun = subs['function']
         inp = eval(subs['input'])
-        hid = eval(subs['hidden'])
+        hid = eval(subs['hidden']) if substrate is None else substrate
         out = eval(subs['output'])
-        substrate = Substrate(inp, out, hid)
 
-        self.substrate = substrate
+        self.substrate = Substrate(inp, out, hid)
         self.actfun = actfun
 
         # Output of CPPN is recurrent, so negate indices
@@ -323,19 +322,20 @@ class _GymEsHyperConfig(_GymHyperConfig):
 
     def __init__(self, args):
 
-        self.params = {
-                'initial_depth': int(params['initial_depth']),
-                'max_depth': int(params['max_depth']),
-                'variance_threshold': float(params['variance_threshold']),
-                'band_threshold': float(params['band_threshold']),
-                'iteration_level': int(params['iteration_level']),
-                'division_threshold': float(params['division_threshold']),
-                'max_weight': float(params['max_weight']),
-                'activation': params['activation']
-                }
+        _GymHyperConfig.__init__(self, args, substrate=())
 
-        _GymHyperConfig.__init__(self, args, cfgfile, substrate, actfun,
-                                 suffix='-eshyper')
+        exit(0)
+
+        self.es_config = {
+                'initial_depth': int(self.params['initial_depth']),
+                'max_depth': int(self.params['max_depth']),
+                'variance_threshold': float(self.params['variance_threshold']),
+                'band_threshold': float(self.params['band_threshold']),
+                'iteration_level': int(self.params['iteration_level']),
+                'division_threshold': float(self.params['division_threshold']),
+                'max_weight': float(self.params['max_weight']),
+                'activation': self.params['activation']
+                }
 
     def save_genome(self, genome):
 
@@ -356,26 +356,6 @@ class _GymEsHyperConfig(_GymHyperConfig):
         esnet = ESNetwork(config.substrate, cppn, config.params)
         net = esnet.create_phenotype_network()
         return cppn, esnet, net
-
-    def make_config(args, cfgfile, novelty=None):
-
-        # Load config from file
-        cfg = _GymNeatConfig.load(cfgfile, '-eshyper')
-        subs = cfg['Substrate']
-        actfun = subs['function']
-        inp = eval(subs['input'])
-        out = eval(subs['output'])
-
-        # Get substrate from -hyper.cfg file named by Gym environment
-        substrate = Substrate(inp, out)
-
-        # Load rest of config from file
-        config = _GymEsHyperConfig(args, cfgfile, substrate, actfun, cfg['ES'])
-
-        evalfun = _GymEsHyperConfig.eval_genome
-
-        return config, evalfun
-
 
 class _NoveltyPopulation(Population):
 
