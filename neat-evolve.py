@@ -53,6 +53,7 @@ def main():
     # Support novelty search
     novelty = Novelty.parse(cfgfilename) if args.novelty else None
 
+    # Get appropriate configuration and evaluation function
     config, evalfun = configfun(args, cfgfilename, novelty)
 
     # Evolve

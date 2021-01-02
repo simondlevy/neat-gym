@@ -46,6 +46,9 @@ class AugmentedGenome(DefaultGenome):
 
 
 class NeatConfig(object):
+    '''
+    Replaces net.Config to support Novelty Search.
+    '''
 
     __params = [ConfigParameter('pop_size', int),
                 ConfigParameter('fitness_criterion', str),
@@ -269,7 +272,7 @@ class _NoveltyPopulation(Population):
 
 class _GymNeatConfig(NeatConfig):
 
-    def __init__(self, args, cfgfile, layout_dict, suffix=''):
+    def __init__(self, args, cfgfile, layout_dict, suffix='', novelty=None):
 
         NeatConfig.__init__(self,
                             neat.DefaultGenome,
@@ -279,7 +282,8 @@ class _GymNeatConfig(NeatConfig):
                             cfgfile,
                             args.env,
                             layout_dict,
-                            args.seed)
+                            args.seed,
+                            novelty=novelty)
 
         self.env = gym.make(args.env)
 
@@ -350,13 +354,15 @@ class _GymNeatConfig(NeatConfig):
 
 class _GymHyperConfig(_GymNeatConfig):
 
-    def __init__(self, args, cfgfile, substrate, actfun, suffix='-hyper'):
+    def __init__(self, args, cfgfile, substrate, actfun,
+                 suffix='-hyper', novelty=None):
 
         _GymNeatConfig.__init__(self,
                                 args,
                                 cfgfile,
                                 {'num_inputs': 5, 'num_outputs': 1},
-                                suffix)
+                                suffix,
+                                novelty=novelty)
 
         self.substrate = substrate
         self.actfun = actfun
@@ -427,7 +433,7 @@ class _GymHyperConfig(_GymNeatConfig):
 
 class _GymEsHyperConfig(_GymHyperConfig):
 
-    def __init__(self, args, cfgfile, substrate, actfun, params):
+    def __init__(self, args, cfgfile, substrate, actfun, params, novelty=None):
 
         self.params = {
                 'initial_depth': int(params['initial_depth']),
@@ -441,7 +447,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
                 }
 
         _GymHyperConfig.__init__(self, args, cfgfile, substrate, actfun,
-                                 suffix='-eshyper')
+                                 suffix='-eshyper', novelty=novelty)
 
     def save_genome(self, genome):
 
