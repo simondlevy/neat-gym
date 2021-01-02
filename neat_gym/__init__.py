@@ -233,16 +233,6 @@ class _GymNeatConfig(NeatConfig):
 
         return fitness / config.reps
 
-    @staticmethod
-    def load(filename):
-
-        if not os.path.isfile(filename):
-            print('Cannot open config file ' + filename)
-            exit(1)
-
-        parser = ConfigParser()
-        parser.read(filename)
-        return parser
 
     @staticmethod
     def _draw_net(net, filename, node_names):
