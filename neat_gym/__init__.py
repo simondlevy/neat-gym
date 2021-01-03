@@ -259,22 +259,23 @@ class _GymNeatConfig(NeatConfig):
 
         for _ in range(config.reps):
 
-            result = _GymNeatConfig.eval_net_novelty(net,
-                                                     config.env,
-                                                     activations=activations,
-                                                     seed=config.seed)
+            result = _GymNeatConfig._eval_net_novelty(net,
+                                                      config.env,
+                                                      config.novelty.ndims,
+                                                      activations=activations,
+                                                      seed=config.seed)
             fitness_sum += result[0]
             novelty_sum += result[1]
 
         return fitness_sum / config.reps, novelty_sum / config.reps
 
     @staticmethod
-    def _eval_net_novelty(net, env, activations, seed):
+    def _eval_net_novelty(net, env, ndims, activations, seed):
 
         env.seed(seed)
         state = env.reset()
         total_reward = 0
-        total_novelty = 0
+        total_novelty = np.zeros(ndims)
         steps = 0
 
         is_discrete = _GymNeatConfig._is_discrete(env)
@@ -290,10 +291,14 @@ class _GymNeatConfig(NeatConfig):
                       if is_discrete else action * env.action_space.high)
 
             state, result, done, _ = env.step_novelty(action)
+
             reward, novelty = result
 
             total_reward += reward
-            total_novelty += novelty
+
+            # We might only get novelty at end of episode
+            #if novelty is not None:
+            #    total_novelty += novelty
 
             if done:
                 break
@@ -446,11 +451,16 @@ class _NoveltyPopulation(Population):
 
                 # Use actual_fitness to encode ignored objective,
                 # and replace genome's fitness with its novelty
-                nov, g.actual_fitness = g.fitness
-                g.fitness = self.config.novelty.add(nov)
+                g.actual_fitness, novelty = g.fitness
+                g.fitness = self.config.novelty.add(novelty)
 
-                if best is None or g.actual_fitness > best.actual_fitness:
+                if best is None:
                     best = g
+
+                else:
+                    print(g.actual_fitness, best.actual_fitness)
+                    if g.actual_fitness > best.actual_fitness:
+                        best = g
 
             self.reporters.post_evaluate(self.config,
                                          self.population,
