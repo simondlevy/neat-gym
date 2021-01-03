@@ -605,6 +605,7 @@ def eval_net(
     env.seed(seed)
     state = env.reset()
     total_reward = 0
+    total_novelty = 0
     steps = 0
 
     is_discrete = _GymNeatConfig._is_discrete(env)
@@ -621,9 +622,7 @@ def eval_net(
 
         if novelty:
             state, result, done, _ = env.step_novelty(action)
-            reward, novelty = result
-            print(reward, novelty)
-            exit(0)
+            reward, nov = result
         else:
             state, reward, done, _ = env.step(action)
 
