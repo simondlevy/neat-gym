@@ -625,15 +625,20 @@ def eval_net(
             reward, nov = result
         else:
             state, reward, done, _ = env.step(action)
+            nov = 0
 
         if render:
             env.render('rgb_array')
             time.sleep(.02)
+
         total_reward += reward
+        total_novelty += novelty
+        
         if done:
             break
+
         steps += 1
 
     env.close()
 
-    return total_reward
+    return (total_reward, total_novelty) if novelty else total_reward
