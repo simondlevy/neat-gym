@@ -188,18 +188,19 @@ class _GymNeatConfig(NeatConfig):
         if args.novelty:
             unenv = env.unwrapped
             if not hasattr(unenv, 'step_novelty'):
-                print('Error: environment %s does not support novelty search' % args.env)
+                print('Error: environment %s does not support novelty search' %
+                      args.env)
                 exit(1)
 
         # Get input/output layout from environment, or from layout for Hyper
-        num_inputs, num_outputs = (
-            (env.observation_space.shape[0],
-            (env.action_space.n
-                           if _GymNeatConfig._is_discrete(env)
-                           else env.action_space.shape[0]))
-            if layout is None
-            else layout
-            )
+        if layout is None:
+            num_inputs = env.observation_space.shape[0]
+            if _GymNeatConfig._is_discrete(env):
+                num_outputs = env.action_space.n
+            else:
+                num_outputs = env.action_space.shape[0]
+        else:
+            num_inputs, num_outputs = layout
 
         # Default to environment name for config file
         cfgfilename = ('config/' + args.env + '.cfg'
@@ -212,7 +213,8 @@ class _GymNeatConfig(NeatConfig):
                             neat.DefaultStagnation,
                             cfgfilename,
                             args.env,
-                            {'num_inputs': num_inputs, 'num_outputs': num_outputs},
+                            {'num_inputs': num_inputs,
+                             'num_outputs': num_outputs},
                             args.seed,
                             args.novelty)
 
@@ -229,18 +231,78 @@ class _GymNeatConfig(NeatConfig):
     @staticmethod
     def eval_net_mean(config, net, activations):
 
-        fitness = 0
+        return (_GymNeatConfig.eval_net_mean_novelty(config, net, activations)
+                if config.novelty is not None
+                else _GymNeatConfig.eval_net_mean_fitness(config,
+                                                          net,
+                                                          activations))
+
+    @staticmethod
+    def eval_net_mean_fitness(config, net, activations):
+
+        fitness_sum = 0
 
         for _ in range(config.reps):
 
-            fitness += eval_net(net,
-                                config.env,
-                                activations=activations,
-                                seed=config.seed,
-                                novelty=config.novelty is not None)
+            fitness_sum += eval_net(net,
+                                    config.env,
+                                    activations=activations,
+                                    seed=config.seed)
 
-        return fitness / config.reps
+        return fitness_sum / config.reps
 
+    @staticmethod
+    def eval_net_mean_novelty(config, net, activations):
+
+        fitness_sum = 0
+        novelty_sum = np.zeros(config.novelty.ndims)
+
+        for _ in range(config.reps):
+
+            result = _GymNeatConfig.eval_net_novelty(net,
+                                                     config.env,
+                                                     activations=activations,
+                                                     seed=config.seed)
+            fitness_sum += result[0]
+            novelty_sum += result[1]
+
+        return fitness_sum / config.reps, novelty_sum / config.reps
+
+    @staticmethod
+    def _eval_net_novelty(net, env, activations, seed):
+
+        env.seed(seed)
+        state = env.reset()
+        total_reward = 0
+        total_novelty = 0
+        steps = 0
+
+        is_discrete = _GymNeatConfig._is_discrete(env)
+
+        while True:
+
+            # Support recurrent nets
+            for k in range(activations):
+                action = net.activate(state)
+
+            # Support both discrete and continuous actions
+            action = (np.argmax(action)
+                      if is_discrete else action * env.action_space.high)
+
+            state, result, done, _ = env.step_novelty(action)
+            reward, novelty = result
+
+            total_reward += reward
+            total_novelty += novelty
+
+            if done:
+                break
+
+            steps += 1
+
+        env.close()
+
+        return total_reward, total_novelty
 
     @staticmethod
     def _draw_net(net, filename, node_names):
@@ -259,7 +321,7 @@ class _GymHyperConfig(_GymNeatConfig):
 
     def __init__(self, args, substrate=None):
 
-        _GymNeatConfig.__init__(self, args, layout=(5,1))
+        _GymNeatConfig.__init__(self, args, layout=(5, 1))
 
         subs = self.params['Substrate']
         actfun = subs['function']
@@ -316,12 +378,13 @@ class _GymHyperConfig(_GymNeatConfig):
                                          config.substrate,
                                          config.actfun))
 
+
 class _GymEsHyperConfig(_GymHyperConfig):
 
     def __init__(self, args):
 
         _GymHyperConfig.__init__(self, args, substrate=())
- 
+
         es = self.params['ES']
 
         self.es_params = {
@@ -354,6 +417,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
         esnet = ESNetwork(config.substrate, cppn, config.es_params)
         net = esnet.create_phenotype_network()
         return cppn, esnet, net
+
 
 class _NoveltyPopulation(Population):
 
@@ -514,7 +578,8 @@ def gym_make(envname):
         env = gym.make(envname)
 
     except Exception:
-        print('Unable to make environment %s [check name or __init__()]' % envname)
+        print('Unable to make environment %s [check name or __init__()]' %
+              envname)
         exit(1)
 
     return env
@@ -585,17 +650,15 @@ def eval_net(
         render=False,
         record_dir=None,
         activations=1,
-        seed=None,
-        novelty=False):
+        seed=None):
     '''
     Evaluates a network
     @param net the network
     @param env the Gym environment
     @param render set to True for rendering
     @param record_dir set to directory name for recording video
-    @param actviations number of times to repeat
+    @param activations number of times to repeat
     @param seed seed for random number generator
-    @param novelty flag for computing novelty as well as reward
     @return total reward
     '''
 
@@ -605,7 +668,6 @@ def eval_net(
     env.seed(seed)
     state = env.reset()
     total_reward = 0
-    total_novelty = 0
     steps = 0
 
     is_discrete = _GymNeatConfig._is_discrete(env)
@@ -620,20 +682,14 @@ def eval_net(
         action = (np.argmax(action)
                   if is_discrete else action * env.action_space.high)
 
-        if novelty:
-            state, result, done, _ = env.step_novelty(action)
-            reward, nov = result
-        else:
-            state, reward, done, _ = env.step(action)
-            nov = 0
+        state, reward, done, _ = env.step(action)
 
         if render:
             env.render('rgb_array')
             time.sleep(.02)
 
         total_reward += reward
-        total_novelty += novelty
-        
+
         if done:
             break
 
@@ -641,4 +697,4 @@ def eval_net(
 
     env.close()
 
-    return (total_reward, total_novelty) if novelty else total_reward
+    return total_reward

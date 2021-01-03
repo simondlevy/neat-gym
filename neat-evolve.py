@@ -10,7 +10,6 @@ MIT License
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 from neat_gym import _GymNeatConfig, _GymHyperConfig, _GymEsHyperConfig, evolve
-from neat_gym.novelty import Novelty
 
 
 def main():
@@ -23,7 +22,7 @@ def main():
     group.add_argument('--eshyper', action='store_true',
                        help='Use ES-HyperNEAT')
     parser.add_argument('--novelty', action='store_true',
-                       help='Use Novelty Search')
+                        help='Use Novelty Search')
     parser.add_argument('--env', default='CartPole-v1', help='Environment id')
     parser.add_argument('--checkpoint', dest='checkpoint', action='store_true',
                         help='Save at each new best')
@@ -47,7 +46,12 @@ def main():
         config = _GymEsHyperConfig(args)
 
     # Evolve
-    evolve(config, config.eval_genome, args.seed, args.env, args.ngen, args.checkpoint)
+    evolve(config,
+           config.eval_genome,
+           args.seed,
+           args.env,
+           args.ngen,
+           args.checkpoint)
 
 
 if __name__ == '__main__':
