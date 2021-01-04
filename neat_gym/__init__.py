@@ -274,10 +274,7 @@ class _GymNeatConfig(NeatConfig):
                       if is_discrete
                       else action * env.action_space.high)
 
-            state, result, done, _ = env.step_novelty(action)
-
-            # Get current reward, novelty
-            reward, novelty = result
+            state, reward, behavior, done, _ = env.step_novelty(action)
 
             # Accumulate reward, but not novelty
             total_reward += reward
@@ -289,8 +286,8 @@ class _GymNeatConfig(NeatConfig):
 
         env.close()
 
-        # Return total reward and final novelty
-        return total_reward, novelty
+        # Return total reward and final behavior
+        return total_reward, behavior
 
     @staticmethod
     def _draw_net(net, filename, node_names):
