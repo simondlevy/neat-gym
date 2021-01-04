@@ -31,12 +31,12 @@ where ```<fitness>``` is the fitness of your evolved network.
 
 ## HyperNEAT and ES-HyperNEAT
 
-NEAT-GYM supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the ```--hyper``` option and
+NEAT-Gym supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the ```--hyper``` option and
 and [ES-HyperNEAT](http://eplex.cs.ucf.edu/ESHyperNEAT/) via the ```--eshyper``` option.
 
 ## Novelty Search
 
-NEAT-GYM supports
+NEAT-Gym supports
 [Novelty Search](https://www.cs.swarthmore.edu/~meeden/DevelopmentalRobotics/lehman_ecj11.pdf)
 via the ```--novelty``` option.  To support this option, your environment should provide a
 ```step_novelty``` method.  Like the ordinary ```step``` method, ```step_novelty``` should 
