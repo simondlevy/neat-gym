@@ -231,7 +231,7 @@ class _GymNeatConfig(NeatConfig):
     @staticmethod
     def eval_net_mean(config, net, activations):
 
-        return (_GymNeatConfig.eval_net_mean_novelty(config, net, activations)
+        return (_GymNeatConfig.eval_net_novelty(config, net, activations)
                 if config.is_novelty()
                 else _GymNeatConfig.eval_net_mean_fitness(config,
                                                           net,
@@ -252,32 +252,16 @@ class _GymNeatConfig(NeatConfig):
         return fitness_sum / config.reps
 
     @staticmethod
-    def eval_net_mean_novelty(config, net, activations):
+    def eval_net_novelty(config, net, activations):
 
-        fitness_sum = 0
-        novelty_sum = np.zeros(config.novelty.ndims)
-
-        for _ in range(config.reps):
-
-            result = _GymNeatConfig._eval_net_novelty(net,
-                                                      config.env,
-                                                      config.novelty.ndims,
-                                                      activations=activations,
-                                                      seed=config.seed)
-            fitness_sum += result[0]
-            novelty_sum += result[1]
-
-        return fitness_sum / config.reps, novelty_sum / config.reps
-
-    @staticmethod
-    def _eval_net_novelty(net, env, ndims, activations, seed):
-
-        env.seed(seed)
+        env = config.env
+        env.seed(config.seed)
         state = env.reset()
-        total_reward = 0
         steps = 0
 
         is_discrete = _GymNeatConfig._is_discrete(env)
+
+        total_reward = 0
 
         while True:
 
@@ -287,7 +271,8 @@ class _GymNeatConfig(NeatConfig):
 
             # Support both discrete and continuous actions
             action = (np.argmax(action)
-                      if is_discrete else action * env.action_space.high)
+                      if is_discrete
+                      else action * env.action_space.high)
 
             state, result, done, _ = env.step_novelty(action)
 
