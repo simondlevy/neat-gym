@@ -97,6 +97,9 @@ class Novelty(object):
         # Start with zero as sparseness
         s = 0
 
+        # Compute sparseness of new point
+        s = self._sparseness(p)
+
         # Below limit, fill archive and ignore actual sparseness
         if self.count < self.limit:
 
@@ -110,9 +113,6 @@ class Novelty(object):
             self.count += 1
 
         else:
-
-            # Compute sparseness of new point
-            s = self._sparseness(p)
 
             # If sparseness excedes threshold, ...
             if s > self.threshold:
