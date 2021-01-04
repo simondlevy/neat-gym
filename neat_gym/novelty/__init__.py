@@ -188,7 +188,7 @@ class Novelty(object):
                 novelty = Novelty(eval(names['k']),
                                   eval(names['threshold']),
                                   eval(names['limit']),
-                                  4)
+                                  eval(names['ndims']))
             except Exception:
                 print('File %s has no [Novelty] section' % cfgfilename)
                 exit(1)

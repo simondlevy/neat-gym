@@ -275,7 +275,6 @@ class _GymNeatConfig(NeatConfig):
         env.seed(seed)
         state = env.reset()
         total_reward = 0
-        total_novelty = np.zeros(ndims)
         steps = 0
 
         is_discrete = _GymNeatConfig._is_discrete(env)
@@ -292,13 +291,11 @@ class _GymNeatConfig(NeatConfig):
 
             state, result, done, _ = env.step_novelty(action)
 
+            # Get current reward, novelty
             reward, novelty = result
 
+            # Accumulate reward, but not novelty
             total_reward += reward
-
-            # We might only get novelty at end of episode
-            #if novelty is not None:
-            #    total_novelty += novelty
 
             if done:
                 break
@@ -307,7 +304,8 @@ class _GymNeatConfig(NeatConfig):
 
         env.close()
 
-        return total_reward, total_novelty
+        # Return total reward and final novelty
+        return total_reward, novelty
 
     @staticmethod
     def _draw_net(net, filename, node_names):
@@ -458,7 +456,6 @@ class _NoveltyPopulation(Population):
                     best = g
 
                 else:
-                    print(g.actual_fitness, best.actual_fitness)
                     if g.actual_fitness > best.actual_fitness:
                         best = g
 
