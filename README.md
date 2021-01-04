@@ -43,7 +43,11 @@ via the ```--novelty``` option.  To use this option, your environment should pro
 accept an action as input; however, instead of returning a tuple ```state, reward, done, info```
 it should return ```state, reward, behavior, done, info```, where ```behavior``` is the behavior
 of the agent at the end of the episode (for example, its final position in the
-maze), or ```None``` before the end of the episode.
+maze), or ```None``` before the end of the episode.  
+
+[gym-nsmaze](https://github.com/simondlevy/gym-nsmaze)
+provides this capability, using the medium/hard maze environments in the Novelty Search
+[paper](https://www.cs.swarthmore.edu/~meeden/DevelopmentalRobotics/lehman_ecj11.pdf).
 
 ## Using NEAT-Gym in other projects
 
