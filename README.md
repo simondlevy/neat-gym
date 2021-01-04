@@ -38,7 +38,7 @@ and [ES-HyperNEAT](http://eplex.cs.ucf.edu/ESHyperNEAT/) via the ```--eshyper```
 
 NEAT-Gym supports
 [Novelty Search](https://www.cs.swarthmore.edu/~meeden/DevelopmentalRobotics/lehman_ecj11.pdf)
-via the ```--novelty``` option.  To support this option, your environment should provide a
+via the ```--novelty``` option.  To use this option, your environment should provide a
 ```step_novelty``` method.  Like the ordinary ```step``` method, ```step_novelty``` should 
 accept an action as input; however, instead of returning a tuple ```state, reward, done, info```
 it should return ```state, reward, behavior, done, info```, where ```behavior``` is the behavior
