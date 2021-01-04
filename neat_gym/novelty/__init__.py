@@ -94,9 +94,6 @@ class Novelty(object):
         @return sparseness of point in archive
         '''
 
-        # Start with zero as sparseness
-        s = 0
-
         # Compute sparseness of new point
         s = self._sparseness(p)
 
