@@ -232,7 +232,7 @@ class _GymNeatConfig(NeatConfig):
     def eval_net_mean(config, net, activations):
 
         return (_GymNeatConfig.eval_net_mean_novelty(config, net, activations)
-                if config.novelty is not None
+                if config.is_novelty()
                 else _GymNeatConfig.eval_net_mean_fitness(config,
                                                           net,
                                                           activations))
@@ -449,8 +449,8 @@ class _NoveltyPopulation(Population):
 
                 # Use actual_fitness to encode ignored objective,
                 # and replace genome's fitness with its novelty
-                g.actual_fitness, novelty = g.fitness
-                g.fitness = self.config.novelty.add(novelty)
+                g.actual_fitness, behavior = g.fitness
+                g.fitness = self.config.novelty.add(behavior)
 
                 if best is None:
                     best = g
