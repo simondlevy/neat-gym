@@ -42,7 +42,8 @@ via the ```--novelty``` option.  To use this option, your environment should pro
 ```step_novelty``` method.  Like the ordinary ```step``` method, ```step_novelty``` should 
 accept an action as input; however, instead of returning a tuple ```state, reward, done, info```
 it should return ```state, reward, behavior, done, info```, where ```behavior``` is the behavior
-of the agent at the end of the episode (for example, its position in the maze).
+of the agent at the end of the episode (for example, its position in the maze), or ```None``` before
+the end of the episode.
 
 ## Using NEAT-Gym in other projects
 
