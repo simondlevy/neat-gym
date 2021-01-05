@@ -31,7 +31,7 @@ def main():
     parser.add_argument('--ngen', type=int, required=False,
                         help='Number of generations to run')
     parser.add_argument('--reps', type=int, default=10, required=False,
-                        help='Number of repetitions per genome')
+                        help='Number of episode repetitions per genome')
     parser.add_argument('--seed', type=int, required=False,
                         help='Seed for random number generator')
     args = parser.parse_args()
