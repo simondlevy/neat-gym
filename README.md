@@ -62,9 +62,9 @@ your Gym environment.  To make these functions available other projects (e.g.,
 ```
 
 You will also need to create a NEAT configuration file for your environment.  As usual,
-the easiest way to do this is to take something that works (like the config file for
-[CartPole-v1](https://github.com/simondlevy/neat-gym/blob/master/config/CartPole-v1.cfg)
-and modify it to do what you want.
+the easiest way to do this is to take something that works (like the 
+[config file](https://github.com/simondlevy/neat-gym/blob/master/config/CartPole-v1.cfg)
+for CartPole-v1) and modify it to do what you want.
 
 ## Related projects
 
