@@ -5,7 +5,7 @@ This repository contains code allowing you to train, test, and visualize
 The two goals of this project are 
 
 1. Make this work as simple as possible.  For example, the name of the NEAT
-configuration file is the same as the name of the environment.
+configuration file defaults to the name of the environment.
 
 2. Make the code run fast, by simultaneously evaluating the fitnesses of the
 population on multiprocessor machines.
