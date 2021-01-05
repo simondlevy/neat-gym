@@ -53,8 +53,16 @@ provides this capability, using the medium/hard maze environments in the Novelty
 
 The
 [neat_gym](https://github.com/simondlevy/NEAT-Gym/blob/master/neat_gym/__init__.py)
-module has functions for loading a .dat file and using it to run an episode of
-your Gym environment.  To make these functions available other projects (e.g., for
+module exports two functions:
+
+* [read-file](https://github.com/simondlevy/neat-gym/blob/master/neat_gym/__init__.py#L614-L635)loads a .dat file 
+from command-line arguments, returning the evolved network and the name of the envrionment used to evovle it
+(as well as flags for recording a move and suppressing the display)
+
+* [eval-net](https://github.com/simondlevy/neat-gym/blob/master/neat_gym/__init__.py#L638-L691)
+takes the output of ```read-file``` and runs an episode of the environment using the network.
+
+To make these functions available other projects (e.g., for
 [3D animation](https://github.com/simondlevy/gym-copter/blob/master/neat/3dtest.py)
 of your environment during testing), do:
 
