@@ -23,8 +23,9 @@ def main():
                        help='Use ES-HyperNEAT')
     parser.add_argument('--novelty', action='store_true',
                         help='Use Novelty Search')
-    parser.add_argument('--env', default='CartPole-v1', help='Environment id')
-    parser.add_argument('--checkpoint', dest='checkpoint', action='store_true',
+    parser.add_argument('--env', dest='env_name', default='CartPole-v1',
+                        help='Environment name')
+    parser.add_argument('--checkpoint', action='store_true',
                         help='Save at each new best')
     parser.add_argument('--config', required=False, default=None,
                         help='Config file; if None, config/<env-name>.cfg')
@@ -49,7 +50,7 @@ def main():
     evolve(config,
            config.eval_genome,
            args.seed,
-           args.env,
+           args.env_name,
            args.ngen,
            args.checkpoint)
 

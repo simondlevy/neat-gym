@@ -64,7 +64,7 @@ class NeatConfig(object):
                  species_set_type,
                  stagnation_type,
                  config_file_name,
-                 task_name,
+                 env_name,
                  layout_dict,
                  seed,
                  novelty=False):
@@ -79,7 +79,7 @@ class NeatConfig(object):
         self.reproduction_type = reproduction_type
         self.species_set_type = species_set_type
         self.stagnation_type = stagnation_type
-        self.task_name = task_name
+        self.env_name = env_name
         self.seed = seed
 
         if not os.path.isfile(config_file_name):
@@ -162,7 +162,7 @@ class NeatConfig(object):
 
         name = self._make_name(genome)
         net = neat.nn.FeedForwardNetwork.create(genome, self)
-        pickle.dump((net, self.task_name), open('models/%s.dat' % name, 'wb'))
+        pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
         _GymNeatConfig._draw_net(net, 'visuals/%s' % name, self.node_names)
 
     def is_novelty(self):
@@ -176,7 +176,7 @@ class NeatConfig(object):
     def _make_name(self, genome, suffix=''):
 
         return '%s%s%+010.3f' % \
-               (self.task_name, suffix, self.get_actual_fitness(genome))
+               (self.env_name, suffix, self.get_actual_fitness(genome))
 
 
 class _GymNeatConfig(NeatConfig):
@@ -184,14 +184,14 @@ class _GymNeatConfig(NeatConfig):
     def __init__(self, args, layout=None):
 
         # Make gym environment form name in command-line arguments
-        env = gym_make(args.env)
+        env = gym_make(args.env_name)
 
         # Make sure environment supports novelty
         if args.novelty:
             unenv = env.unwrapped
             if not hasattr(unenv, 'step_novelty'):
                 print('Error: environment %s does not support novelty search' %
-                      args.env)
+                      args.env_name)
                 exit(1)
 
         # Get input/output layout from environment, or from layout for Hyper
@@ -205,7 +205,7 @@ class _GymNeatConfig(NeatConfig):
             num_inputs, num_outputs = layout
 
         # Default to environment name for config file
-        cfgfilename = ('config/' + args.env + '.cfg'
+        cfgfilename = ('config/' + args.env_name + '.cfg'
                        if args.config is None else args.config)
 
         NeatConfig.__init__(self,
@@ -214,7 +214,7 @@ class _GymNeatConfig(NeatConfig):
                             neat.DefaultSpeciesSet,
                             neat.DefaultStagnation,
                             cfgfilename,
-                            args.env,
+                            args.env_name,
                             {'num_inputs': num_inputs,
                              'num_outputs': num_outputs},
                             args.seed,
@@ -337,7 +337,7 @@ class _GymHyperConfig(_GymNeatConfig):
         self._save_nets(genome, cppn, net)
 
     def _save_nets(self, genome, cppn, net, suffix='-hyper'):
-        pickle.dump((net, self.task_name),
+        pickle.dump((net, self.env_name),
                     open('models/%s.dat' %
                          self._make_name(genome, suffix=suffix), 'wb'))
         _GymNeatConfig._draw_net(cppn,
@@ -510,12 +510,12 @@ class _NoveltyPopulation(Population):
 
 class _SaveReporter(BaseReporter):
 
-    def __init__(self, task_name, checkpoint):
+    def __init__(self, env_name, checkpoint):
 
         BaseReporter.__init__(self)
 
         self.best_fitness = -np.inf
-        self.task_name = task_name
+        self.env_name = env_name
         self.checkpoint = checkpoint
 
     def post_evaluate(self, config, population, species, best_genome):
@@ -576,7 +576,7 @@ def gym_make(envname):
     return env
 
 
-def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
+def evolve(config, evalfun, seed, env_name, ngen, checkpoint):
     '''
     NEAT evolution with parallel evaluator
     '''
@@ -598,7 +598,7 @@ def evolve(config, evalfun, seed, task_name, ngen, checkpoint):
     pop.add_reporter(stats)
 
     # Add a reporter (which can also checkpoint the best)
-    pop.add_reporter(_SaveReporter(task_name, checkpoint))
+    pop.add_reporter(_SaveReporter(env_name, checkpoint))
 
     # Create a parallel fitness evaluator
     pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
