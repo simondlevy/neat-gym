@@ -21,7 +21,7 @@ This will run neat-python on the default [CartPole-v1](https://gym.openai.com/en
 [parallel fitness evaluator](https://neat-python.readthedocs.io/en/latest/module_summaries.html#parallel),
 so you can take advantage of all the cores on your computer.
 
-Once evolution finishes, you can test out your evolved network by doing:
+Once evolution finishes, you can try out your evolved network by doing:
 
 ```
 % python3 neat-test.py models/CartPole-v1<fitness>.dat
