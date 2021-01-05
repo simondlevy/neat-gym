@@ -6,10 +6,8 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-import multiprocessing as mp
 import os
 import argparse
-import random
 import pickle
 import time
 import warnings
@@ -23,9 +21,6 @@ import numpy as np
 from neat.config import ConfigParameter, UnknownConfigItemError
 from neat.population import Population, CompleteExtinctionException
 from neat.genome import DefaultGenome
-from neat.reporting import StdOutReporter, BaseReporter
-from neat.math_util import mean, stdev
-
 from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
@@ -508,56 +503,6 @@ class _NoveltyPopulation(Population):
                                              self.config.pop_size)
 
 
-class _SaveReporter(BaseReporter):
-
-    def __init__(self, env_name, checkpoint):
-
-        BaseReporter.__init__(self)
-
-        self.best_fitness = -np.inf
-        self.env_name = env_name
-        self.checkpoint = checkpoint
-
-    def post_evaluate(self, config, population, species, best_genome):
-
-        best_genome_fitness = config.get_actual_fitness(best_genome)
-
-        if self.checkpoint and best_genome_fitness > self.best_fitness:
-            self.best_fitness = best_genome_fitness
-            print('############# Saving new best %f ##############' %
-                  self.best_fitness)
-            config.save_genome(best_genome)
-
-
-class _StdOutReporter(StdOutReporter):
-
-    def __init__(self, show_species_detail):
-
-        StdOutReporter.__init__(self, show_species_detail)
-
-    def post_evaluate(self, config, population, species, best_genome):
-        if config.novelty is None:
-            StdOutReporter.post_evaluate(
-                    self,
-                    config,
-                    population,
-                    species,
-                    best_genome)
-            return
-        novelties = [c.fitness for c in population.values()]
-        nov_mean = mean(novelties)
-        nov_std = stdev(novelties)
-        best_species_id = species.get_species_id(best_genome.key)
-        print('Population\'s average novelty: %3.5f stdev: %3.5f' %
-              (nov_mean, nov_std))
-        print('Best novelty: %3.5f - size: (%d,%d) - species %d - id %d' %
-              (best_genome.fitness,
-               best_genome.size()[0],
-               best_genome.size()[1],
-               best_species_id,
-               best_genome.key))
-        print('Best actual fitness: %f ' % best_genome.actual_fitness)
-
 # Public functions ===================================================
 
 
@@ -574,41 +519,6 @@ def gym_make(envname):
         exit(1)
 
     return env
-
-
-def evolve(config, evalfun, seed, env_name, ngen, checkpoint):
-    '''
-    NEAT evolution with parallel evaluator
-    '''
-
-    # Set random seed (including None)
-    random.seed(seed)
-
-    # Make directories for saving results
-    os.makedirs('models', exist_ok=True)
-    os.makedirs('visuals', exist_ok=True)
-
-    # Create an ordinary population or a population for NoveltySearch
-    pop = (_NoveltyPopulation(config)
-           if config.is_novelty() else Population(config))
-
-    # Add a stdout reporter to show progress in the terminal.
-    pop.add_reporter(_StdOutReporter(show_species_detail=False))
-    stats = neat.StatisticsReporter()
-    pop.add_reporter(stats)
-
-    # Add a reporter (which can also checkpoint the best)
-    pop.add_reporter(_SaveReporter(env_name, checkpoint))
-
-    # Create a parallel fitness evaluator
-    pe = neat.ParallelEvaluator(mp.cpu_count(), evalfun)
-
-    # Run for number of generations specified in config file
-    winner = (pop.run(pe.evaluate)
-              if ngen is None else pop.run(pe.evaluate, ngen))
-
-    # Save winner
-    config.save_genome(winner)
 
 
 def read_file(allow_record=False):
