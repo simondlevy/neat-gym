@@ -7,7 +7,7 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-from neat_gym import read_file, eval_net, gym_make
+from neat_gym import read_file, eval_net
 
 # Load genome and configuration from pickled file
 net, env_name, record_dir, nodisplay = read_file(allow_record=True)

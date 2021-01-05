@@ -29,6 +29,21 @@ from pureples.shared.substrate import Substrate
 from neat_gym.novelty import Novelty
 
 
+def _gym_make(envname):
+
+    env = None
+
+    try:
+        env = gym.make(envname)
+
+    except Exception:
+        print('Unable to make environment %s [check name or __init__()]' %
+              envname)
+        exit(1)
+
+    return env
+
+
 class AugmentedGenome(DefaultGenome):
     '''
     Supports both ordinary NEAT and Novelty Search.
@@ -180,7 +195,7 @@ class _GymNeatConfig(NeatConfig):
     def __init__(self, args, layout=None):
 
         # Make gym environment form name in command-line arguments
-        env = gym_make(args.env_name)
+        env = _gym_make(args.env_name)
 
         # Make sure environment supports novelty
         if args.novelty:
@@ -552,21 +567,6 @@ def _eval_net(
 # Public functions ===================================================
 
 
-def gym_make(envname):
-
-    env = None
-
-    try:
-        env = gym.make(envname)
-
-    except Exception:
-        print('Unable to make environment %s [check name or __init__()]' %
-              envname)
-        exit(1)
-
-    return env
-
-
 def read_file(allow_record=False):
     '''
     Reads a genome/config file based on command-line argument
@@ -610,7 +610,7 @@ def eval_net(
     '''
     return _eval_net(
                      net,
-                     gym_make(env_name),
+                     _gym_make(env_name),
                      render,
                      record_dir,
                      activations, seed)
