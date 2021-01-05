@@ -673,7 +673,7 @@ def eval_net(
 
         state, reward, done, _ = env.step(action)
 
-        if render:
+        if render or (record_dir is not None):
             env.render('rgb_array')
             time.sleep(.02)
 

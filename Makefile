@@ -8,7 +8,7 @@ nedit:
 	vim neat_gym/novelty/__init__.py
 
 clean:
-	rm -rf models/ visuals/
+	sudo rm -rf build/ dist/ *.egg-info __pycache__ */__pycache__ models/ visuals/
 
 commit:
 	git commit -a
