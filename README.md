@@ -55,7 +55,7 @@ The
 [neat_gym](https://github.com/simondlevy/NEAT-Gym/blob/master/neat_gym/__init__.py)
 module exports two functions:
 
-* [read-file](https://github.com/simondlevy/neat-gym/blob/master/neat_gym/__init__.py#L614-L635)loads a .dat file 
+* [read-file](https://github.com/simondlevy/neat-gym/blob/master/neat_gym/__init__.py#L614-L635) loads a .dat file 
 from command-line arguments, returning the evolved network and the name of the envrionment used to evovle it
 (as well as flags for recording a move and suppressing the display)
 
