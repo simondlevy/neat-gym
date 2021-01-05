@@ -542,12 +542,12 @@ class _StdOutReporter(StdOutReporter):
                     species,
                     best_genome)
             return
-        fitnesses = [c.fitness for c in population.values()]
-        fit_mean = mean(fitnesses)
-        fit_std = stdev(fitnesses)
+        novelties = [c.fitness for c in population.values()]
+        nov_mean = mean(novelties)
+        nov_std = stdev(novelties)
         best_species_id = species.get_species_id(best_genome.key)
         print('Population\'s average novelty: %3.5f stdev: %3.5f' %
-              (fit_mean, fit_std))
+              (nov_mean, nov_std))
         print('Best novelty: %3.5f - size: (%d,%d) - species %d - id %d' %
               (best_genome.fitness,
                best_genome.size()[0],
