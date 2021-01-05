@@ -54,8 +54,9 @@ provides this capability, using the medium/hard maze environments in the Novelty
 The
 [neat_gym](https://github.com/simondlevy/NEAT-Gym/blob/master/neat_gym/__init__.py)
 module has functions for loading a .dat file and using it to run an episode of
-your Gym environment.  To make these functions available other projects (e.g.,
-3D animation of your environment), do:
+your Gym environment.  To make these functions available other projects (e.g., for
+[3D animation](https://github.com/simondlevy/gym-copter/blob/master/neat/3dtest.py)
+of your environment during testing), do:
 
 ```
 % sudo python3 setup.py install
