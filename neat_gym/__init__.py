@@ -108,6 +108,7 @@ class NeatConfig(object):
             raise RuntimeError('NEAT section missing from configuration file.')
 
         param_list_names = []
+
         for p in self.__params:
             if p.default is None:
                 setattr(self, p.name, p.parse('NEAT', parameters))
@@ -119,6 +120,7 @@ class NeatConfig(object):
                     warnings.warn('Using default %s for %s' %
                                   (p.default, p.name), DeprecationWarning)
             param_list_names.append(p.name)
+
         param_dict = dict(parameters.items('NEAT'))
         unknown_list = [x for x in param_dict if x not in param_list_names]
         if unknown_list:
