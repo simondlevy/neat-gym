@@ -7,6 +7,9 @@ edit:
 nedit:
 	vim neat_gym/novelty/__init__.py
 
+evolve:
+	./neat-evolve.py
+
 clean:
 	sudo rm -rf build/ dist/ *.egg-info __pycache__ */__pycache__ models/ visuals/
 

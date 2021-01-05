@@ -155,6 +155,7 @@ class NeatConfig(object):
 
     def save_genome(self, genome):
 
+        print(self.env_name)
         name = self._make_name(genome)
         net = neat.nn.FeedForwardNetwork.create(genome, self)
         pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
@@ -241,10 +242,10 @@ class _GymNeatConfig(NeatConfig):
 
         for _ in range(config.reps):
 
-            fitness_sum += eval_net(net,
-                                    config.env,
-                                    activations=activations,
-                                    seed=config.seed)
+            fitness_sum += _eval_net(net,
+                                     config.env,
+                                     activations=activations,
+                                     seed=config.seed)
 
         return fitness_sum / config.reps
 
@@ -503,6 +504,51 @@ class _NoveltyPopulation(Population):
                                              self.config.pop_size)
 
 
+def _eval_net(
+        net,
+        env,
+        render=False,
+        record_dir=None,
+        activations=1,
+        seed=None):
+
+    if record_dir is not None:
+        env = wrappers.Monitor(env, record_dir, force=True)
+
+    env.seed(seed)
+    state = env.reset()
+    total_reward = 0
+    steps = 0
+
+    is_discrete = _GymNeatConfig._is_discrete(env)
+
+    while True:
+
+        # Support recurrent nets
+        for k in range(activations):
+            action = net.activate(state)
+
+        # Support both discrete and continuous actions
+        action = (np.argmax(action)
+                  if is_discrete else action * env.action_space.high)
+
+        state, reward, done, _ = env.step(action)
+
+        if render or (record_dir is not None):
+            env.render('rgb_array')
+            time.sleep(.02)
+
+        total_reward += reward
+
+        if done:
+            break
+
+        steps += 1
+
+    env.close()
+
+    return total_reward
+
 # Public functions ===================================================
 
 
@@ -547,7 +593,7 @@ def read_file(allow_record=False):
 
 def eval_net(
         net,
-        env,
+        env_name,
         render=False,
         record_dir=None,
         activations=1,
@@ -555,47 +601,16 @@ def eval_net(
     '''
     Evaluates a network
     @param net the network
-    @param env the Gym environment
+    @param env_name name of the Gym environment
     @param render set to True for rendering
     @param record_dir set to directory name for recording video
     @param activations number of times to repeat
     @param seed seed for random number generator
     @return total reward
     '''
-
-    if record_dir is not None:
-        env = wrappers.Monitor(env, record_dir, force=True)
-
-    env.seed(seed)
-    state = env.reset()
-    total_reward = 0
-    steps = 0
-
-    is_discrete = _GymNeatConfig._is_discrete(env)
-
-    while True:
-
-        # Support recurrent nets
-        for k in range(activations):
-            action = net.activate(state)
-
-        # Support both discrete and continuous actions
-        action = (np.argmax(action)
-                  if is_discrete else action * env.action_space.high)
-
-        state, reward, done, _ = env.step(action)
-
-        if render or (record_dir is not None):
-            env.render('rgb_array')
-            time.sleep(.02)
-
-        total_reward += reward
-
-        if done:
-            break
-
-        steps += 1
-
-    env.close()
-
-    return total_reward
+    return _eval_net(
+                     net,
+                     gym_make(env_name),
+                     render,
+                     record_dir,
+                     activations, seed)
