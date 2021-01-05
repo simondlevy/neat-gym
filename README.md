@@ -32,7 +32,7 @@ where ```<fitness>``` is the fitness of your evolved network.
 ## HyperNEAT and ES-HyperNEAT
 
 NEAT-Gym supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the ```--hyper``` option and
-and [ES-HyperNEAT](http://eplex.cs.ucf.edu/ESHyperNEAT/) via the ```--eshyper``` option.
+and [ES-HyperNEAT](http://eplex.cs.ucf.edu/ESHyperNEAT/) via the <br> ```--eshyper``` option.
 
 ## Novelty Search
 
