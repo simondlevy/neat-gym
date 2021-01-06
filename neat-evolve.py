@@ -271,7 +271,7 @@ class _GymNeatConfig(NeatConfig):
 
             behaviors[j] = behavior
 
-        return reward_sum / self.reps, behaviors[0]
+        return reward_sum / self.reps, behaviors
 
     def eval_net_novelty(self, net, activations):
 
@@ -451,9 +451,11 @@ class _NoveltyPopulation(Population):
                                        g.key)
 
                 # Use actual_fitness to encode ignored objective,
-                # and replace genome's fitness with its novelty
-                g.actual_fitness, behavior = g.fitness
-                g.fitness = self.config.novelty.add(behavior)
+                # and replace genome's fitness with its novelty,
+                # summed over behaviors
+                g.actual_fitness, behaviors = g.fitness
+                g.fitness = np.sum([self.config.novelty.add(behavior)
+                                    for behavior in behaviors])
 
                 if best is None:
                     best = g
