@@ -238,7 +238,13 @@ class _GymNeatConfig(NeatConfig):
         # Store environment for later
         self.env = env
 
-    def eval_net_mean_fitness(self, net, activations):
+    def eval_net_mean(self, net, activations):
+
+        return (self.eval_net_mean_novelty(net, activations)
+                if self.is_novelty()
+                else self.eval_net_mean_reward(net, activations))
+
+    def eval_net_mean_reward(self, net, activations):
 
         reward_sum = 0
 
@@ -251,23 +257,21 @@ class _GymNeatConfig(NeatConfig):
 
         return reward_sum / self.reps
 
-    def eval_net_mean(self, net, activations):
-
-        return (self.eval_net_mean_novelty(net, activations)
-                if self.is_novelty()
-                else self.eval_net_mean_fitness(net, activations))
-
     def eval_net_mean_novelty(self, net, activations):
 
         reward_sum = 0
 
-        for _ in range(self.reps):
+        behaviors = np.zeros((self.reps, self.novelty.ndims))
+
+        for j in range(self.reps):
 
             reward, behavior = self.eval_net_novelty(net, activations)
 
             reward_sum += reward
 
-        return reward_sum / self.reps, behavior
+            behaviors[j] = behavior
+
+        return reward_sum / self.reps, behaviors[0]
 
     def eval_net_novelty(self, net, activations):
 
