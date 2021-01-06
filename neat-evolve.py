@@ -256,16 +256,16 @@ class _GymNeatConfig(NeatConfig):
     @staticmethod
     def eval_net_mean_fitness(config, net, activations):
 
-        fitness_sum = 0
+        reward_sum = 0
 
         for _ in range(config.reps):
 
-            fitness_sum += _eval_net(net,
-                                     config.env,
-                                     activations=activations,
-                                     seed=config.seed)
+            reward_sum += _eval_net(net,
+                                    config.env,
+                                    activations=activations,
+                                    seed=config.seed)
 
-        return fitness_sum / config.reps
+        return reward_sum / config.reps
 
     @staticmethod
     def eval_net_mean_novelty(config, net, activations):
