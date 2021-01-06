@@ -23,7 +23,6 @@ from neat.reporting import StdOutReporter, BaseReporter
 
 from neat.config import ConfigParameter, UnknownConfigItemError
 from neat.population import Population, CompleteExtinctionException
-from neat.genome import DefaultGenome
 from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
@@ -31,19 +30,6 @@ from pureples.shared.substrate import Substrate
 
 from neat_gym import _gym_make, _is_discrete, _eval_net
 from neat_gym.novelty import Novelty
-
-
-class AugmentedGenome(DefaultGenome):
-    '''
-    Supports both ordinary NEAT and Novelty Search.
-    '''
-
-    def __init__(self, key):
-
-        DefaultGenome.__init__(self, key)
-
-        # Sparsity is used as fitness; need anoter variable for actual fitness
-        self.actual_fitness = None
 
 
 def _parse_novelty(cfgfilename):
