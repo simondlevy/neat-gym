@@ -270,8 +270,23 @@ class _GymNeatConfig(NeatConfig):
     @staticmethod
     def eval_net_mean_novelty(config, net, activations):
 
-        env = config.env
-        env.seed(config.seed)
+        reward_sum = 0
+
+        for _ in range(config.reps):
+
+            reward, behavior = _GymNeatConfig.eval_net_novelty(net,
+                                                               config.env,
+                                                               activations,
+                                                               config.seed)
+
+            reward_sum += reward
+
+        return reward_sum / config.reps, behavior
+
+    @staticmethod
+    def eval_net_novelty(net, env, activations, seed):
+
+        env.seed(seed)
         state = env.reset()
         steps = 0
 
