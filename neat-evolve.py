@@ -46,6 +46,31 @@ class AugmentedGenome(DefaultGenome):
         self.actual_fitness = None
 
 
+def _parse_novelty(cfgfilename):
+
+    novelty = None
+
+    parameters = ConfigParser()
+
+    with open(cfgfilename) as f:
+        if hasattr(parameters, 'read_file'):
+            parameters.read_file(f)
+        else:
+            parameters.readfp(f)
+
+        try:
+            names = parameters['Novelty']
+            novelty = Novelty(eval(names['k']),
+                              eval(names['threshold']),
+                              eval(names['limit']),
+                              eval(names['ndims']))
+        except Exception:
+            print('File %s has no [Novelty] section' % cfgfilename)
+            exit(1)
+
+    return novelty
+
+
 class NeatConfig(object):
     '''
     Replaces neat.Config to support Novelty Search.
@@ -152,7 +177,7 @@ class NeatConfig(object):
             reproduction_type.parse_config(reproduction_dict)
 
         # Support novelty search
-        self.novelty = Novelty.parse(config_file_name) if novelty else None
+        self.novelty = _parse_novelty(config_file_name) if novelty else None
 
         # Store config parameters for subclasses
         self.params = parameters
