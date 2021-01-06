@@ -247,7 +247,7 @@ class _GymNeatConfig(NeatConfig):
     @staticmethod
     def eval_net_mean(config, net, activations):
 
-        return (_GymNeatConfig.eval_net_novelty(config, net, activations)
+        return (_GymNeatConfig.eval_net_mean_novelty(config, net, activations)
                 if config.is_novelty()
                 else _GymNeatConfig.eval_net_mean_fitness(config,
                                                           net,
@@ -268,7 +268,7 @@ class _GymNeatConfig(NeatConfig):
         return fitness_sum / config.reps
 
     @staticmethod
-    def eval_net_novelty(config, net, activations):
+    def eval_net_mean_novelty(config, net, activations):
 
         env = config.env
         env.seed(config.seed)
