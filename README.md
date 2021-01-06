@@ -1,6 +1,7 @@
 This repository contains code allowing you to train, test, and visualize
 [OpenAI Gym](https://gym.openai.com/) environments (games) using the
-[NEAT](https://www.cse.unr.edu/~sushil/class/gas/papers/NEAT.pdf) algorithm.
+[NEAT](https://www.cse.unr.edu/~sushil/class/gas/papers/NEAT.pdf) algorithm
+and its variants.
 
 The two goals of this project are 
 
