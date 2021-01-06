@@ -245,9 +245,12 @@ class _GymNeatConfig(NeatConfig):
                             args.seed,
                             args.novelty)
 
-        # Store environment, number or repetitions for later
+        # Get number of episode repetitions
+        gympar = self.params['Gym']
+        self.reps = int(gympar['episode_reps'])
+
+        # Store environment for later
         self.env = env
-        self.reps = args.reps
 
     @staticmethod
     def eval_genome(genome, config):
@@ -600,8 +603,6 @@ def main():
                         help='Config file; if None, config/<env-name>.cfg')
     parser.add_argument('--ngen', type=int, required=False,
                         help='Number of generations to run')
-    parser.add_argument('--reps', type=int, default=10, required=False,
-                        help='Number of episode repetitions per genome')
     parser.add_argument('--seed', type=int, required=False,
                         help='Seed for random number generator')
     args = parser.parse_args()
