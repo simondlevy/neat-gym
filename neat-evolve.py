@@ -238,55 +238,41 @@ class _GymNeatConfig(NeatConfig):
         # Store environment for later
         self.env = env
 
-    @staticmethod
-    def eval_genome(genome, config):
-
-        net = neat.nn.FeedForwardNetwork.create(genome, config)
-        return _GymNeatConfig.eval_net_mean(config, net, 1)
-
-    @staticmethod
-    def eval_net_mean(config, net, activations):
-
-        return (_GymNeatConfig.eval_net_mean_novelty(config, net, activations)
-                if config.is_novelty()
-                else _GymNeatConfig.eval_net_mean_fitness(config,
-                                                          net,
-                                                          activations))
-
-    @staticmethod
-    def eval_net_mean_fitness(config, net, activations):
+    def eval_net_mean_fitness(self, net, activations):
 
         reward_sum = 0
 
-        for _ in range(config.reps):
+        for _ in range(self.reps):
 
             reward_sum += _eval_net(net,
-                                    config.env,
+                                    self.env,
                                     activations=activations,
-                                    seed=config.seed)
+                                    seed=self.seed)
 
-        return reward_sum / config.reps
+        return reward_sum / self.reps
 
-    @staticmethod
-    def eval_net_mean_novelty(config, net, activations):
+    def eval_net_mean(self, net, activations):
+
+        return (self.eval_net_mean_novelty(net, activations)
+                if self.is_novelty()
+                else self.eval_net_mean_fitness(net, activations))
+
+    def eval_net_mean_novelty(self, net, activations):
 
         reward_sum = 0
 
-        for _ in range(config.reps):
+        for _ in range(self.reps):
 
-            reward, behavior = _GymNeatConfig.eval_net_novelty(net,
-                                                               config.env,
-                                                               activations,
-                                                               config.seed)
+            reward, behavior = self.eval_net_novelty(net, activations)
 
             reward_sum += reward
 
-        return reward_sum / config.reps, behavior
+        return reward_sum / self.reps, behavior
 
-    @staticmethod
-    def eval_net_novelty(net, env, activations, seed):
+    def eval_net_novelty(self, net, activations):
 
-        env.seed(seed)
+        env = self.env
+        env.seed(self.seed)
         state = env.reset()
         steps = 0
 
@@ -328,6 +314,12 @@ class _GymNeatConfig(NeatConfig):
 
         # Delete text
         os.remove(filename)
+
+    @staticmethod
+    def eval_genome(genome, config):
+
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        return config.eval_net_mean(net, 1)
 
 
 class _GymHyperConfig(_GymNeatConfig):
@@ -380,7 +372,7 @@ class _GymHyperConfig(_GymNeatConfig):
 
         cppn, net = _GymHyperConfig._make_nets(genome, config)
         activations = len(config.substrate.hidden_coordinates) + 2
-        return _GymNeatConfig.eval_net_mean(config, net, activations)
+        return config.eval_net_mean(net, activations)
 
     @staticmethod
     def _make_nets(genome, config):
@@ -421,7 +413,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def eval_genome(genome, config):
 
         _, esnet, net = _GymEsHyperConfig._make_nets(genome, config)
-        return _GymNeatConfig.eval_net_mean(config, net, esnet.activations)
+        return config.eval_net_mean(net, esnet.activations)
 
     @staticmethod
     def _make_nets(genome, config):
