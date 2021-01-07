@@ -261,7 +261,8 @@ class _GymNeatConfig(NeatConfig):
 
         reward_sum = 0
 
-        behaviors = np.zeros((self.reps, self.novelty.ndims))
+        # No behaviors yet
+        behaviors = [None] * self.reps
 
         for j in range(self.reps):
 
@@ -452,9 +453,11 @@ class _NoveltyPopulation(Population):
 
                 # Use actual_fitness to encode ignored objective,
                 # and replace genome's fitness with its novelty,
-                # summed over behaviors
+                # summed over behaviors.  If the behavior is None,
+                # we treat its sparsity as zero.
                 g.actual_fitness, behaviors = g.fitness
-                g.fitness = np.sum([self.config.novelty.add(behavior)
+                g.fitness = np.sum([0 if behavior is None
+                                    else self.config.novelty.add(behavior)
                                     for behavior in behaviors])
 
                 if best is None:
