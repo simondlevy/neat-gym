@@ -142,6 +142,8 @@ class Novelty(object):
         of how unique this point is relative to the archive of saved examples.
         '''
 
+        print('P: ', p)
+
         nbrs = (self.rtree_index.nearest(p, self.k)
                 if self.rtree_index is not None
                 else np.argsort([Novelty._distance(p, q)
