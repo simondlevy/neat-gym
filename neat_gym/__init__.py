@@ -22,9 +22,9 @@ def _gym_make(envname):
     try:
         env = gym.make(envname)
 
-    except Exception:
-        print('Unable to make environment %s [check name or __init__()]' %
-              envname)
+    except Exception as e:
+        print('Unable to make environment %s: %s' %
+              (envname, e))
         exit(1)
 
     return env
