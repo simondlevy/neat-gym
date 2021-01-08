@@ -259,7 +259,7 @@ class _GymNeatConfig(NeatConfig):
             reward_sum += _eval_net(net,
                                     self.env,
                                     activations=activations,
-                                    seed=self.seed)
+                                    seed=self.seed)[0]
 
         return reward_sum / self.reps
 

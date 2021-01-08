@@ -77,7 +77,7 @@ def _eval_net(
 
     env.close()
 
-    return total_reward
+    return total_reward, steps
 
 # Public functions ===================================================
 
@@ -128,4 +128,4 @@ def eval_net(
                      _gym_make(env_name),
                      render,
                      record_dir,
-                     activations, seed)
+                     activations, seed)[0]
