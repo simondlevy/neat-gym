@@ -116,12 +116,12 @@ class Novelty(object):
                 # Implement a circular buffer
                 idx = self.count % self.limit
 
-                # Remove old point from kNN
+                # If R*-tree available
                 if self.rtree_index is not None:
 
-                    pt = Novelty._expand_point(self.archive[idx])
-
-                    self.rtree_index.delete(idx, pt)
+                    # Remove old point from kNN
+                    p_old = Novelty._expand_point(self.archive[idx])
+                    self.rtree_index.delete(idx, p_old)
 
                     # Insert new point in kNN.  With interleaved=False, the
                     # order of input and output is: (xmin, xmax, ymin, ymax,
@@ -142,9 +142,7 @@ class Novelty(object):
         of how unique this point is relative to the archive of saved examples.
         '''
 
-        print('P: ', p)
-
-        nbrs = (self.rtree_index.nearest(p, self.k)
+        nbrs = (self.rtree_index.nearest(Novelty._expand_point(p), self.k)
                 if self.rtree_index is not None
                 else np.argsort([Novelty._distance(p, q)
                                  for q in self.archive])[:self.k])
