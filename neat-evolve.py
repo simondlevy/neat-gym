@@ -256,27 +256,32 @@ class _GymNeatConfig(NeatConfig):
 
         for _ in range(self.reps):
 
-            reward_sum += _eval_net(net,
-                                    self.env,
-                                    activations=activations,
-                                    seed=self.seed)[0]
+            reward, steps = _eval_net(net,
+                                      self.env,
+                                      activations=activations,
+                                      seed=self.seed)
+
+            reward_sum += reward
 
         return reward_sum / self.reps
 
     def eval_net_mean_novelty(self, net, activations):
 
         reward_sum = 0
+        total_steps = 0
 
         # No behaviors yet
         behaviors = [None] * self.reps
 
         for j in range(self.reps):
 
-            reward, behavior = self.eval_net_novelty(net, activations)
+            reward, behavior, steps = self.eval_net_novelty(net, activations)
 
             reward_sum += reward
 
             behaviors[j] = behavior
+
+            total_steps += steps
 
         return reward_sum / self.reps, behaviors
 
@@ -315,7 +320,7 @@ class _GymNeatConfig(NeatConfig):
         env.close()
 
         # Return total reward and final behavior
-        return total_reward, behavior
+        return total_reward, behavior, steps
 
     @staticmethod
     def draw_net(net, filename, node_names):
