@@ -170,7 +170,6 @@ class NeatConfig(object):
 
     def save_genome(self, genome):
 
-        print(self.env_name)
         name = self.make_name(genome)
         net = neat.nn.FeedForwardNetwork.create(genome, self)
         pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
@@ -191,6 +190,9 @@ class NeatConfig(object):
 
 
 class _GymNeatConfig(NeatConfig):
+    '''
+    A class for helping Gym work with NEAT
+    '''
 
     def __init__(self, args, layout=None):
 
@@ -219,6 +221,7 @@ class _GymNeatConfig(NeatConfig):
         cfgfilename = ('config/' + args.env_name + '.cfg'
                        if args.config is None else args.config)
 
+        # Do non-Gym config stuff
         NeatConfig.__init__(self,
                             neat.DefaultGenome,
                             neat.DefaultReproduction,
@@ -237,6 +240,9 @@ class _GymNeatConfig(NeatConfig):
 
         # Store environment for later
         self.env = env
+
+        # We'll report total evaluations at end of run
+        self.total_evaluations = 0
 
     def eval_net_mean(self, net, activations):
 
@@ -627,7 +633,7 @@ def main():
            if config.is_novelty()
            else neat.Population(config))
 
-    # Add a stdout reporter to show progress in the terminal.
+    # Add a stdout reporter to show progress in the terminal
     pop.add_reporter(_StdOutReporter(show_species_detail=False))
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
@@ -642,6 +648,9 @@ def main():
     winner = (pop.run(pe.evaluate)
               if args.ngen is None
               else pop.run(pe.evaluate, args.ngen))
+
+    # Report total number of evaluations
+    print('Total evaluations = %d' % config.total_evaluations)
 
     # Save winner
     config.save_genome(winner)
