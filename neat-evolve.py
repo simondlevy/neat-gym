@@ -253,6 +253,7 @@ class _GymNeatConfig(NeatConfig):
     def eval_net_mean_reward(self, net, activations):
 
         reward_sum = 0
+        total_steps = 0
 
         for _ in range(self.reps):
 
@@ -262,8 +263,9 @@ class _GymNeatConfig(NeatConfig):
                                       seed=self.seed)
 
             reward_sum += reward
+            total_steps += steps
 
-        return reward_sum / self.reps
+        return reward_sum/self.reps, total_steps
 
     def eval_net_mean_novelty(self, net, activations):
 
@@ -283,7 +285,7 @@ class _GymNeatConfig(NeatConfig):
 
             total_steps += steps
 
-        return reward_sum / self.reps, behaviors
+        return reward_sum/self.reps, behaviors, total_steps
 
     def eval_net_novelty(self, net, activations):
 
@@ -333,9 +335,16 @@ class _GymNeatConfig(NeatConfig):
 
     @staticmethod
     def eval_genome(genome, config):
-
+        '''
+        The result of this function gets assigned to the genome's fitness.
+        As a side-effect, we also store the number of evaluations
+        taken to produce this result.
+        '''
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        return config.eval_net_mean(net, 1)
+        result = config.eval_net_mean(net, 1)
+        genome.total_evaluations = result[-1]
+        print(genome.total_evaluations)
+        return result[:2] if config.is_novelty() else result[0]
 
 
 class _GymHyperConfig(_GymNeatConfig):
