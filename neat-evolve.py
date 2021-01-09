@@ -103,15 +103,24 @@ class NeatConfig(object):
             else:
                 parameters.readfp(f)
 
+            self.node_names = {}
+
             try:
                 names = parameters['Names']
-                self.node_names = {}
                 for idx, name in enumerate(eval(names['input'])):
                     self.node_names[-idx-1] = name
                 for idx, name in enumerate(eval(names['output'])):
                     self.node_names[idx] = name
             except Exception:
-                self.node_names = {}
+                pass
+
+            # For recurrent nets (default to feed-forward)
+            self.activations = 1
+            genome_params = parameters['DefaultGenome']
+            try:
+                self.activations = int(genome_params['activations'])
+            except Exception:
+                pass
 
         # NEAT configuration
         if not parameters.has_section('NEAT'):
@@ -340,7 +349,7 @@ class _GymNeatConfig(NeatConfig):
         The result of this function gets assigned to the genome's fitness.
         '''
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        return config.eval_net_mean(net, 1)
+        return config.eval_net_mean(net, config.activations)
 
 
 class _GymHyperConfig(_GymNeatConfig):
@@ -469,6 +478,7 @@ class _GymPopulation(Population):
             # Gather and report statistics.
             best = None
             for g in self.population.values():
+
                 if g.fitness is None:
                     raise RuntimeError('Fitness not assigned to genome %d' %
                                        g.key)

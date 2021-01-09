@@ -1,3 +1,11 @@
+#
+# Makefile for convenience
+#
+# Copyright (C) 2020 Simon D. Levy
+#
+# MIT License
+#
+
 install:
 	sudo python3 setup.py install
 
