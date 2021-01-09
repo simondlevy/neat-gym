@@ -58,18 +58,6 @@ def _parse_novelty(cfgfilename):
     return novelty
 
 
-class _FeedForwardNetwork(FeedForwardNetwork):
-    '''
-    neat.nn.FeedForwardNetwork with id for debugging
-    '''
-    @staticmethod
-    def create(genome, config):
-
-        net = FeedForwardNetwork.create(genome, config)
-        net.id = np.random.randint(1000)
-        return net
-
-
 class NeatConfig(object):
     '''
     Replaces neat.Config to support Novelty Search.
@@ -191,7 +179,7 @@ class NeatConfig(object):
     def save_genome(self, genome):
 
         name = self.make_name(genome)
-        net = _FeedForwardNetwork.create(genome, self)
+        net = FeedForwardNetwork.create(genome, self)
         pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
         _GymNeatConfig.draw_net(net, 'visuals/%s' % name, self.node_names)
 
@@ -359,7 +347,7 @@ class _GymNeatConfig(NeatConfig):
         '''
         The result of this function gets assigned to the genome's fitness.
         '''
-        net = _FeedForwardNetwork.create(genome, config)
+        net = FeedForwardNetwork.create(genome, config)
         return config.eval_net_mean(net)
 
 
