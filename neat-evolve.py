@@ -265,7 +265,7 @@ class _GymNeatConfig(NeatConfig):
             reward_sum += reward
             total_steps += steps
 
-        return reward_sum/self.reps
+        return reward_sum/self.reps, total_steps
 
     def eval_net_mean_novelty(self, net, activations):
 
@@ -468,6 +468,9 @@ class _GymPopulation(Population):
                 if g.fitness is None:
                     raise RuntimeError('Fitness not assigned to genome %d' %
                                        g.key)
+
+                # Break out fitness tuple into actual fitness, total steps
+                g.fitness, steps = g.fitness
 
                 # Use actual_fitness to encode ignored objective,
                 # and replace genome's fitness with its novelty,
@@ -755,7 +758,7 @@ def main():
     # Create an ordinary population or a population for NoveltySearch
     pop = (_NoveltyPopulation(config)
            if config.is_novelty()
-           else neat.Population(config))
+           else _GymPopulation(config))
 
     # Add a stdout reporter to show progress in the terminal
     pop.add_reporter(_StdOutReporter(show_species_detail=False))
