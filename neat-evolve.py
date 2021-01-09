@@ -177,6 +177,9 @@ class NeatConfig(object):
         # Store config parameters for subclasses
         self.params = parameters
 
+        # For debugging
+        self.gen = 0
+
     def save_genome(self, genome):
 
         name = self.make_name(genome)
@@ -254,13 +257,13 @@ class _GymNeatConfig(NeatConfig):
         self.current_evaluations = 0
         self.total_evaluations = 0
 
-    def eval_net_mean(self, net, activations):
+    def eval_net_mean(self, net):
 
-        return (self.eval_net_mean_novelty(net, activations)
+        return (self.eval_net_mean_novelty(net)
                 if self.is_novelty()
-                else self.eval_net_mean_reward(net, activations))
+                else self.eval_net_mean_reward(net))
 
-    def eval_net_mean_reward(self, net, activations):
+    def eval_net_mean_reward(self, net):
 
         reward_sum = 0
         total_steps = 0
@@ -269,7 +272,7 @@ class _GymNeatConfig(NeatConfig):
 
             reward, steps = _eval_net(net,
                                       self.env,
-                                      activations=activations,
+                                      activations=self.activations,
                                       seed=self.seed)
 
             reward_sum += reward
@@ -277,7 +280,7 @@ class _GymNeatConfig(NeatConfig):
 
         return reward_sum/self.reps, total_steps
 
-    def eval_net_mean_novelty(self, net, activations):
+    def eval_net_mean_novelty(self, net):
 
         reward_sum = 0
         total_steps = 0
@@ -287,7 +290,7 @@ class _GymNeatConfig(NeatConfig):
 
         for j in range(self.reps):
 
-            reward, behavior, steps = self.eval_net_novelty(net, activations)
+            reward, behavior, steps = self.eval_net_novelty(net)
 
             reward_sum += reward
 
@@ -297,7 +300,7 @@ class _GymNeatConfig(NeatConfig):
 
         return reward_sum/self.reps, behaviors, total_steps
 
-    def eval_net_novelty(self, net, activations):
+    def eval_net_novelty(self, net):
 
         env = self.env
         env.seed(self.seed)
@@ -311,7 +314,7 @@ class _GymNeatConfig(NeatConfig):
         while True:
 
             # Support recurrent nets
-            for k in range(activations):
+            for k in range(self.activations):
                 action = net.activate(state)
 
             # Support both discrete and continuous actions
@@ -349,7 +352,7 @@ class _GymNeatConfig(NeatConfig):
         The result of this function gets assigned to the genome's fitness.
         '''
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        return config.eval_net_mean(net, config.activations)
+        return config.eval_net_mean(net)
 
 
 class _GymHyperConfig(_GymNeatConfig):
@@ -410,7 +413,7 @@ class _GymHyperConfig(_GymNeatConfig):
 
         cppn, net = config.make_nets(genome)
         activations = len(config.substrate.hidden_coordinates) + 2
-        return config.eval_net_mean(net, activations)
+        return config.eval_net_mean(net)
 
 
 class _GymEsHyperConfig(_GymHyperConfig):
@@ -448,7 +451,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def eval_genome(genome, config):
 
         _, esnet, net = config.make_nets(genome)
-        return config.eval_net_mean(net, esnet.activations)
+        return config.eval_net_mean(net)
 
 
 class _GymPopulation(Population):
@@ -465,6 +468,8 @@ class _GymPopulation(Population):
         gen = 0
 
         while ngen is None or gen < ngen:
+
+            self.config.gen = gen
 
             gen += 1
 
