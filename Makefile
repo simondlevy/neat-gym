@@ -9,6 +9,9 @@
 install:
 	sudo python3 setup.py install
 
+evo:
+	./neat-evolve.py
+
 edit:
 	vim neat-evolve.py
 

@@ -20,9 +20,10 @@ from configparser import ConfigParser
 import neat
 from neat.math_util import mean, stdev
 from neat.reporting import StdOutReporter, BaseReporter
-
 from neat.config import ConfigParameter, UnknownConfigItemError
 from neat.population import Population, CompleteExtinctionException
+from neat.nn import FeedForwardNetwork
+
 from pureples.hyperneat.hyperneat import create_phenotype_network
 from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
@@ -55,6 +56,18 @@ def _parse_novelty(cfgfilename):
             exit(1)
 
     return novelty
+
+
+class _FeedForwardNetwork(FeedForwardNetwork):
+    '''
+    neat.nn.FeedForwardNetwork with id for debugging
+    '''
+    @staticmethod
+    def create(genome, config):
+
+        net = FeedForwardNetwork.create(genome, config)
+        net.id = np.random.randint(1000)
+        return net
 
 
 class NeatConfig(object):
@@ -111,14 +124,6 @@ class NeatConfig(object):
                     self.node_names[-idx-1] = name
                 for idx, name in enumerate(eval(names['output'])):
                     self.node_names[idx] = name
-            except Exception:
-                pass
-
-            # For recurrent nets (default to feed-forward)
-            self.activations = 1
-            genome_params = parameters['DefaultGenome']
-            try:
-                self.activations = int(genome_params['activations'])
             except Exception:
                 pass
 
@@ -180,10 +185,13 @@ class NeatConfig(object):
         # For debugging
         self.gen = 0
 
+        # Default to non-recurrent net
+        self.activations = 1
+
     def save_genome(self, genome):
 
         name = self.make_name(genome)
-        net = neat.nn.FeedForwardNetwork.create(genome, self)
+        net = _FeedForwardNetwork.create(genome, self)
         pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
         _GymNeatConfig.draw_net(net, 'visuals/%s' % name, self.node_names)
 
@@ -351,7 +359,7 @@ class _GymNeatConfig(NeatConfig):
         '''
         The result of this function gets assigned to the genome's fitness.
         '''
-        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        net = _FeedForwardNetwork.create(genome, config)
         return config.eval_net_mean(net)
 
 
@@ -369,6 +377,9 @@ class _GymHyperConfig(_GymNeatConfig):
 
         self.substrate = Substrate(inp, out, hid)
         self.actfun = actfun
+
+        # For recurrent nets
+        self.activations = len(self.substrate.hidden_coordinates) + 2
 
         # Output of CPPN is recurrent, so negate indices
         self.node_names = {j: self.node_names[k]
@@ -412,7 +423,6 @@ class _GymHyperConfig(_GymNeatConfig):
     def eval_genome(genome, config):
 
         cppn, net = config.make_nets(genome)
-        activations = len(config.substrate.hidden_coordinates) + 2
         return config.eval_net_mean(net)
 
 
