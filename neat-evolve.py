@@ -491,6 +491,9 @@ class _GymPopulation(Population):
                                          self.species,
                                          best)
 
+            # Accumulate total evaluations for this run
+            self.config.total_evaluations += self.config.current_evaluations
+
             # Track the best genome ever seen.
             if (self.best_genome is None or
                     best.actual_fitness > self.best_genome.actual_fitness):
@@ -780,7 +783,7 @@ def main():
               else pop.run(pe.evaluate, args.ngen))
 
     # Report total number of evaluations
-    print('Total evaluations = %d' % config.current_evaluations)
+    print('\nTotal evaluations = %d' % config.current_evaluations)
 
     # Save winner
     config.save_genome(winner)
