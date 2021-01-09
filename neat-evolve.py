@@ -265,7 +265,7 @@ class _GymNeatConfig(NeatConfig):
             reward_sum += reward
             total_steps += steps
 
-        return reward_sum/self.reps, total_steps
+        return reward_sum/self.reps
 
     def eval_net_mean_novelty(self, net, activations):
 
@@ -285,7 +285,7 @@ class _GymNeatConfig(NeatConfig):
 
             total_steps += steps
 
-        return reward_sum/self.reps, behaviors, total_steps
+        return reward_sum/self.reps, behaviors
 
     def eval_net_novelty(self, net, activations):
 
@@ -337,14 +337,9 @@ class _GymNeatConfig(NeatConfig):
     def eval_genome(genome, config):
         '''
         The result of this function gets assigned to the genome's fitness.
-        As a side-effect, we also store the number of evaluations
-        taken to produce this result.
         '''
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        result = config.eval_net_mean(net, 1)
-        genome.total_evaluations = result[-1]
-        print(genome.total_evaluations)
-        return result[:2] if config.is_novelty() else result[0]
+        return config.eval_net_mean(net, 1)
 
 
 class _GymHyperConfig(_GymNeatConfig):
@@ -508,7 +503,7 @@ class _NoveltyPopulation(Population):
                     break
 
             # Create the next generation from the current generation.
-            self._reproduce()
+            self.reproduce()
 
             # Check for complete extinction.
             if not self.species.species:
@@ -539,13 +534,13 @@ class _NoveltyPopulation(Population):
 
         return self.best_genome
 
-    def _reproduce(self):
+    def reproduce(self):
         self.population = \
                  self.reproduction.reproduce(self.config, self.species,
                                              self.config.pop_size,
                                              self.generation)
 
-    def _create_new_pop(self):
+    def create_new_pop(self):
         self.population = \
                 self.reproduction.create_new(self.config.genome_type,
                                              self.config.genome_config,
@@ -580,27 +575,33 @@ class _StdOutReporter(StdOutReporter):
         StdOutReporter.__init__(self, show_species_detail)
 
     def post_evaluate(self, config, population, species, best_genome):
+
+        # Ordinary report if not novelty search
         if config.novelty is None:
+
             StdOutReporter.post_evaluate(
                     self,
                     config,
                     population,
                     species,
                     best_genome)
-            return
-        novelties = [c.fitness for c in population.values()]
-        nov_mean = mean(novelties)
-        nov_std = stdev(novelties)
-        best_species_id = species.get_species_id(best_genome.key)
-        print('Population\'s average novelty: %3.5f stdev: %3.5f' %
-              (nov_mean, nov_std))
-        print('Best novelty: %3.5f - size: (%d,%d) - species %d - id %d' %
-              (best_genome.fitness,
-               best_genome.size()[0],
-               best_genome.size()[1],
-               best_species_id,
-               best_genome.key))
-        print('Best actual fitness: %f ' % best_genome.actual_fitness)
+
+        # Special report for novelty search
+        else:
+
+            novelties = [c.fitness for c in population.values()]
+            nov_mean = mean(novelties)
+            nov_std = stdev(novelties)
+            best_species_id = species.get_species_id(best_genome.key)
+            print('Population\'s average novelty: %3.5f stdev: %3.5f' %
+                  (nov_mean, nov_std))
+            print('Best novelty: %3.5f - size: (%d,%d) - species %d - id %d' %
+                  (best_genome.fitness,
+                   best_genome.size()[0],
+                   best_genome.size()[1],
+                   best_species_id,
+                   best_genome.key))
+            print('Best actual fitness: %f ' % best_genome.actual_fitness)
 
 
 def main():
