@@ -241,7 +241,8 @@ class _GymNeatConfig(NeatConfig):
         # Store environment for later
         self.env = env
 
-        # We'll report total evaluations at end of run
+        # Track evaluations
+        self.current_evaluations = 0
         self.total_evaluations = 0
 
     def eval_net_mean(self, net, activations):
@@ -457,6 +458,8 @@ class _GymPopulation(Population):
         while n is None or k < n:
             k += 1
 
+            self.config.current_evaluations = 0
+
             self.reporters.start_generation(self.generation)
 
             # Evaluate all genomes using the user-provided function.
@@ -470,13 +473,11 @@ class _GymPopulation(Population):
                                        g.key)
 
                 # Break out fitness tuple into actual fitness, total steps
-                g.fitness, steps = g.fitness
-
-                # Use actual_fitness to encode ignored objective,
-                # and replace genome's fitness with its novelty,
-                # summed over behaviors.  If the behavior is None,
-                # we treat its sparsity as zero.
+                g.fitness, evaluations = g.fitness
                 g.actual_fitness = g.fitness
+
+                # Accumulate total evaluations
+                self.config.current_evaluations += evaluations
 
                 if best is None:
                     best = g
