@@ -286,7 +286,7 @@ class _GymNeatConfig(NeatConfig):
 
             total_steps += steps
 
-        return reward_sum/self.reps, behaviors
+        return reward_sum/self.reps, behaviors, total_steps
 
     def eval_net_novelty(self, net, activations):
 
@@ -472,9 +472,9 @@ class _GymPopulation(Population):
                     raise RuntimeError('Fitness not assigned to genome %d' %
                                        g.key)
 
-                # Break out fitness tuple into actual fitness, total steps
-                g.fitness, evaluations = g.fitness
-                g.actual_fitness = g.fitness
+                # Break out fitness tuple into actual fitness, evaluations
+                g.fitness, g.actual_fitness, evaluations = (
+                        self.parse_fitness(g.fitness))
 
                 # Accumulate total evaluations
                 self.config.current_evaluations += evaluations
@@ -553,6 +553,13 @@ class _GymPopulation(Population):
                                              self.config.genome_config,
                                              self.config.pop_size)
 
+    def parse_fitness(self, fitness):
+        '''
+        Break out fitness tuple into
+        (fitness for selection, actual fitness, evaluations)
+        '''
+        return fitness[0], fitness[0], fitness[1]
+
 
 class _NoveltyPopulation(_GymPopulation):
     '''
@@ -563,104 +570,22 @@ class _NoveltyPopulation(_GymPopulation):
 
         _GymPopulation.__init__(self, config)
 
-    def run(self, fitness_function, n=None):
+    def parse_fitness(self, fitness):
+        '''
+        Break out fitness tuple into
+        (fitness for selection, actual fitness, evaluations)
+        '''
 
-        k = 0
+        # Use actual_fitness to encode ignored objective, and replace genome's
+        # fitness with its novelty, summed over behaviors.  If the behavior is
+        # None, we treat its sparsity as zero.
+        actual_fitness, behaviors, evaluations = fitness
 
-        while n is None or k < n:
-            k += 1
+        fitness = np.sum([0 if behavior is None
+                          else self.config.novelty.add(behavior)
+                          for behavior in behaviors])
 
-            self.reporters.start_generation(self.generation)
-
-            # Evaluate all genomes using the user-provided function.
-            fitness_function(list(self.population.items()), self.config)
-
-            # Gather and report statistics.
-            best = None
-            for g in self.population.values():
-                if g.fitness is None:
-                    raise RuntimeError('Fitness not assigned to genome %d' %
-                                       g.key)
-
-                # Use actual_fitness to encode ignored objective,
-                # and replace genome's fitness with its novelty,
-                # summed over behaviors.  If the behavior is None,
-                # we treat its sparsity as zero.
-                g.actual_fitness, behaviors = g.fitness
-                g.fitness = np.sum([0 if behavior is None
-                                    else self.config.novelty.add(behavior)
-                                    for behavior in behaviors])
-
-                if best is None:
-                    best = g
-
-                else:
-                    if g.actual_fitness > best.actual_fitness:
-                        best = g
-
-            self.reporters.post_evaluate(self.config,
-                                         self.population,
-                                         self.species,
-                                         best)
-
-            # Track the best genome ever seen.
-            if (self.best_genome is None or
-                    best.actual_fitness > self.best_genome.actual_fitness):
-                self.best_genome = best
-
-            if not self.config.no_fitness_termination:
-                # End if the fitness threshold is reached.
-                fv = self.fitness_criterion(g.actual_fitness
-                                            for g in self.population.values())
-                if fv >= self.config.fitness_threshold:
-                    self.reporters.found_solution(self.config,
-                                                  self.generation,
-                                                  best)
-                    break
-
-            # Create the next generation from the current generation.
-            self.reproduce()
-
-            # Check for complete extinction.
-            if not self.species.species:
-                self.reporters.complete_extinction()
-
-                # If requested by the user, create a completely new population,
-                # otherwise raise an exception.
-                if self.config.reset_on_extinction:
-                    self.create_new_pop()
-                else:
-                    raise CompleteExtinctionException()
-
-            # Divide the new population into species.
-            self.species.speciate(self.config,
-                                  self.population,
-                                  self.generation)
-
-            self.reporters.end_generation(self.config,
-                                          self.population,
-                                          self.species)
-
-            self.generation += 1
-
-        if self.config.no_fitness_termination:
-            self.reporters.found_solution(self.config,
-                                          self.generation,
-                                          self.best_genome)
-
-        return self.best_genome
-
-    def reproduce(self):
-        self.population = \
-                 self.reproduction.reproduce(self.config, self.species,
-                                             self.config.pop_size,
-                                             self.generation)
-
-    def create_new_pop(self):
-        self.population = \
-                self.reproduction.create_new(self.config.genome_type,
-                                             self.config.genome_config,
-                                             self.config.pop_size)
+        return fitness, actual_fitness, evaluations
 
 
 class _SaveReporter(BaseReporter):
@@ -783,7 +708,7 @@ def main():
               else pop.run(pe.evaluate, args.ngen))
 
     # Report total number of evaluations
-    print('\nTotal evaluations = %d' % config.current_evaluations)
+    print('\nTotal evaluations = %d' % config.total_evaluations)
 
     # Save winner
     config.save_genome(winner)
