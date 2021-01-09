@@ -451,12 +451,13 @@ class _GymPopulation(Population):
 
         Population.__init__(self, config)
 
-    def run(self, fitness_function, n=None):
+    def run(self, fitness_function, ngen=None):
 
-        k = 0
+        gen = 0
 
-        while n is None or k < n:
-            k += 1
+        while ngen is None or gen < ngen:
+
+            gen += 1
 
             self.config.current_evaluations = 0
 
