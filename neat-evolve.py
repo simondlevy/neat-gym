@@ -716,6 +716,8 @@ class _StdOutReporter(StdOutReporter):
                    best_genome.key))
             print('Best actual fitness: %f ' % best_genome.actual_fitness)
 
+        print('Evaluations this generation: %d' % config.current_evaluations)
+
 
 def main():
 
@@ -778,7 +780,7 @@ def main():
               else pop.run(pe.evaluate, args.ngen))
 
     # Report total number of evaluations
-    print('Total evaluations = %d' % config.total_evaluations)
+    print('Total evaluations = %d' % config.current_evaluations)
 
     # Save winner
     config.save_genome(winner)
