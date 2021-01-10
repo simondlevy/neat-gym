@@ -242,6 +242,9 @@ class _GymNeatConfig(NeatConfig):
                             args.seed,
                             args.novelty)
 
+        # Set max episode steps from spec in __init__.py
+        self.max_episode_steps = env.spec.max_episode_steps
+
         # Get number of episode repetitions
         gympar = self.params['Gym']
         self.reps = int(gympar['episode_reps'])
@@ -253,13 +256,13 @@ class _GymNeatConfig(NeatConfig):
         self.current_evaluations = 0
         self.total_evaluations = 0
 
-    def eval_net_mean(self, net):
+    def eval_net_mean(self, net, genome):
 
-        return (self.eval_net_mean_novelty(net)
+        return (self.eval_net_mean_novelty(net, genome)
                 if self.is_novelty()
-                else self.eval_net_mean_reward(net))
+                else self.eval_net_mean_reward(net, genome))
 
-    def eval_net_mean_reward(self, net):
+    def eval_net_mean_reward(self, net, genome):
 
         reward_sum = 0
         total_steps = 0
@@ -269,14 +272,15 @@ class _GymNeatConfig(NeatConfig):
             reward, steps = _eval_net(net,
                                       self.env,
                                       activations=self.activations,
-                                      seed=self.seed)
+                                      seed=self.seed,
+                                      max_episode_steps=self.max_episode_steps)
 
             reward_sum += reward
             total_steps += steps
 
         return reward_sum/self.reps, total_steps
 
-    def eval_net_mean_novelty(self, net):
+    def eval_net_mean_novelty(self, net, genome):
 
         reward_sum = 0
         total_steps = 0
@@ -286,7 +290,7 @@ class _GymNeatConfig(NeatConfig):
 
         for j in range(self.reps):
 
-            reward, behavior, steps = self.eval_net_novelty(net)
+            reward, behavior, steps = self.eval_net_novelty(net, genome)
 
             reward_sum += reward
 
@@ -296,7 +300,7 @@ class _GymNeatConfig(NeatConfig):
 
         return reward_sum/self.reps, behaviors, total_steps
 
-    def eval_net_novelty(self, net):
+    def eval_net_novelty(self, net, genome):
 
         env = self.env
         env.seed(self.seed)
@@ -307,7 +311,7 @@ class _GymNeatConfig(NeatConfig):
 
         total_reward = 0
 
-        while True:
+        while steps < self.max_episode_steps:
 
             # Support recurrent nets
             for k in range(self.activations):
@@ -348,7 +352,7 @@ class _GymNeatConfig(NeatConfig):
         The result of this function gets assigned to the genome's fitness.
         '''
         net = FeedForwardNetwork.create(genome, config)
-        return config.eval_net_mean(net)
+        return config.eval_net_mean(net, genome)
 
 
 class _GymHyperConfig(_GymNeatConfig):
@@ -411,7 +415,7 @@ class _GymHyperConfig(_GymNeatConfig):
     def eval_genome(genome, config):
 
         cppn, net = config.make_nets(genome)
-        return config.eval_net_mean(net)
+        return config.eval_net_mean(net, genome)
 
 
 class _GymEsHyperConfig(_GymHyperConfig):
@@ -449,7 +453,7 @@ class _GymEsHyperConfig(_GymHyperConfig):
     def eval_genome(genome, config):
 
         _, esnet, net = config.make_nets(genome)
-        return config.eval_net_mean(net)
+        return config.eval_net_mean(net, genome)
 
 
 class _GymPopulation(Population):
@@ -480,6 +484,7 @@ class _GymPopulation(Population):
 
             # Gather and report statistics.
             best = None
+            count = 0
             for g in self.population.values():
 
                 if g.fitness is None:

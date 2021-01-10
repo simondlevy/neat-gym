@@ -40,7 +40,8 @@ def _eval_net(
         render=False,
         record_dir=None,
         activations=1,
-        seed=None):
+        seed=None,
+        max_episode_steps=None):
 
     if record_dir is not None:
         env = wrappers.Monitor(env, record_dir, force=True)
@@ -52,7 +53,7 @@ def _eval_net(
 
     is_discrete = _is_discrete(env)
 
-    while True:
+    while max_episode_steps is None or steps < max_episode_steps:
 
         # Support recurrent nets
         for k in range(activations):
