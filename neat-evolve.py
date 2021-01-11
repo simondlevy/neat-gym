@@ -270,10 +270,10 @@ class _GymNeatConfig(NeatConfig):
         for _ in range(self.reps):
 
             reward, steps = eval_net(net,
-                                      self.env,
-                                      activations=self.activations,
-                                      seed=self.seed,
-                                      max_episode_steps=self.max_episode_steps)
+                                     self.env,
+                                     activations=self.activations,
+                                     seed=self.seed,
+                                     max_episode_steps=self.max_episode_steps)
 
             reward_sum += reward
             total_steps += steps
@@ -484,7 +484,6 @@ class _GymPopulation(Population):
 
             # Gather and report statistics.
             best = None
-            count = 0
             for g in self.population.values():
 
                 if g.fitness is None:

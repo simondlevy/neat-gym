@@ -60,6 +60,7 @@ def read_file(allow_record=False):
     # Return genome, config, and optional save flag
     return net, env_name, args.record if allow_record else None, args.nodisplay
 
+
 def eval_net(
         net,
         env,
