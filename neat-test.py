@@ -14,9 +14,9 @@ from neat_gym import read_file, eval_net
 net, env_name, record_dir, nodisplay = read_file(allow_record=True)
 
 # Run the network on the environment
-reward, steps = eval_net(net,
-                         gym.make(env_name),
-                         render=(not nodisplay),
-                         record_dir=record_dir)
+eval_net(net,
+        gym.make(env_name),
+        render=(not nodisplay),
+        record_dir=record_dir,
+        report=True)
 
-print('Got reward %6.6f in %d steps' % (reward, steps))

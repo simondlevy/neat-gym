@@ -65,6 +65,7 @@ def eval_net(
         net,
         env,
         render=False,
+        report=False,
         record_dir=None,
         activations=1,
         seed=None,
@@ -113,5 +114,8 @@ def eval_net(
         steps += 1
 
     env.close()
+
+    if report:
+        print('Got reward %+6.6f in %d steps' % (total_reward, steps))
 
     return total_reward, steps
