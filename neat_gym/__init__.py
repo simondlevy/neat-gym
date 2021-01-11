@@ -34,7 +34,33 @@ def _is_discrete(env):
     return 'Discrete' in str(type(env.action_space))
 
 
-def _eval_net(
+# Public functions ===================================================
+
+
+def read_file(allow_record=False):
+    '''
+    Reads a genome/config file based on command-line argument
+    @return genome,config tuple
+    '''
+
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+                        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('filename', metavar='FILENAME', help='.dat input file')
+    parser.add_argument('--nodisplay', dest='nodisplay', action='store_true',
+                        help='Suppress display')
+    if allow_record:
+        parser.add_argument('--record', default=None,
+                            help='If specified, sets the recording dir')
+    args = parser.parse_args()
+
+    # Load net and environment name from pickled file
+    net, env_name = pickle.load(open(args.filename, 'rb'))
+
+    # Return genome, config, and optional save flag
+    return net, env_name, args.record if allow_record else None, args.nodisplay
+
+def eval_net(
         net,
         env,
         render=False,
@@ -42,7 +68,16 @@ def _eval_net(
         activations=1,
         seed=None,
         max_episode_steps=None):
-
+    '''
+    Evaluates a network
+    @param net the network
+    @param env the Gym environment
+    @param render set to True for rendering
+    @param record_dir set to directory name for recording video
+    @param activations number of times to repeat
+    @param seed seed for random number generator
+    @return total reward
+    '''
     if record_dir is not None:
         env = wrappers.Monitor(env, record_dir, force=True)
 
@@ -79,54 +114,3 @@ def _eval_net(
     env.close()
 
     return total_reward, steps
-
-# Public functions ===================================================
-
-
-def read_file(allow_record=False):
-    '''
-    Reads a genome/config file based on command-line argument
-    @return genome,config tuple
-    '''
-
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser(
-                        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('filename', metavar='FILENAME', help='.dat input file')
-    parser.add_argument('--nodisplay', dest='nodisplay', action='store_true',
-                        help='Suppress display')
-    if allow_record:
-        parser.add_argument('--record', default=None,
-                            help='If specified, sets the recording dir')
-    args = parser.parse_args()
-
-    # Load net and environment name from pickled file
-    net, env_name = pickle.load(open(args.filename, 'rb'))
-
-    # Return genome, config, and optional save flag
-    return net, env_name, args.record if allow_record else None, args.nodisplay
-
-
-def eval_net(
-        net,
-        env_name,
-        render=False,
-        record_dir=None,
-        activations=1,
-        seed=None):
-    '''
-    Evaluates a network
-    @param net the network
-    @param env_name name of the Gym environment
-    @param render set to True for rendering
-    @param record_dir set to directory name for recording video
-    @param activations number of times to repeat
-    @param seed seed for random number generator
-    @return total reward
-    '''
-    return _eval_net(
-                     net,
-                     _gym_make(env_name),
-                     render,
-                     record_dir,
-                     activations, seed)[0]

@@ -29,7 +29,7 @@ from pureples.es_hyperneat.es_hyperneat import ESNetwork
 from pureples.shared.visualize import draw_net
 from pureples.shared.substrate import Substrate
 
-from neat_gym import _gym_make, _is_discrete, _eval_net
+from neat_gym import _gym_make, _is_discrete, eval_net
 from neat_gym.novelty import Novelty
 
 
@@ -269,7 +269,7 @@ class _GymNeatConfig(NeatConfig):
 
         for _ in range(self.reps):
 
-            reward, steps = _eval_net(net,
+            reward, steps = eval_net(net,
                                       self.env,
                                       activations=self.activations,
                                       seed=self.seed,
