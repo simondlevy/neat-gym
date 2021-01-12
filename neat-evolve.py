@@ -94,8 +94,9 @@ class NeatConfig(object):
         self.seed = seed
 
         if not os.path.isfile(config_file_name):
-            raise Exception('No such config file: %s' %
-                            os.path.abspath(config_file_name))
+            print('No such config file: %s' %
+                  os.path.abspath(config_file_name))
+            exit(1)
 
         parameters = ConfigParser()
         with open(config_file_name) as f:
