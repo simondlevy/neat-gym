@@ -208,14 +208,6 @@ class _GymNeatConfig(NeatConfig):
         # Make gym environment form name in command-line arguments
         env = _gym_make(args.env_name)
 
-        # Make sure environment supports novelty
-        if args.novelty:
-            unenv = env.unwrapped
-            if not hasattr(unenv, 'step_novelty'):
-                print('Error: environment %s does not support novelty search' %
-                      args.env_name)
-                exit(1)
-
         # Get input/output layout from environment, or from layout for Hyper
         if layout is None:
             num_inputs = env.observation_space.shape[0]
@@ -323,7 +315,9 @@ class _GymNeatConfig(NeatConfig):
                       if is_discrete
                       else action * env.action_space.high)
 
-            state, reward, behavior, done, _ = env.step_novelty(action)
+            state, reward, done, info = env.step(action)
+
+            behavior = info['behavior']
 
             # Accumulate reward, but not novelty
             total_reward += reward

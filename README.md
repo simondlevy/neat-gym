@@ -39,16 +39,12 @@ and [ES-HyperNEAT](http://eplex.cs.ucf.edu/ESHyperNEAT/) via the <br> ```--eshyp
 
 NEAT-Gym supports
 [Novelty Search](https://www.cs.swarthmore.edu/~meeden/DevelopmentalRobotics/lehman_ecj11.pdf)
-via the ```--novelty``` option.  To use this option, your Gym environment should provide a
-```step_novelty``` method.  Like the ordinary ```step``` method, ```step_novelty``` should 
-accept an action as input; however, instead of returning a tuple ```state, reward, done, info```
-it should return ```state, reward, behavior, done, info```, where ```behavior``` is the behavior
-of the agent at the end of the episode (for example, its final position in the
-maze), or ```None``` before the end of the episode.  
-
-[gym-nsmaze](https://github.com/simondlevy/gym-nsmaze)
-provides this capability, using the medium/hard maze environments in the Novelty Search
-[paper](https://www.cs.swarthmore.edu/~meeden/DevelopmentalRobotics/lehman_ecj11.pdf).
+via the ```--novelty``` option.  To use this option, the ```info``` dictionary 
+returned by your environment's ```step()``` method should have an entry for ```behavior```,
+whose value is the behavior of the agent at the end of the episode (for
+example, its final position in the maze), or ```None``` before the end of the
+episode.  (For an example,look
+[here](https://github.com/simondlevy/gym-nsmaze/blob/main/gym_nsmaze/envs/__init__.py#L134-L144).
 
 ## Using NEAT-Gym in other projects
 
