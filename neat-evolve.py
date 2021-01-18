@@ -666,6 +666,8 @@ def main():
     parser = argparse.ArgumentParser(
             formatter_class=ArgumentDefaultsHelpFormatter)
     group = parser.add_mutually_exclusive_group()
+    parser.add_argument('configfile', metavar='CONFIGFILE',
+                        help='input config file')
     group.add_argument('--hyper', action='store_true', help='Use HyperNEAT')
     group.add_argument('--eshyper', action='store_true',
                        help='Use ES-HyperNEAT')
