@@ -78,14 +78,10 @@ def _parse_novelty(cfgfilename):
             except Exception:
                 pass
 
-        # Parse type sections.
-        genome_dict = dict(parameters.items(genome_type.__name__))
-
         # Add layout (input/output) info
         for key in layout_dict:
             genome_dict[key] = layout_dict[key]
 
-        self.genome_config = genome_type.parse_config(genome_dict)
 '''
 
 
@@ -109,7 +105,7 @@ class _GymNeatConfig(object):
             exit(1)
 
         # Use default NEAT settings
-        genome_type = neat.DefaultGenome
+        self.genome_type = neat.DefaultGenome
         self.reproduction_type = neat.DefaultReproduction
         self.species_set_type = neat.DefaultSpeciesSet
         self.stagnation_type = neat.DefaultStagnation
@@ -150,29 +146,6 @@ class _GymNeatConfig(object):
         self._check_params(configfile, parameters, 'NEAT')
         self._check_params(configfile, parameters, 'Gym')
 
-        param_dict = dict(parameters.items('NEAT'))
-        unknown_list = [x for x in param_dict if x not in param_list_names]
-        if unknown_list:
-            if len(unknown_list) > 1:
-                self._error(
-                        'Unknown (section NEAT) configuration items:\n' +
-                        '\n\t'.join(unknown_list))
-            self._error(
-                'Unknown (section NEAT) configuration item %s' %
-                format(unknown_list[0]))
-
-
-        stagnation_dict = dict(parameters.items(self.stagnation_type.__name__))
-        self.stagnation_config = self.stagnation_type.parse_config(stagnation_dict)
-
-        self.species_set_dict = dict(parameters.items(self.species_set_type.__name__))
-        self.species_set_config = \
-            self.species_set_type.parse_config(self.species_set_dict)
-
-        self.reproduction_dict = dict(parameters.items(self.reproduction_type.__name__))
-        self.reproduction_config = \
-            self.reproduction_type.parse_config(self.reproduction_dict)
-
         # Get number of episode repetitions
         gympar = parameters['Gym']
         env_name = gympar['environment']
@@ -190,6 +163,25 @@ class _GymNeatConfig(object):
                 num_outputs = env.action_space.shape[0]
         else:
             num_inputs, num_outputs = layout
+
+        # Parse type sections.
+        genome_dict = dict(parameters.items(self.genome_type.__name__))
+
+        genome_dict['num_inputs'] = num_inputs
+        genome_dict['num_outputs'] = num_outputs
+
+        self.genome_config = self.genome_type.parse_config(genome_dict)
+
+        stagnation_dict = dict(parameters.items(self.stagnation_type.__name__))
+        self.stagnation_config = self.stagnation_type.parse_config(stagnation_dict)
+
+        self.species_set_dict = dict(parameters.items(self.species_set_type.__name__))
+        self.species_set_config = \
+            self.species_set_type.parse_config(self.species_set_dict)
+
+        self.reproduction_dict = dict(parameters.items(self.reproduction_type.__name__))
+        self.reproduction_config = \
+            self.reproduction_type.parse_config(self.reproduction_dict)
 
         # Store environment name for saving results
         self.env_name = env_name
