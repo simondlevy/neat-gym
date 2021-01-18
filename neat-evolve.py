@@ -248,14 +248,8 @@ class _GymNeatConfig(_NeatConfig):
         self.env_name = env_name
         self.seed = seed
 
-        exit(0)
-
         # Set max episode steps from spec in __init__.py
         self.max_episode_steps = env.spec.max_episode_steps
-
-        # Get number of episode repetitions
-        gympar = self.params['Gym']
-        self.reps = int(gympar['episode_reps'])
 
         # Store environment for later
         self.env = env
@@ -263,6 +257,8 @@ class _GymNeatConfig(_NeatConfig):
         # Track evaluations
         self.current_evaluations = 0
         self.total_evaluations = 0
+
+        exit(0)
 
     def eval_net_mean(self, net, genome):
 
