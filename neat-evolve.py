@@ -58,18 +58,7 @@ def _parse_novelty(cfgfilename):
     return novelty
 
 
-class _NeatConfig(object):
-
-    def __init__(self,
-                 genome_type,
-                 reproduction_type,
-                 species_set_type,
-                 stagnation_type,
-                 config_file_name,
-                 env_name,
-                 layout_dict,
-                 seed,
-                 novelty=False):
+'''
 
         # Check that the provided types have the required methods.
         assert hasattr(genome_type, 'parse_config')
@@ -129,9 +118,10 @@ class _NeatConfig(object):
             genome_dict[key] = layout_dict[key]
 
         self.genome_config = genome_type.parse_config(genome_dict)
+'''
 
 
-class _GymNeatConfig(_NeatConfig):
+class _GymNeatConfig(object):
     '''
     A class for helping Gym work with NEAT
     '''
