@@ -680,8 +680,6 @@ def main():
     # Run for number of generations specified in config file
     winner = pop.run(pe.evaluate, config.ngen)
 
-    exit(0)
-
     # Report total number of evaluations
     print('\nTotal evaluations = %d' % config.total_evaluations)
 
