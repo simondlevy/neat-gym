@@ -18,6 +18,9 @@ edit:
 nedit:
 	vim neat_gym/novelty/__init__.py
 
+cedit:
+	vim config/CartPole-v1.cfg
+
 evolve:
 	./neat-evolve.py
 

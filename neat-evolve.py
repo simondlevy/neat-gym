@@ -116,10 +116,6 @@ class _NeatConfig(object):
             except Exception:
                 pass
 
-        # NEAT configuration
-        if not parameters.has_section('NEAT'):
-            raise RuntimeError('NEAT section missing from configuration file.')
-
         param_list_names = []
 
         for p in self.__params:
@@ -229,13 +225,8 @@ class _GymNeatConfig(_NeatConfig):
             except Exception:
                 pass
 
-        # NEAT configuration
-        if not parameters.has_section('NEAT'):
-            raise RuntimeError('NEAT section missing from configuration file %s' % configfile)
-
-        # Gym configuration
-        if not parameters.has_section('Gym'):
-            raise RuntimeError('Gym section missing from configuration file %s' % configfile)
+        self._check_params(configfile, parameters, 'NEAT')
+        self._check_params(configfile, parameters, 'Gym')
 
         # Get number of episode repetitions
         gympar = parameters['Gym']
@@ -370,6 +361,14 @@ class _GymNeatConfig(_NeatConfig):
 
         # Return total reward and final behavior
         return total_reward, behavior, steps
+
+    def _check_params(self, filename, params, section_name):
+        if not params.has_section(section_name):
+            self._error('ERROR: %s section missing from configuration file %s' % (section_name, filename))
+
+    def _error(self, msg):
+       print(msg)
+       exit(1)
 
     @staticmethod
     def draw_net(net, filename, node_names):
