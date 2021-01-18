@@ -232,13 +232,13 @@ class _GymNeatConfig(_NeatConfig):
         # Get number of episode repetitions
         gympar = parameters['Gym']
         env_name = gympar['environment']
-        print(env_name)
-        exit(0)
         self.reps = int(gympar['episode_reps'])
 
 
         # Make gym environment form name in command-line arguments
-        env = _gym_make(args.env_name)
+        env = _gym_make(env_name)
+
+        exit(0)
 
         # Get input/output layout from environment, or from layout for Hyper
         if layout is None:

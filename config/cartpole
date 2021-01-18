@@ -12,7 +12,7 @@ reset_on_extinction   = False
 no_fitness_termination = False
 
 [Gym]
-environment = Cartpole-v0
+environment = CartPole-v1
 episode_reps = 10
 
 [Substrate]
