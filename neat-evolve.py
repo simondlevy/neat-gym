@@ -58,7 +58,7 @@ def _parse_novelty(cfgfilename):
     return novelty
 
 
-class NeatConfig(object):
+class _NeatConfig(object):
     '''
     Replaces neat.Config to support Novelty Search.
     '''
@@ -198,7 +198,7 @@ class NeatConfig(object):
                (self.env_name, suffix, self.get_actual_fitness(genome))
 
 
-class _GymNeatConfig(NeatConfig):
+class _GymNeatConfig(_NeatConfig):
     '''
     A class for helping Gym work with NEAT
     '''
@@ -223,17 +223,17 @@ class _GymNeatConfig(NeatConfig):
                        if args.config is None else args.config)
 
         # Do non-Gym config stuff
-        NeatConfig.__init__(self,
-                            neat.DefaultGenome,
-                            neat.DefaultReproduction,
-                            neat.DefaultSpeciesSet,
-                            neat.DefaultStagnation,
-                            cfgfilename,
-                            args.env_name,
-                            {'num_inputs': num_inputs,
-                             'num_outputs': num_outputs},
-                            args.seed,
-                            args.novelty)
+        _NeatConfig.__init__(self,
+                             neat.DefaultGenome,
+                             neat.DefaultReproduction,
+                             neat.DefaultSpeciesSet,
+                             neat.DefaultStagnation,
+                             cfgfilename,
+                             args.env_name,
+                             {'num_inputs': num_inputs,
+                              'num_outputs': num_outputs},
+                             args.seed,
+                             args.novelty)
 
         # Set max episode steps from spec in __init__.py
         self.max_episode_steps = env.spec.max_episode_steps
