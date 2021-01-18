@@ -20,7 +20,7 @@ from configparser import ConfigParser
 import neat
 from neat.math_util import mean, stdev
 from neat.reporting import StdOutReporter, BaseReporter
-from neat.config import ConfigParameter, UnknownConfigItemError
+from neat.config import ConfigParameter
 from neat.population import Population, CompleteExtinctionException
 from neat.nn import FeedForwardNetwork
 
@@ -60,15 +60,62 @@ def _parse_novelty(cfgfilename):
 
 '''
 
-        # Check that the provided types have the required methods.
-        assert hasattr(genome_type, 'parse_config')
-        assert hasattr(reproduction_type, 'parse_config')
-        assert hasattr(species_set_type, 'parse_config')
-        assert hasattr(stagnation_type, 'parse_config')
-
-
         parameters = ConfigParser()
         with open(config_file_name) as f:
+            if hasattr(parameters, 'read_file'):
+                parameters.read_file(f)
+            else:
+                parameters.readfp(f)
+
+            self.node_names = {}
+
+            try:
+                names = parameters['Names']
+                for idx, name in enumerate(eval(names['input'])):
+                    self.node_names[-idx-1] = name
+                for idx, name in enumerate(eval(names['output'])):
+                    self.node_names[idx] = name
+            except Exception:
+                pass
+
+        # Parse type sections.
+        genome_dict = dict(parameters.items(genome_type.__name__))
+
+        # Add layout (input/output) info
+        for key in layout_dict:
+            genome_dict[key] = layout_dict[key]
+
+        self.genome_config = genome_type.parse_config(genome_dict)
+'''
+
+
+class _GymNeatConfig(object):
+    '''
+    A class for helping Gym work with NEAT
+    '''
+
+    __params = [ConfigParameter('pop_size', int),
+                ConfigParameter('fitness_criterion', str),
+                ConfigParameter('fitness_threshold', float),
+                ConfigParameter('reset_on_extinction', bool),
+                ConfigParameter('no_fitness_termination', bool, False)]
+
+    def __init__(self, configfile, novelty=False, layout=None):
+
+        # Check config file exists
+        if not os.path.isfile(configfile):
+            print('No such config file: %s' %
+                  os.path.abspath(configfile))
+            exit(1)
+
+        # Use default NEAT settings
+        genome_type = neat.DefaultGenome
+        self.reproduction_type = neat.DefaultReproduction
+        self.species_set_type = neat.DefaultSpeciesSet
+        self.stagnation_type = neat.DefaultStagnation
+
+        parameters = ConfigParser()
+        with open(configfile) as f:
             if hasattr(parameters, 'read_file'):
                 parameters.read_file(f)
             else:
@@ -103,66 +150,12 @@ def _parse_novelty(cfgfilename):
         unknown_list = [x for x in param_dict if x not in param_list_names]
         if unknown_list:
             if len(unknown_list) > 1:
-                raise UnknownConfigItemError(
+                self._error(
                         'Unknown (section NEAT) configuration items:\n' +
                         '\n\t'.join(unknown_list))
-            raise UnknownConfigItemError(
+            self._error(
                 'Unknown (section NEAT) configuration item %s' %
                 format(unknown_list[0]))
-
-        # Parse type sections.
-        genome_dict = dict(parameters.items(genome_type.__name__))
-
-        # Add layout (input/output) info
-        for key in layout_dict:
-            genome_dict[key] = layout_dict[key]
-
-        self.genome_config = genome_type.parse_config(genome_dict)
-'''
-
-
-class _GymNeatConfig(object):
-    '''
-    A class for helping Gym work with NEAT
-    '''
-
-    __params = [ConfigParameter('pop_size', int),
-                ConfigParameter('fitness_criterion', str),
-                ConfigParameter('fitness_threshold', float),
-                ConfigParameter('reset_on_extinction', bool),
-                ConfigParameter('no_fitness_termination', bool, False)]
-
-    def __init__(self, configfile, novelty=False, layout=None):
-
-        # Check config file exists
-        if not os.path.isfile(configfile):
-            print('No such config file: %s' %
-                  os.path.abspath(configfile))
-            exit(1)
-
-        # Use default NEAT settings
-        self.genome_type = neat.DefaultGenome
-        self.reproduction_type = neat.DefaultReproduction
-        self.species_set_type = neat.DefaultSpeciesSet
-        self.stagnation_type = neat.DefaultStagnation
-
-        parameters = ConfigParser()
-        with open(configfile) as f:
-            if hasattr(parameters, 'read_file'):
-                parameters.read_file(f)
-            else:
-                parameters.readfp(f)
-
-            self.node_names = {}
-
-            try:
-                names = parameters['Names']
-                for idx, name in enumerate(eval(names['input'])):
-                    self.node_names[-idx-1] = name
-                for idx, name in enumerate(eval(names['output'])):
-                    self.node_names[idx] = name
-            except Exception:
-                pass
 
         # Bozo filter for missing sections
         self._check_params(configfile, parameters, 'NEAT')
@@ -340,11 +333,11 @@ class _GymNeatConfig(object):
 
     def _check_params(self, filename, params, section_name):
         if not params.has_section(section_name):
-            self._error('ERROR: %s section missing from configuration file %s' % (section_name, filename))
+            self._error('%s section missing from configuration file %s' % (section_name, filename))
 
     def _error(self, msg):
-       print(msg)
-       exit(1)
+        print('ERROR: ' + msg)
+        exit(1)
 
     @staticmethod
     def draw_net(net, filename, node_names):
@@ -702,12 +695,12 @@ def main():
     os.makedirs('models', exist_ok=True)
     os.makedirs('visuals', exist_ok=True)
 
-    exit(0)
-
     # Create an ordinary population or a population for NoveltySearch
     pop = (_NoveltyPopulation(config)
            if config.is_novelty()
            else _GymPopulation(config))
+
+    exit(0)
 
     # Add a stdout reporter to show progress in the terminal
     pop.add_reporter(_StdOutReporter(show_species_detail=False))
