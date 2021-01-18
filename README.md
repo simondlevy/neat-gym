@@ -17,7 +17,7 @@ do the following:
 ```
 % python3 neat-evolve.py config/cartpole
 ```
-This will run neat-python on the default [CartPole-v1](https://gym.openai.com/envs/CartPole-v1/) environment using the
+This will run neat-python on the [CartPole-v1](https://gym.openai.com/envs/CartPole-v1/) environment using the
 [parallel fitness evaluator](https://neat-python.readthedocs.io/en/latest/module_summaries.html#parallel),
 so you can take advantage of all the cores on your computer.
 
