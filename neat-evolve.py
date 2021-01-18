@@ -199,7 +199,7 @@ class _GymNeatConfig(_NeatConfig):
     A class for helping Gym work with NEAT
     '''
 
-    def __init__(self, configfile):
+    def __init__(self, configfile, layout=None):
 
         # Check config file exists
         if not os.path.isfile(configfile):
@@ -238,8 +238,6 @@ class _GymNeatConfig(_NeatConfig):
         # Make gym environment form name in command-line arguments
         env = _gym_make(env_name)
 
-        exit(0)
-
         # Get input/output layout from environment, or from layout for Hyper
         if layout is None:
             num_inputs = env.observation_space.shape[0]
@@ -250,9 +248,9 @@ class _GymNeatConfig(_NeatConfig):
         else:
             num_inputs, num_outputs = layout
 
-        # Default to environment name for config file
-        cfgfilename = ('config/' + args.env_name + '.cfg'
-                       if args.config is None else args.config)
+
+        print(num_inputs, num_outputs)
+        exit(0)
 
         # Do non-Gym config stuff
         _NeatConfig.__init__(self,
