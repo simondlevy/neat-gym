@@ -203,13 +203,35 @@ class _GymNeatConfig(_NeatConfig):
     A class for helping Gym work with NEAT
     '''
 
-    def __init__(self, args):
+    def __init__(self, configfile):
 
         # Check config file exists
-        if not os.path.isfile(args.configfile):
+        if not os.path.isfile(configfile):
             print('No such config file: %s' %
-                  os.path.abspath(args.configfile))
+                  os.path.abspath(configfile))
             exit(1)
+
+        parameters = ConfigParser()
+        with open(configfile) as f:
+            if hasattr(parameters, 'read_file'):
+                parameters.read_file(f)
+            else:
+                parameters.readfp(f)
+
+            self.node_names = {}
+
+            try:
+                names = parameters['Names']
+                for idx, name in enumerate(eval(names['input'])):
+                    self.node_names[-idx-1] = name
+                for idx, name in enumerate(eval(names['output'])):
+                    self.node_names[idx] = name
+            except Exception:
+                pass
+
+        # NEAT configuration
+        if not parameters.has_section('NEAT'):
+            raise RuntimeError('NEAT section missing from configuration file %s' % configfile)
 
         
         exit(0)
@@ -692,13 +714,13 @@ def main():
     args = parser.parse_args()
 
     # Default to original NEAT
-    config = _GymNeatConfig(args)
+    config = _GymNeatConfig(args.configfile)
 
     # Check for HyperNEAT, ES-HyperNEAT
     if args.hyper:
-        config = _GymHyperConfig(args)
+        config = _GymHyperConfig(args.configfile)
     if args.eshyper:
-        config = _GymEsHyperConfig(args)
+        config = _GymEsHyperConfig(args.configfile)
 
     # Set random seed (including None)
     random.seed(args.seed)
