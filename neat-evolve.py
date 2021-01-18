@@ -233,7 +233,14 @@ class _GymNeatConfig(_NeatConfig):
         if not parameters.has_section('NEAT'):
             raise RuntimeError('NEAT section missing from configuration file %s' % configfile)
 
-        
+        # Gym configuration
+        if not parameters.has_section('Gym'):
+            raise RuntimeError('Gym section missing from configuration file %s' % configfile)
+
+        # Get number of episode repetitions
+        gympar = parameters['Gym']
+        self.reps = int(gympar['episode_reps'])
+
         exit(0)
 
 
