@@ -9,17 +9,20 @@
 install:
 	sudo python3 setup.py install
 
-evo:
-	./neat-evolve.py --seed 0
-
 edit:
 	vim neat-evolve.py
 
 nedit:
 	vim neat_gym/novelty/__init__.py
 
+cedit:
+	vim config/cartpole
+
 evolve:
-	./neat-evolve.py
+	./neat-evolve.py config/cartpole
+
+help:
+	./neat-evolve.py --help
 
 clean:
 	sudo rm -rf build/ dist/ *.egg-info __pycache__ */__pycache__ models/ visuals/

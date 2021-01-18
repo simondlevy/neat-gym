@@ -5,8 +5,7 @@ and its variants.
 
 The two goals of this project are 
 
-1. Make this work as simple as possible.  For example, the name of the NEAT
-configuration file defaults to the name of the environment.
+1. Make this work as simple as possible, via config files.
 
 2. Make the code run fast, by simultaneously evaluating the fitnesses of the
 population on multiprocessor machines.
@@ -16,7 +15,7 @@ and [PUREPLES](https://github.com/ukuleleplayer/pureples) from source. Then
 do the following:
 
 ```
-% python3 neat-evolve.py 
+% python3 neat-evolve.py config/cartpole
 ```
 This will run neat-python on the default [CartPole-v1](https://gym.openai.com/envs/CartPole-v1/) environment using the
 [parallel fitness evaluator](https://neat-python.readthedocs.io/en/latest/module_summaries.html#parallel),

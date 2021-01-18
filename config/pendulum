@@ -1,42 +1,48 @@
-# HyperNEAT configuration for CartPole-v1
+# ES HyperNEAT configuration for Pendulum-v0
 #
-# Copyright (C) Adrian Westh and Simon D. Levy
+# Copyright (C) 2020 Simon D. Levy
 #
 # MIT License
 
+# The `NEAT` section specifies parameters particular to the NEAT algorithm
+# or the experiment itself.  This is the only required section.
+
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 475
-pop_size              = 50
+fitness_threshold     = -110
+pop_size              = 96
 reset_on_extinction   = False
 no_fitness_termination = False
 
 [Gym]
+environment = Pendulum-v0
 episode_reps = 10
 
 [Substrate]
-# For (ES-)HyperNEAT
-input  = [(-1. +(2.*i/3.), -1.) for i in range(4)]
-hidden = [[(-0.5, 0.5), (0.5, 0.5)], [(-0.5, -0.5), (0.5, -0.5)]]
-output = [(-1., 1.), (1., 1.)]
-function = sigmoid
+input  = [(-0.5, -1.), (0,-1), (0.5, -1.)]
+hidden = [ [(-0.5, 0.5), (0.5, 0.5)], [(-0.5, -0.5), (0.5, -0.5)] ]
+output = [(0, 1.)]
+function = tanh
 
 [ES]
-# For ES-HyperNEAT
-initial_depth         = 0 
-max_depth             = 1 
+initial_depth         = 2 
+max_depth             = 3 
 variance_threshold    = 0.03 
 band_threshold        = 0.3 
 iteration_level       = 1
 division_threshold    = 0.5 
-max_weight            = 8.0 
-activation            = sigmoid
+max_weight            = 5.0 
+activation            = tanh
 
 [DefaultGenome]
+
+# number of hidden units for the CPPN (ES-HyperNEAT will determine number of hidden units in output)
+num_hidden            = 0
+
 # node activation options
 activation_default      = tanh
 activation_mutate_rate  = 0.5
-activation_options      = gauss sin tanh
+activation_options      = tanh relu
 
 # node aggregation options
 aggregation_default     = sum
@@ -71,9 +77,6 @@ initial_connection      = full
 node_add_prob           = 0.2
 node_delete_prob        = 0.2
 
-# CPPN network parameters
-num_hidden              = 0
-
 # node response options
 response_init_mean      = 1.0
 response_init_stdev     = 0.0
@@ -98,12 +101,12 @@ compatibility_threshold = 3.0
 [DefaultStagnation]
 species_fitness_func = max
 max_stagnation       = 20
-species_elitism      = 5
+species_elitism      = 10
 
 [DefaultReproduction]
-elitism            = 5
+elitism            = 10
 survival_threshold = 0.2
 
 [Names]
-input  = ['cartpos', 'cartvel', 'poleang', 'polevel']
-output = ['left', 'right']
+input  = ['cos', 'sin', 'dot']
+output = ['torque']

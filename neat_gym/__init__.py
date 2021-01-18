@@ -40,6 +40,7 @@ def _is_discrete(env):
 def read_file(allow_record=False):
     '''
     Reads a genome/config file based on command-line argument
+    @param allow_record set to True to support recording to movie
     @return genome,config tuple
     '''
 
