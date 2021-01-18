@@ -63,12 +63,6 @@ class _NeatConfig(object):
     Replaces neat.Config to support Novelty Search.
     '''
 
-    __params = [ConfigParameter('pop_size', int),
-                ConfigParameter('fitness_criterion', str),
-                ConfigParameter('fitness_threshold', float),
-                ConfigParameter('reset_on_extinction', bool),
-                ConfigParameter('no_fitness_termination', bool, False)]
-
     def __init__(self,
                  genome_type,
                  reproduction_type,
@@ -85,13 +79,6 @@ class _NeatConfig(object):
         assert hasattr(reproduction_type, 'parse_config')
         assert hasattr(species_set_type, 'parse_config')
         assert hasattr(stagnation_type, 'parse_config')
-
-        self.genome_type = genome_type
-        self.reproduction_type = reproduction_type
-        self.species_set_type = species_set_type
-        self.stagnation_type = stagnation_type
-        self.env_name = env_name
-        self.seed = seed
 
         if not os.path.isfile(config_file_name):
             print('No such config file: %s' %
@@ -199,6 +186,12 @@ class _GymNeatConfig(_NeatConfig):
     A class for helping Gym work with NEAT
     '''
 
+    __params = [ConfigParameter('pop_size', int),
+                ConfigParameter('fitness_criterion', str),
+                ConfigParameter('fitness_threshold', float),
+                ConfigParameter('reset_on_extinction', bool),
+                ConfigParameter('no_fitness_termination', bool, False)]
+
     def __init__(self, configfile, layout=None):
 
         # Check config file exists
@@ -248,22 +241,15 @@ class _GymNeatConfig(_NeatConfig):
         else:
             num_inputs, num_outputs = layout
 
+        self.genome_type = neat.DefaultGenome
+        self.reproduction_type = neat.DefaultReproduction
+        self.species_set_type = neat.DefaultSpeciesSet
+        self.stagnation_type = neat.DefaultStagnation
+        self.env_name = env_name
 
-        print(num_inputs, num_outputs)
         exit(0)
 
-        # Do non-Gym config stuff
-        _NeatConfig.__init__(self,
-                             neat.DefaultGenome,
-                             neat.DefaultReproduction,
-                             neat.DefaultSpeciesSet,
-                             neat.DefaultStagnation,
-                             cfgfilename,
-                             args.env_name,
-                             {'num_inputs': num_inputs,
-                              'num_outputs': num_outputs},
-                             args.seed,
-                             args.novelty)
+        self.seed = seed
 
         # Set max episode steps from spec in __init__.py
         self.max_episode_steps = env.spec.max_episode_steps
