@@ -146,6 +146,10 @@ class _GymNeatConfig(object):
                                   (p.default, p.name), DeprecationWarning)
             param_list_names.append(p.name)
 
+        # Bozo filter for missing sections
+        self._check_params(configfile, parameters, 'NEAT')
+        self._check_params(configfile, parameters, 'Gym')
+
         param_dict = dict(parameters.items('NEAT'))
         unknown_list = [x for x in param_dict if x not in param_list_names]
         if unknown_list:
@@ -157,9 +161,6 @@ class _GymNeatConfig(object):
                 'Unknown (section NEAT) configuration item %s' %
                 format(unknown_list[0]))
 
-        # Bozo filter for missing sections
-        self._check_params(configfile, parameters, 'NEAT')
-        self._check_params(configfile, parameters, 'Gym')
 
         stagnation_dict = dict(parameters.items(self.stagnation_type.__name__))
         self.stagnation_config = self.stagnation_type.parse_config(stagnation_dict)
