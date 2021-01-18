@@ -189,9 +189,9 @@ class _GymNeatConfig(object):
         # Get number of generations and random seed from config;
         # use defaults if missing
         neatpar = parameters['NEAT']
-        self.ngen = self._get_with_default(neatpar, 'generations', None)
-        self.seed = self._get_with_default(neatpar, 'seed', None)
-        self.checkpoint = self._get_with_default(neatpar, 'checkpoint', False)
+        self.ngen = self._get_with_default(neatpar, 'generations', lambda s:int(s), None)
+        self.seed = self._get_with_default(neatpar, 'seed', lambda s:int(s), None)
+        self.checkpoint = self._get_with_default(neatpar, 'checkpoint', lambda s:bool(s), False)
 
         # Set random seed (including None)
         random.seed(self.seed)
@@ -321,8 +321,8 @@ class _GymNeatConfig(object):
         return '%s%s%+010.3f' % \
                (self.env_name, suffix, self.get_actual_fitness(genome))
 
-    def _get_with_default(self, params, name, default):
-        return params[name] if name in params else default
+    def _get_with_default(self, params, name, fun, default):
+        return fun(params[name]) if name in params else default
 
     def _check_params(self, filename, params, section_name):
         if not params.has_section(section_name):
@@ -704,12 +704,10 @@ def main():
     # Create a parallel fitness evaluator
     pe = neat.ParallelEvaluator(mp.cpu_count(), config.eval_genome)
 
-    exit(0)
-
     # Run for number of generations specified in config file
-    winner = (pop.run(pe.evaluate)
-              if args.ngen is None
-              else pop.run(pe.evaluate, args.ngen))
+    winner = pop.run(pe.evaluate, config.ngen)
+
+    exit(0)
 
     # Report total number of evaluations
     print('\nTotal evaluations = %d' % config.total_evaluations)
