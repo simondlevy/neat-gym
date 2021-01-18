@@ -693,18 +693,18 @@ def main():
            if config.is_novelty()
            else _GymPopulation(config))
 
-    exit(0)
-
     # Add a stdout reporter to show progress in the terminal
     pop.add_reporter(_StdOutReporter(show_species_detail=False))
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
 
     # Add a reporter (which can also checkpoint the best)
-    pop.add_reporter(_SaveReporter(args.env_name, args.checkpoint))
+    pop.add_reporter(_SaveReporter(config.env_name, config.checkpoint))
 
     # Create a parallel fitness evaluator
     pe = neat.ParallelEvaluator(mp.cpu_count(), config.eval_genome)
+
+    exit(0)
 
     # Run for number of generations specified in config file
     winner = (pop.run(pe.evaluate)
