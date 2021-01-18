@@ -702,8 +702,6 @@ def main():
                         help='Use Novelty Search')
     parser.add_argument('--checkpoint', action='store_true',
                         help='Save at each new best')
-    parser.add_argument('--seed', type=int, required=False,
-                        help='Seed for random number generator')
     args = parser.parse_args()
 
     # Default to original NEAT
@@ -713,9 +711,9 @@ def main():
 
     # Check for HyperNEAT, ES-HyperNEAT
     if args.hyper:
-        config = _GymHyperConfig(args.configfile, args.seed)
+        config = _GymHyperConfig(args.configfile)
     if args.eshyper:
-        config = _GymEsHyperConfig(args.configfile, args.seed)
+        config = _GymEsHyperConfig(args.configfile)
 
     # Set random seed (including None)
     random.seed(args.seed)
