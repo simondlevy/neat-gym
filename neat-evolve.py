@@ -205,8 +205,15 @@ class _GymNeatConfig(_NeatConfig):
 
     def __init__(self, args):
 
-        print(args)
+        # Check config file exists
+        if not os.path.isfile(args.configfile):
+            print('No such config file: %s' %
+                  os.path.abspath(args.configfile))
+            exit(1)
+
+        
         exit(0)
+
 
         # Make gym environment form name in command-line arguments
         env = _gym_make(args.env_name)
