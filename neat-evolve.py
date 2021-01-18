@@ -192,7 +192,7 @@ class _GymNeatConfig(_NeatConfig):
                 ConfigParameter('reset_on_extinction', bool),
                 ConfigParameter('no_fitness_termination', bool, False)]
 
-    def __init__(self, configfile, layout=None):
+    def __init__(self, configfile, seed, layout=None):
 
         # Check config file exists
         if not os.path.isfile(configfile):
@@ -246,10 +246,9 @@ class _GymNeatConfig(_NeatConfig):
         self.species_set_type = neat.DefaultSpeciesSet
         self.stagnation_type = neat.DefaultStagnation
         self.env_name = env_name
+        self.seed = seed
 
         exit(0)
-
-        self.seed = seed
 
         # Set max episode steps from spec in __init__.py
         self.max_episode_steps = env.spec.max_episode_steps
@@ -706,13 +705,13 @@ def main():
     args = parser.parse_args()
 
     # Default to original NEAT
-    config = _GymNeatConfig(args.configfile)
+    config = _GymNeatConfig(args.configfile, args.seed)
 
     # Check for HyperNEAT, ES-HyperNEAT
     if args.hyper:
-        config = _GymHyperConfig(args.configfile)
+        config = _GymHyperConfig(args.configfile, args.seed)
     if args.eshyper:
-        config = _GymEsHyperConfig(args.configfile)
+        config = _GymEsHyperConfig(args.configfile, args.seed)
 
     # Set random seed (including None)
     random.seed(args.seed)
