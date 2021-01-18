@@ -59,9 +59,6 @@ def _parse_novelty(cfgfilename):
 
 
 class _NeatConfig(object):
-    '''
-    Replaces neat.Config to support Novelty Search.
-    '''
 
     def __init__(self,
                  genome_type,
@@ -80,10 +77,6 @@ class _NeatConfig(object):
         assert hasattr(species_set_type, 'parse_config')
         assert hasattr(stagnation_type, 'parse_config')
 
-        if not os.path.isfile(config_file_name):
-            print('No such config file: %s' %
-                  os.path.abspath(config_file_name))
-            exit(1)
 
         parameters = ConfigParser()
         with open(config_file_name) as f:
@@ -137,49 +130,6 @@ class _NeatConfig(object):
 
         self.genome_config = genome_type.parse_config(genome_dict)
 
-        species_set_dict = dict(parameters.items(species_set_type.__name__))
-        self.species_set_config = \
-            species_set_type.parse_config(species_set_dict)
-
-        stagnation_dict = dict(parameters.items(stagnation_type.__name__))
-        self.stagnation_config = stagnation_type.parse_config(stagnation_dict)
-
-        reproduction_dict = dict(parameters.items(reproduction_type.__name__))
-        self.reproduction_config = \
-            reproduction_type.parse_config(reproduction_dict)
-
-        # Support novelty search
-        self.novelty = _parse_novelty(config_file_name) if novelty else None
-
-        # Store config parameters for subclasses
-        self.params = parameters
-
-        # For debugging
-        self.gen = 0
-
-        # Default to non-recurrent net
-        self.activations = 1
-
-    def save_genome(self, genome):
-
-        name = self.make_name(genome)
-        net = FeedForwardNetwork.create(genome, self)
-        pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
-        _GymNeatConfig.draw_net(net, 'visuals/%s' % name, self.node_names)
-
-    def is_novelty(self):
-
-        return self.novelty is not None
-
-    def get_actual_fitness(self, genome):
-
-        return genome.actual_fitness if self.is_novelty() else genome.fitness
-
-    def make_name(self, genome, suffix=''):
-
-        return '%s%s%+010.3f' % \
-               (self.env_name, suffix, self.get_actual_fitness(genome))
-
 
 class _GymNeatConfig(_NeatConfig):
     '''
@@ -192,13 +142,19 @@ class _GymNeatConfig(_NeatConfig):
                 ConfigParameter('reset_on_extinction', bool),
                 ConfigParameter('no_fitness_termination', bool, False)]
 
-    def __init__(self, configfile, layout=None):
+    def __init__(self, configfile, novelty=False, layout=None):
 
         # Check config file exists
         if not os.path.isfile(configfile):
             print('No such config file: %s' %
                   os.path.abspath(configfile))
             exit(1)
+
+        # Use default NEAT settings
+        self.genome_type = neat.DefaultGenome
+        self.reproduction_type = neat.DefaultReproduction
+        self.species_set_type = neat.DefaultSpeciesSet
+        self.stagnation_type = neat.DefaultStagnation
 
         parameters = ConfigParser()
         with open(configfile) as f:
@@ -222,6 +178,17 @@ class _GymNeatConfig(_NeatConfig):
         self._check_params(configfile, parameters, 'NEAT')
         self._check_params(configfile, parameters, 'Gym')
 
+        stagnation_dict = dict(parameters.items(self.stagnation_type.__name__))
+        self.stagnation_config = self.stagnation_type.parse_config(stagnation_dict)
+
+        self.species_set_dict = dict(parameters.items(self.species_set_type.__name__))
+        self.species_set_config = \
+            self.species_set_type.parse_config(self.species_set_dict)
+
+        self.reproduction_dict = dict(parameters.items(self.reproduction_type.__name__))
+        self.reproduction_config = \
+            self.reproduction_type.parse_config(self.reproduction_dict)
+
         # Get number of episode repetitions
         gympar = parameters['Gym']
         env_name = gympar['environment']
@@ -239,12 +206,6 @@ class _GymNeatConfig(_NeatConfig):
                 num_outputs = env.action_space.shape[0]
         else:
             num_inputs, num_outputs = layout
-
-        # Use default NEAT settings
-        self.genome_type = neat.DefaultGenome
-        self.reproduction_type = neat.DefaultReproduction
-        self.species_set_type = neat.DefaultSpeciesSet
-        self.stagnation_type = neat.DefaultStagnation
 
         # Store environment name for saving results
         self.env_name = env_name
@@ -268,6 +229,18 @@ class _GymNeatConfig(_NeatConfig):
         # Track evaluations
         self.current_evaluations = 0
         self.total_evaluations = 0
+
+        # Support novelty search
+        self.novelty = _parse_novelty(configfile) if novelty else None
+
+        # Store config parameters for subclasses
+        self.params = parameters
+
+        # For debugging
+        self.gen = 0
+
+        # Default to non-recurrent net
+        self.activations = 1
 
     def eval_net_mean(self, net, genome):
 
@@ -351,6 +324,26 @@ class _GymNeatConfig(_NeatConfig):
 
         # Return total reward and final behavior
         return total_reward, behavior, steps
+
+    def save_genome(self, genome):
+
+        name = self.make_name(genome)
+        net = FeedForwardNetwork.create(genome, self)
+        pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
+        _GymNeatConfig.draw_net(net, 'visuals/%s' % name, self.node_names)
+
+    def is_novelty(self):
+
+        return self.novelty is not None
+
+    def get_actual_fitness(self, genome):
+
+        return genome.actual_fitness if self.is_novelty() else genome.fitness
+
+    def make_name(self, genome, suffix=''):
+
+        return '%s%s%+010.3f' % \
+               (self.env_name, suffix, self.get_actual_fitness(genome))
 
     def _get_with_default(self, params, name, default):
         return params[name] if name in params else default
