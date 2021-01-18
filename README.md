@@ -28,7 +28,7 @@ Once evolution finishes, you can try out your evolved network by doing:
 ```
 
 where ```<fitness>``` is the fitness of your evolved network.
-The ```visuals``` folder will contain a PDF of the corresponding model.
+The ```visuals``` folder will contain a PDF showing the corresponding model.
 
 ## HyperNEAT and ES-HyperNEAT
 
