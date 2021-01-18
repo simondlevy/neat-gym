@@ -203,7 +203,10 @@ class _GymNeatConfig(_NeatConfig):
     A class for helping Gym work with NEAT
     '''
 
-    def __init__(self, args, layout=None):
+    def __init__(self, args):
+
+        print(args)
+        exit(0)
 
         # Make gym environment form name in command-line arguments
         env = _gym_make(args.env_name)
@@ -673,12 +676,8 @@ def main():
                        help='Use ES-HyperNEAT')
     parser.add_argument('--novelty', action='store_true',
                         help='Use Novelty Search')
-    parser.add_argument('--env', dest='env_name', default='CartPole-v1',
-                        help='Environment name')
     parser.add_argument('--checkpoint', action='store_true',
                         help='Save at each new best')
-    parser.add_argument('--config', required=False, default=None,
-                        help='Config file; if None, config/<env-name>.cfg')
     parser.add_argument('--ngen', type=int, required=False,
                         help='Number of generations to run')
     parser.add_argument('--seed', type=int, required=False,
