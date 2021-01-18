@@ -58,33 +58,6 @@ def _parse_novelty(cfgfilename):
     return novelty
 
 
-'''
-
-        parameters = ConfigParser()
-        with open(config_file_name) as f:
-            if hasattr(parameters, 'read_file'):
-                parameters.read_file(f)
-            else:
-                parameters.readfp(f)
-
-            self.node_names = {}
-
-            try:
-                names = parameters['Names']
-                for idx, name in enumerate(eval(names['input'])):
-                    self.node_names[-idx-1] = name
-                for idx, name in enumerate(eval(names['output'])):
-                    self.node_names[idx] = name
-            except Exception:
-                pass
-
-        # Add layout (input/output) info
-        for key in layout_dict:
-            genome_dict[key] = layout_dict[key]
-
-'''
-
-
 class _GymNeatConfig(object):
     '''
     A class for helping Gym work with NEAT
