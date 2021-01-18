@@ -256,6 +256,9 @@ class _GymNeatConfig(_NeatConfig):
         self.seed = self._get_with_default(neatpar, 'seed', None)
         self.checkpoint = self._get_with_default(neatpar, 'checkpoint', False)
 
+        # Set random seed (including None)
+        random.seed(self.seed)
+
         # Set max episode steps from spec in __init__.py
         self.max_episode_steps = env.spec.max_episode_steps
 
@@ -706,20 +709,17 @@ def main():
     # Default to original NEAT
     config = _GymNeatConfig(args.configfile)
 
-    exit(0)
-
     # Check for HyperNEAT, ES-HyperNEAT
     if args.hyper:
         config = _GymHyperConfig(args.configfile)
     if args.eshyper:
         config = _GymEsHyperConfig(args.configfile)
 
-    # Set random seed (including None)
-    random.seed(args.seed)
-
     # Make directories for saving results
     os.makedirs('models', exist_ok=True)
     os.makedirs('visuals', exist_ok=True)
+
+    exit(0)
 
     # Create an ordinary population or a population for NoveltySearch
     pop = (_NoveltyPopulation(config)
