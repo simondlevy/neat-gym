@@ -192,7 +192,7 @@ class _GymNeatConfig(_NeatConfig):
                 ConfigParameter('reset_on_extinction', bool),
                 ConfigParameter('no_fitness_termination', bool, False)]
 
-    def __init__(self, configfile, seed, layout=None):
+    def __init__(self, configfile, layout=None):
 
         # Check config file exists
         if not os.path.isfile(configfile):
@@ -227,7 +227,6 @@ class _GymNeatConfig(_NeatConfig):
         env_name = gympar['environment']
         self.reps = int(gympar['episode_reps'])
 
-
         # Make gym environment form name in command-line arguments
         env = _gym_make(env_name)
 
@@ -241,11 +240,24 @@ class _GymNeatConfig(_NeatConfig):
         else:
             num_inputs, num_outputs = layout
 
+        # Use default NEAT settings
         self.genome_type = neat.DefaultGenome
         self.reproduction_type = neat.DefaultReproduction
         self.species_set_type = neat.DefaultSpeciesSet
         self.stagnation_type = neat.DefaultStagnation
+
+        # Store environment name for saving results
         self.env_name = env_name
+
+        # Get number of generations and random seed from config;
+        # use defaults if missing
+        neatpar = parameters['NEAT']
+        self.ngen = self._get_with_default(neatpar, 'generations')
+        self.seed = self._get_with_default(neatpar, 'seed')
+
+        print(self.ngen, self.seed)
+        exit(0)
+
         self.seed = seed
 
         # Set max episode steps from spec in __init__.py
@@ -340,6 +352,9 @@ class _GymNeatConfig(_NeatConfig):
 
         # Return total reward and final behavior
         return total_reward, behavior, steps
+
+    def _get_with_default(self, params, name):
+        return params[name] if name in params else None
 
     def _check_params(self, filename, params, section_name):
         if not params.has_section(section_name):
@@ -692,14 +707,12 @@ def main():
                         help='Use Novelty Search')
     parser.add_argument('--checkpoint', action='store_true',
                         help='Save at each new best')
-    parser.add_argument('--ngen', type=int, required=False,
-                        help='Number of generations to run')
     parser.add_argument('--seed', type=int, required=False,
                         help='Seed for random number generator')
     args = parser.parse_args()
 
     # Default to original NEAT
-    config = _GymNeatConfig(args.configfile, args.seed)
+    config = _GymNeatConfig(args.configfile)
 
     exit(0)
 
