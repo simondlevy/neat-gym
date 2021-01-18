@@ -701,8 +701,6 @@ def main():
                        help='Use ES-HyperNEAT')
     parser.add_argument('--novelty', action='store_true',
                         help='Use Novelty Search')
-    parser.add_argument('--checkpoint', action='store_true',
-                        help='Save at each new best')
     args = parser.parse_args()
 
     # Default to original NEAT
