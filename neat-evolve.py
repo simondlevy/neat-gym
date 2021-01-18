@@ -255,11 +255,6 @@ class _GymNeatConfig(_NeatConfig):
         self.ngen = self._get_with_default(neatpar, 'generations')
         self.seed = self._get_with_default(neatpar, 'seed')
 
-        print(self.ngen, self.seed)
-        exit(0)
-
-        self.seed = seed
-
         # Set max episode steps from spec in __init__.py
         self.max_episode_steps = env.spec.max_episode_steps
 
