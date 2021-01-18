@@ -225,14 +225,16 @@ class _GymNeatConfig(_NeatConfig):
             except Exception:
                 pass
 
+        # Bozo filter for missing sections
         self._check_params(configfile, parameters, 'NEAT')
         self._check_params(configfile, parameters, 'Gym')
 
         # Get number of episode repetitions
         gympar = parameters['Gym']
-        self.reps = int(gympar['episode_reps'])
-
+        env_name = gympar['environment']
+        print(env_name)
         exit(0)
+        self.reps = int(gympar['episode_reps'])
 
 
         # Make gym environment form name in command-line arguments
