@@ -5,11 +5,12 @@
 # MIT License
 
 [NEAT]
-fitness_criterion     = max
-fitness_threshold     = 475
-pop_size              = 50
-reset_on_extinction   = False
+fitness_criterion      = max
+fitness_threshold      = 475
+pop_size               = 50
+reset_on_extinction    = False
 no_fitness_termination = False
+generations            = 100
 
 [Gym]
 environment = CartPole-v1

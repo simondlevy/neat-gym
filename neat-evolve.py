@@ -258,8 +258,6 @@ class _GymNeatConfig(_NeatConfig):
         self.current_evaluations = 0
         self.total_evaluations = 0
 
-        exit(0)
-
     def eval_net_mean(self, net, genome):
 
         return (self.eval_net_mean_novelty(net, genome)
@@ -702,6 +700,8 @@ def main():
 
     # Default to original NEAT
     config = _GymNeatConfig(args.configfile, args.seed)
+
+    exit(0)
 
     # Check for HyperNEAT, ES-HyperNEAT
     if args.hyper:
