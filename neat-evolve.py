@@ -252,8 +252,9 @@ class _GymNeatConfig(_NeatConfig):
         # Get number of generations and random seed from config;
         # use defaults if missing
         neatpar = parameters['NEAT']
-        self.ngen = self._get_with_default(neatpar, 'generations')
-        self.seed = self._get_with_default(neatpar, 'seed')
+        self.ngen = self._get_with_default(neatpar, 'generations', None)
+        self.seed = self._get_with_default(neatpar, 'seed', None)
+        self.checkpoint = self._get_with_default(neatpar, 'checkpoint', False)
 
         # Set max episode steps from spec in __init__.py
         self.max_episode_steps = env.spec.max_episode_steps
@@ -348,8 +349,8 @@ class _GymNeatConfig(_NeatConfig):
         # Return total reward and final behavior
         return total_reward, behavior, steps
 
-    def _get_with_default(self, params, name):
-        return params[name] if name in params else None
+    def _get_with_default(self, params, name, default):
+        return params[name] if name in params else default
 
     def _check_params(self, filename, params, section_name):
         if not params.has_section(section_name):
