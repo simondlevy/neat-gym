@@ -21,6 +21,9 @@ cedit:
 pole:
 	./neat-evolve.py config/cartpole
 
+plot:
+	./neat-plot.py runs/CartPole-v1.csv
+
 help:
 	./neat-evolve.py --help
 
@@ -31,8 +34,6 @@ commit:
 	git commit -a
 
 flake:
-	flake8 setup.py
+	flake8 *.py
 	flake8 neat_gym/__init__.py
 	flake8 neat_gym/novelty/__init__.py
-	flake8 neat-evolve.py
-	flake8 neat-test.py
