@@ -589,7 +589,6 @@ class _SaveReporter(BaseReporter):
         BaseReporter.__init__(self)
 
         self.best_fitness = -np.inf
-        self.env_name = env_name
         self.checkpoint = checkpoint
 
         os.makedirs('models', exist_ok=True)
