@@ -584,7 +584,7 @@ class _NoveltyPopulation(_GymPopulation):
 
 class _SaveReporter(BaseReporter):
 
-    def __init__(self, env_name, checkpoint):
+    def __init__(self, env_name, checkpoint, novelty):
 
         BaseReporter.__init__(self)
 
@@ -594,6 +594,12 @@ class _SaveReporter(BaseReporter):
         os.makedirs('models', exist_ok=True)
         os.makedirs('visuals', exist_ok=True)
         os.makedirs('runs', exist_ok=True)
+
+        self.csvfile = open('runs/%s.csv' % env_name, 'w')
+        self.csvfile.write('Gen,MeanFit,StdFit,MaxFit')
+        if novelty:
+            self.csvfile.write('MeanNov,StdNov,MaxNov')
+        self.csvfile.write('\n')
 
     def post_evaluate(self, config, population, species, best_genome):
 
@@ -616,8 +622,6 @@ class _StdOutReporter(StdOutReporter):
 
         # Ordinary report if not novelty search
         if config.novelty is None:
-
-            print('no novelty')
 
             StdOutReporter.post_evaluate(
                     self,
@@ -681,7 +685,9 @@ def main():
     pop.add_reporter(stats)
 
     # Add a reporter (which can also checkpoint the best)
-    pop.add_reporter(_SaveReporter(config.env_name, config.checkpoint))
+    pop.add_reporter(_SaveReporter(config.env_name, 
+                                   config.checkpoint,
+                                   args.novelty))
 
     # Create a parallel fitness evaluator
     pe = neat.ParallelEvaluator(mp.cpu_count(), config.eval_genome)
