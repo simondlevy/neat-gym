@@ -19,10 +19,11 @@ args = parser.parse_args()
 data = genfromtxt(args.csvfile, delimiter=',', skip_header=1)
 
 plt.plot(data[:,0], data[:,1])
+plt.plot(data[:,0], data[:,3])
 
 plt.xlabel('Generation')
 
-plt.legend(['Mean Fitness'])
+plt.legend(['Mean Fitness', 'Max Fitness'])
 
 plt.show()
 
