@@ -146,13 +146,16 @@ class _GymNeatConfig(object):
         self.genome_config = self.genome_type.parse_config(genome_dict)
 
         stagnation_dict = dict(parameters.items(self.stagnation_type.__name__))
-        self.stagnation_config = self.stagnation_type.parse_config(stagnation_dict)
+        self.stagnation_config = \
+            self.stagnation_type.parse_config(stagnation_dict)
 
-        self.species_set_dict = dict(parameters.items(self.species_set_type.__name__))
+        self.species_set_dict = \
+            dict(parameters.items(self.species_set_type.__name__))
         self.species_set_config = \
             self.species_set_type.parse_config(self.species_set_dict)
 
-        self.reproduction_dict = dict(parameters.items(self.reproduction_type.__name__))
+        self.reproduction_dict = \
+            dict(parameters.items(self.reproduction_type.__name__))
         self.reproduction_config = \
             self.reproduction_type.parse_config(self.reproduction_dict)
 
@@ -162,9 +165,12 @@ class _GymNeatConfig(object):
         # Get number of generations and random seed from config;
         # use defaults if missing
         neatpar = parameters['NEAT']
-        self.ngen = self._get_with_default(neatpar, 'generations', lambda s:int(s), None)
-        self.seed = self._get_with_default(neatpar, 'seed', lambda s:int(s), None)
-        self.checkpoint = self._get_with_default(neatpar, 'checkpoint', lambda s:bool(s), False)
+        self.ngen = self._get_with_default(neatpar, 'generations',
+                                           lambda s: int(s), None)
+        self.seed = self._get_with_default(neatpar, 'seed',
+                                           lambda s: int(s), None)
+        self.checkpoint = self._get_with_default(neatpar, 'checkpoint',
+                                                 lambda s: bool(s), False)
 
         # Set random seed (including None)
         random.seed(self.seed)
@@ -299,7 +305,8 @@ class _GymNeatConfig(object):
 
     def _check_params(self, filename, params, section_name):
         if not params.has_section(section_name):
-            self._error('%s section missing from configuration file %s' % (section_name, filename))
+            self._error('%s section missing from configuration file %s' %
+                        (section_name, filename))
 
     def _error(self, msg):
         print('ERROR: ' + msg)

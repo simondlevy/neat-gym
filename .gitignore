@@ -3,7 +3,6 @@ build/
 dist/
 *.egg-info
 __pycache__/
-
-tmp/
+runs/
 models/
 visuals/
