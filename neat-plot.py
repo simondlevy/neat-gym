@@ -42,10 +42,6 @@ def main():
 
     g = data[:, 0]
 
-    mnfit = data[:, 1]
-    sdfit = data[:, 2]
-    mxfit = data[:, 3]
-
     # Data from Novelty Search
     if data.shape[1] > 4:
 
@@ -56,7 +52,6 @@ def main():
     plot(data, 1, 'g', 'm', 'Fitness')
 
     plt.title(args.csvfile)
-
     plt.show()
 
 
