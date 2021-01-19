@@ -40,8 +40,6 @@ def main():
         print('Unable to open file %s' % args.csvfile)
         exit(1)
 
-    g = data[:, 0]
-
     # Data from Novelty Search
     if data.shape[1] > 4:
 
