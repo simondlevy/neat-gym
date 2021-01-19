@@ -28,6 +28,15 @@ def plot(data, beg, s1, s2, lbl):
     plt.legend(['Mean ' + lbl, 'Max ' + lbl])
 
 
+def plot_novelty(data):
+
+    plot(data, 4, 'b', 'k', 'Novelty')
+
+
+def plot_fitness(data):
+
+    plot(data, 1, 'g', 'm', 'Fitness')
+
 def main():
 
     parser = argparse.ArgumentParser()
@@ -46,14 +55,14 @@ def main():
     if data.shape[1] > 4:
 
         plt.subplot(2, 1, 1)
-        plot(data, 1, 'g', 'm', 'Fitness')
+        plot_fitness(data)
         plt.title(args.csvfile)
         plt.subplot(2, 1, 2)
-        plot(data, 4, 'b', 'k', 'Novelty')
+        plot_novelty(data)
 
     else:
 
-        plot(data, 1, 'g', 'm', 'Fitness')
+        plot_fitness(data)
 
     plt.show()
 
