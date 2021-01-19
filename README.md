@@ -10,6 +10,8 @@ The two goals of this project are
 2. Make the code run fast, by simultaneously evaluating the fitnesses of the
 population on multiprocessor machines.
 
+## Quickstart
+
 To get started you should install [neat-python](https://github.com/CodeReclaimers/neat-python) 
 and [PUREPLES](https://github.com/ukuleleplayer/pureples) from source. Then 
 do the following:
@@ -28,7 +30,10 @@ Once evolution finishes, you can try out your evolved network by doing:
 ```
 
 where ```<fitness>``` is the fitness of your evolved network.
-The ```visuals``` folder will contain a PDF showing the corresponding model.
+The ```visuals``` folder will contain a PDF showing the corresponding model,
+and the ```runs``` folder will contain a CSV file with the history of the 
+fitnesses (mean, standard deviation, max).  To visualize this history you
+can run the ```neat-plot.py``` script on this CSV file.
 
 ## HyperNEAT and ES-HyperNEAT
 
