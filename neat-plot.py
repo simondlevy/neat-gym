@@ -21,13 +21,12 @@ except Exception:
     print('Unable to open file %s' % args.csvfile)
     exit(1)
 
-print(data)
-exit(0)
-
 g = data[:, 0]
+
 mnfit = data[:, 1]
 sdfit = data[:, 2]
 mxfit = data[:, 3]
+
 plt.plot(g, mnfit)
 plt.plot(g, mxfit)
 plt.errorbar(g, mnfit, sdfit, linestyle='None')
