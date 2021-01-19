@@ -11,28 +11,53 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-parser = argparse.ArgumentParser()
-parser.add_argument('csvfile', metavar='CSVFILE', help='input .csv file')
-args = parser.parse_args()
 
-try:
-    data = np.genfromtxt(args.csvfile, delimiter=',', skip_header=1)
-except Exception:
-    print('Unable to open file %s' % args.csvfile)
-    exit(1)
+def plot(data, beg, s1, s2, lbl):
 
-g = data[:, 0]
+    g = data[:, 0]
 
-mnfit = data[:, 1]
-sdfit = data[:, 2]
-mxfit = data[:, 3]
+    mn = data[:, beg]
+    sd = data[:, beg+1]
+    mx = data[:, beg+2]
 
-plt.plot(g, mnfit)
-plt.plot(g, mxfit)
-plt.errorbar(g, mnfit, sdfit, linestyle='None')
+    plt.plot(g, mn, s1)
+    plt.plot(g, mx, s2)
+    plt.errorbar(g, mn, sd, linestyle='None')
 
-plt.xlabel('Generation')
-plt.title(args.csvfile)
-plt.legend(['Mean Fitness', 'Max Fitness'])
+    plt.xlabel('Generation')
+    plt.legend(['Mean ' + lbl, 'Max ' + lbl])
 
-plt.show()
+
+def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('csvfile', metavar='CSVFILE', help='input .csv file')
+    args = parser.parse_args()
+
+    try:
+        data = np.genfromtxt(args.csvfile, delimiter=',', skip_header=1)
+    except Exception:
+        print('Unable to open file %s' % args.csvfile)
+        exit(1)
+
+    g = data[:, 0]
+
+    mnfit = data[:, 1]
+    sdfit = data[:, 2]
+    mxfit = data[:, 3]
+
+    # Data from Novelty Search
+    if data.shape[1] > 4:
+
+        plt.subplot(2, 1, 2)
+        plot(data, 4, 'b', 'k', 'Novelty')
+        plt.subplot(2, 1, 1)
+
+    plot(data, 1, 'g', 'm', 'Fitness')
+
+    plt.title(args.csvfile)
+
+    plt.show()
+
+
+main()

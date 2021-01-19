@@ -596,7 +596,7 @@ class _SaveReporter(BaseReporter):
         self.csvfile = open('runs/%s.csv' % env_name, 'w')
         self.csvfile.write('Gen,MeanFit,StdFit,MaxFit')
         if novelty:
-            self.csvfile.write('MeanNov,StdNov,MaxNov')
+            self.csvfile.write(',MeanNov,StdNov,MaxNov')
         self.csvfile.write('\n')
 
     def post_evaluate(self, config, population, species, best_genome):
