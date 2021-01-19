@@ -267,14 +267,10 @@ class _GymNeatConfig(object):
 
         return self.novelty is not None
 
-    def get_actual_fitness(self, genome):
-
-        return genome.actual_fitness if self.is_novelty() else genome.fitness
-
     def make_name(self, genome, suffix=''):
 
         return '%s%s%+010.3f' % \
-               (self.env_name, suffix, self.get_actual_fitness(genome))
+               (self.env_name, suffix, genome.actual_fitness)
 
     def get_with_default(self, params, name, fun, default):
         return fun(params[name]) if name in params else default
@@ -605,14 +601,17 @@ class _SaveReporter(BaseReporter):
 
     def post_evaluate(self, config, population, species, best_genome):
 
-        fit_max = config.get_actual_fitness(best_genome)
-
         fits = [c.actual_fitness for c in population.values()]
 
         # Save current generation info to history file
+        fit_max = max(fits)
         self.csvfile.write('%d,%+5.3f,%+5.3f,%+5.3f' %
                            (config.gen, mean(fits), stdev(fits), fit_max))
 
+        if config.is_novelty():
+            novs = [c.fitness for c in population.values()]
+            self.csvfile.write('%+5.3f,%+5.3f,%+5.3f' %
+                               (mean(novs), stdev(novs), max(novs)))
         self.csvfile.write('\n')
 
         # Track best
