@@ -612,6 +612,7 @@ class _SaveReporter(BaseReporter):
         # Save current generation info to history file
         self.csvfile.write('%d,%+5.3f,%+5.3f,%+5.3f' %
                            (config.gen, mean(fits), stdev(fits), fit_max))
+
         self.csvfile.write('\n')
 
         # Track best
@@ -630,18 +631,8 @@ class _StdOutReporter(StdOutReporter):
 
     def post_evaluate(self, config, population, species, best_genome):
 
-        # Ordinary report if not novelty search
-        if not config.is_novelty():
-
-            StdOutReporter.post_evaluate(
-                    self,
-                    config,
-                    population,
-                    species,
-                    best_genome)
-
         # Special report for novelty search
-        else:
+        if config.is_novelty():
 
             novelties = [c.fitness for c in population.values()]
             nov_mean = mean(novelties)
@@ -656,6 +647,16 @@ class _StdOutReporter(StdOutReporter):
                    best_species_id,
                    best_genome.key))
             print('Best actual fitness: %f ' % best_genome.actual_fitness)
+
+        # Ordinary report otherwise
+        else:
+
+            StdOutReporter.post_evaluate(
+                    self,
+                    config,
+                    population,
+                    species,
+                    best_genome)
 
         print('Evaluations this generation: %d' % config.current_evaluations)
 
