@@ -37,6 +37,7 @@ def plot_fitness(data):
 
     plot(data, 1, 'g', 'm', 'Fitness')
 
+
 def main():
 
     parser = argparse.ArgumentParser()
@@ -54,13 +55,24 @@ def main():
     # Data from Novelty Search
     if data.shape[1] > 4:
 
-        plt.subplot(2, 1, 1)
-        plot_fitness(data)
-        plt.title(args.csvfile)
-        plt.subplot(2, 1, 2)
-        plot_novelty(data)
+        if args.split:
+            plot_fitness(data)
+            plt.title(args.csvfile)
+            plt.figure()
+            plot_novelty(data)
+            plt.title(args.csvfile)
+
+        else:
+            plt.subplot(2, 1, 1)
+            plot_fitness(data)
+            plt.title(args.csvfile)
+            plt.subplot(2, 1, 2)
+            plot_novelty(data)
 
     else:
+
+        if args.split:
+            print('No novelty data')
 
         plot_fitness(data)
 
