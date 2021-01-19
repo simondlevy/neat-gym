@@ -588,9 +588,9 @@ class _SaveReporter(BaseReporter):
         self.checkpoint = checkpoint
 
         # Make directories for results
-        os.makedirs('models', exist_ok=True)
-        os.makedirs('visuals', exist_ok=True)
-        os.makedirs('runs', exist_ok=True)
+        _SaveReporter.mkdir('models')
+        _SaveReporter.mkdir('visuals')
+        _SaveReporter.mkdir('runs')
 
         # Create CSV file for history and write its header
         self.csvfile = open('runs/%s.csv' % env_name, 'w')
@@ -620,6 +620,9 @@ class _SaveReporter(BaseReporter):
             print('############# Saving new best %f ##############' %
                   self.best_fitness)
             config.save_genome(best_genome)
+
+    def mkdir(name):
+        os.makedirs(name, exist_ok=True)
 
 
 class _StdOutReporter(StdOutReporter):
