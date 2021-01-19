@@ -591,10 +591,12 @@ class _SaveReporter(BaseReporter):
         self.best_fitness = -np.inf
         self.checkpoint = checkpoint
 
+        # Make directories for results
         os.makedirs('models', exist_ok=True)
         os.makedirs('visuals', exist_ok=True)
         os.makedirs('runs', exist_ok=True)
 
+        # Create CSV file for history and write its header
         self.csvfile = open('runs/%s.csv' % env_name, 'w')
         self.csvfile.write('Gen,MeanFit,StdFit,MaxFit')
         if novelty:
@@ -603,10 +605,20 @@ class _SaveReporter(BaseReporter):
 
     def post_evaluate(self, config, population, species, best_genome):
 
-        best_genome_fitness = config.get_actual_fitness(best_genome)
+        fit_max = config.get_actual_fitness(best_genome)
 
-        if self.checkpoint and best_genome_fitness > self.best_fitness:
-            self.best_fitness = best_genome_fitness
+        fitnesses = [c.fitness for c in population.values()]
+        fit_mean = mean(fitnesses)
+        fit_std = stdev(fitnesses)
+
+        # Save current generation info to history file
+        self.csvfile.write('%d,%+5.3f,%+5.3f,%+5.3f' %
+                           (config.gen, fit_mean, fit_std, fit_max))
+        self.csvfile.write('\n')
+
+        # Track best
+        if self.checkpoint and fit_max > self.best_fitness:
+            self.best_fitness = fit_max
             print('############# Saving new best %f ##############' %
                   self.best_fitness)
             config.save_genome(best_genome)
@@ -685,7 +697,7 @@ def main():
     pop.add_reporter(stats)
 
     # Add a reporter (which can also checkpoint the best)
-    pop.add_reporter(_SaveReporter(config.env_name, 
+    pop.add_reporter(_SaveReporter(config.env_name,
                                    config.checkpoint,
                                    args.novelty))
 
