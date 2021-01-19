@@ -610,9 +610,11 @@ class _SaveReporter(BaseReporter):
 
         if config.is_novelty():
             novs = [c.fitness for c in population.values()]
-            self.csvfile.write('%+5.3f,%+5.3f,%+5.3f' %
+            self.csvfile.write(',%+5.3f,%+5.3f,%+5.3f' %
                                (mean(novs), stdev(novs), max(novs)))
+
         self.csvfile.write('\n')
+        self.csvfile.flush()
 
         # Track best
         if self.checkpoint and fit_max > self.best_fitness:
