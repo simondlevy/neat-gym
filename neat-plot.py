@@ -15,18 +15,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument('csvfile', metavar='CSVFILE', help='input .csv file')
 args = parser.parse_args()
 
-
 data = genfromtxt(args.csvfile, delimiter=',', skip_header=1)
 
 g = data[:, 0]
 mnfit = data[:, 1]
-
+sdfit = data[:, 2]
+mxfit = data[:, 3]
 plt.plot(g, mnfit)
-plt.plot(g, data[:, 3])
-plt.errorbar(g, mnfit, data[:, 2], linestyle='None')
+plt.plot(g, mxfit)
+plt.errorbar(g, mnfit, sdfit, linestyle='None')
 
 plt.xlabel('Generation')
-
+plt.title(args.csvfile)
 plt.legend(['Mean Fitness', 'Max Fitness'])
 
 plt.show()
