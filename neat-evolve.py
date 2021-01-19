@@ -617,6 +617,8 @@ class _StdOutReporter(StdOutReporter):
         # Ordinary report if not novelty search
         if config.novelty is None:
 
+            print('no novelty')
+
             StdOutReporter.post_evaluate(
                     self,
                     config,
@@ -660,13 +662,13 @@ def main():
     args = parser.parse_args()
 
     # Default to original NEAT
-    config = _GymNeatConfig(args.configfile)
+    config = _GymNeatConfig(args.configfile, novelty=args.novelty)
 
     # Check for HyperNEAT, ES-HyperNEAT
     if args.hyper:
-        config = _GymHyperConfig(args.configfile)
+        config = _GymHyperConfig(args.configfile, novelty=args.novelty)
     if args.eshyper:
-        config = _GymEsHyperConfig(args.configfile)
+        config = _GymEsHyperConfig(args.configfile, novelty=args.novelty)
 
     # Create an ordinary population or a population for NoveltySearch
     pop = (_NoveltyPopulation(config)
