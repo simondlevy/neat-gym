@@ -32,6 +32,8 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('csvfile', metavar='CSVFILE', help='input .csv file')
+    parser.add_argument('--split', action='store_true',
+                        help='Make two separate plots')
     args = parser.parse_args()
 
     try:
@@ -43,13 +45,16 @@ def main():
     # Data from Novelty Search
     if data.shape[1] > 4:
 
+        plt.subplot(2, 1, 1)
+        plot(data, 1, 'g', 'm', 'Fitness')
+        plt.title(args.csvfile)
         plt.subplot(2, 1, 2)
         plot(data, 4, 'b', 'k', 'Novelty')
-        plt.subplot(2, 1, 1)
 
-    plot(data, 1, 'g', 'm', 'Fitness')
+    else:
 
-    plt.title(args.csvfile)
+        plot(data, 1, 'g', 'm', 'Fitness')
+
     plt.show()
 
 
