@@ -33,31 +33,6 @@ from neat_gym import _gym_make, _is_discrete, eval_net
 from neat_gym.novelty import Novelty
 
 
-def _parse_novelty(cfgfilename):
-
-    novelty = None
-
-    parameters = ConfigParser()
-
-    with open(cfgfilename) as f:
-        if hasattr(parameters, 'read_file'):
-            parameters.read_file(f)
-        else:
-            parameters.readfp(f)
-
-        try:
-            names = parameters['Novelty']
-            novelty = Novelty(eval(names['k']),
-                              eval(names['threshold']),
-                              eval(names['limit']),
-                              eval(names['ndims']))
-        except Exception:
-            print('File %s has no [Novelty] section' % cfgfilename)
-            exit(1)
-
-    return novelty
-
-
 class _GymNeatConfig(object):
     '''
     A class for helping Gym work with NEAT
@@ -116,8 +91,8 @@ class _GymNeatConfig(object):
             param_list_names.append(p.name)
 
         # Bozo filter for missing sections
-        self._check_params(configfile, parameters, 'NEAT')
-        self._check_params(configfile, parameters, 'Gym')
+        self.check_params(configfile, parameters, 'NEAT')
+        self.check_params(configfile, parameters, 'Gym')
 
         # Get number of episode repetitions
         gympar = parameters['Gym']
@@ -165,12 +140,12 @@ class _GymNeatConfig(object):
         # Get number of generations and random seed from config;
         # use defaults if missing
         neatpar = parameters['NEAT']
-        self.ngen = self._get_with_default(neatpar, 'generations',
-                                           lambda s: int(s), None)
-        self.seed = self._get_with_default(neatpar, 'seed',
-                                           lambda s: int(s), None)
-        self.checkpoint = self._get_with_default(neatpar, 'checkpoint',
-                                                 lambda s: bool(s), False)
+        self.ngen = self.get_with_default(neatpar, 'generations',
+                                          lambda s: int(s), None)
+        self.seed = self.get_with_default(neatpar, 'seed',
+                                          lambda s: int(s), None)
+        self.checkpoint = self.get_with_default(neatpar, 'checkpoint',
+                                                lambda s: bool(s), False)
 
         # Set random seed (including None)
         random.seed(self.seed)
@@ -186,7 +161,8 @@ class _GymNeatConfig(object):
         self.total_evaluations = 0
 
         # Support novelty search
-        self.novelty = _parse_novelty(configfile) if novelty else None
+        self.novelty = _GymNeatConfig.parse_novelty(configfile) \
+            if novelty else None
 
         # Store config parameters for subclasses
         self.params = parameters
@@ -300,15 +276,15 @@ class _GymNeatConfig(object):
         return '%s%s%+010.3f' % \
                (self.env_name, suffix, self.get_actual_fitness(genome))
 
-    def _get_with_default(self, params, name, fun, default):
+    def get_with_default(self, params, name, fun, default):
         return fun(params[name]) if name in params else default
 
-    def _check_params(self, filename, params, section_name):
+    def check_params(self, filename, params, section_name):
         if not params.has_section(section_name):
-            self._error('%s section missing from configuration file %s' %
-                        (section_name, filename))
+            self.error('%s section missing from configuration file %s' %
+                       (section_name, filename))
 
-    def _error(self, msg):
+    def error(self, msg):
         print('ERROR: ' + msg)
         exit(1)
 
@@ -328,6 +304,31 @@ class _GymNeatConfig(object):
         '''
         net = FeedForwardNetwork.create(genome, config)
         return config.eval_net_mean(net, genome)
+
+    @staticmethod
+    def parse_novelty(cfgfilename):
+
+        novelty = None
+
+        parameters = ConfigParser()
+
+        with open(cfgfilename) as f:
+            if hasattr(parameters, 'read_file'):
+                parameters.read_file(f)
+            else:
+                parameters.readfp(f)
+
+            try:
+                names = parameters['Novelty']
+                novelty = Novelty(eval(names['k']),
+                                  eval(names['threshold']),
+                                  eval(names['limit']),
+                                  eval(names['ndims']))
+            except Exception:
+                print('File %s has no [Novelty] section' % cfgfilename)
+                exit(1)
+
+        return novelty
 
 
 class _GymHyperConfig(_GymNeatConfig):
@@ -591,6 +592,10 @@ class _SaveReporter(BaseReporter):
         self.env_name = env_name
         self.checkpoint = checkpoint
 
+        os.makedirs('models', exist_ok=True)
+        os.makedirs('visuals', exist_ok=True)
+        os.makedirs('runs', exist_ok=True)
+
     def post_evaluate(self, config, population, species, best_genome):
 
         best_genome_fitness = config.get_actual_fitness(best_genome)
@@ -663,10 +668,6 @@ def main():
         config = _GymHyperConfig(args.configfile)
     if args.eshyper:
         config = _GymEsHyperConfig(args.configfile)
-
-    # Make directories for saving results
-    os.makedirs('models', exist_ok=True)
-    os.makedirs('visuals', exist_ok=True)
 
     # Create an ordinary population or a population for NoveltySearch
     pop = (_NoveltyPopulation(config)

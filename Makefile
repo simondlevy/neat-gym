@@ -18,7 +18,7 @@ nedit:
 cedit:
 	vim config/cartpole
 
-evolve:
+cartpole:
 	./neat-evolve.py config/cartpole
 
 help:
