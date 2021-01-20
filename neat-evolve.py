@@ -571,7 +571,7 @@ class _GymPopulation(Population):
         plt.ylabel("Size per Species")
         plt.xlabel("Generations")
 
-        plt.savefig('visuals/%s-species.svg' % self.env_name)
+        plt.savefig('visuals/%s-species.pdf' % self.env_name)
 
         plt.close()
 
