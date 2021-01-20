@@ -22,7 +22,9 @@ def plot(data, beg, s1, s2, lbl):
 
     plt.plot(g, mn, s1)
     plt.plot(g, mx, s2)
-    plt.errorbar(g, mn, sd, linestyle='None')
+    # plt.errorbar(g, mn, sd, linestyle='None')
+    plt.plot(g, mn + sd, 'g--')
+    plt.plot(g, mn - sd, 'g--')
 
     plt.xlabel('Generation')
     plt.legend(['Mean ' + lbl, 'Max ' + lbl])
@@ -35,7 +37,7 @@ def plot_novelty(data):
 
 def plot_fitness(data):
 
-    plot(data, 1, 'g', 'm', 'Fitness')
+    plot(data, 1, 'r', 'm', 'Fitness')
 
 
 def main():
