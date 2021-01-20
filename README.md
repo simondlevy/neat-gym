@@ -1,7 +1,7 @@
 <p float="left">
-<img src="media/figure.png" width=200>
-<img src="media/network.png" width=200>
-<img src="media/movie.gif" width=200>
+<img src="media/figure.png" width=300>
+<img src="media/network.png" width=300>
+<img src="media/movie.gif" width=300>
 </p>
 
 ## About
