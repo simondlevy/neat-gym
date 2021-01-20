@@ -262,7 +262,7 @@ class _GymNeatConfig(object):
         name = self.make_name(genome)
         net = FeedForwardNetwork.create(genome, self)
         pickle.dump((net, self.env_name), open('models/%s.dat' % name, 'wb'))
-        _GymNeatConfig.draw_net(net, 'visuals/%s' % name, self.node_names)
+        _GymNeatConfig.draw_net(net, 'visuals/%s-network' % name, self.node_names)
 
     def is_novelty(self):
 
@@ -571,7 +571,7 @@ class _GymPopulation(Population):
         plt.ylabel("Size per Species")
         plt.xlabel("Generations")
 
-        plt.savefig('visuals/%s.svg' % self.env_name)
+        plt.savefig('visuals/%s-species.svg' % self.env_name)
 
         plt.close()
 
