@@ -1,6 +1,6 @@
-<img src="media/figure.png">
-<img src="media/network.png">
-<img src="media/movie.gif">
+<img src="media/figure.png" width=400>
+<img src="media/network.png" width=400>
+<img src="media/movie.gif" width=400>
 
 This repository contains code allowing you to train, test, and visualize
 [OpenAI Gym](https://gym.openai.com/) environments (games) using the
