@@ -1,6 +1,6 @@
 <img src="media/figure.png" width=400 align=left>
 <img src="media/network.png" width=400 align=right>
-<img src="media/movie.gif" width=400>
+<img src="media/movie.gif" width=400 alignt=center>
 
 <br>
 
