@@ -14,6 +14,7 @@ import pickle
 import warnings
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 import multiprocessing as mp
 from configparser import ConfigParser
 
@@ -433,9 +434,11 @@ class _GymPopulation(Population):
     Supports genomes that report their number of evaluations
     '''
 
-    def __init__(self, config):
+    def __init__(self, config, stats):
 
         Population.__init__(self, config)
+
+        self.stats = stats
 
     def run(self, fitness_function, ngen=None):
 
@@ -529,6 +532,8 @@ class _GymPopulation(Population):
                                           self.generation,
                                           self.best_genome)
 
+        self.plot_species()
+
         return self.best_genome
 
     def reproduce(self):
@@ -550,15 +555,36 @@ class _GymPopulation(Population):
         '''
         return fitness[0], fitness[0], fitness[1]
 
+    def plot_species(self, view=False, filename='speciation.svg'):
+        """ Visualizes speciation throughout evolution. """
+
+        species_sizes = self.stats.get_species_sizes()
+        num_generations = len(species_sizes)
+        curves = np.array(species_sizes).T
+
+        fig, ax = plt.subplots()
+        ax.stackplot(range(num_generations), *curves)
+
+        plt.title("Speciation")
+        plt.ylabel("Size per Species")
+        plt.xlabel("Generations")
+
+        plt.savefig(filename)
+
+        if view:
+            plt.show()
+
+        plt.close()
+
 
 class _NoveltyPopulation(_GymPopulation):
     '''
     Supports genomes that report their novelty
     '''
 
-    def __init__(self, config):
+    def __init__(self, config, stats):
 
-        _GymPopulation.__init__(self, config)
+        _GymPopulation.__init__(self, config, stats)
 
     def parse_fitness(self, fitness):
         '''
@@ -689,14 +715,16 @@ def main():
     if args.eshyper:
         config = _GymEsHyperConfig(args.configfile, novelty=args.novelty)
 
+    # Create a statistics reporter
+    stats = neat.StatisticsReporter()
+
     # Create an ordinary population or a population for NoveltySearch
-    pop = (_NoveltyPopulation(config)
+    pop = (_NoveltyPopulation(config, stats)
            if config.is_novelty()
-           else _GymPopulation(config))
+           else _GymPopulation(config, stats))
 
     # Add a stdout reporter to show progress in the terminal
     pop.add_reporter(_StdOutReporter(show_species_detail=False))
-    stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
 
     # Add a reporter (which can also checkpoint the best)

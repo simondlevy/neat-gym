@@ -1,3 +1,4 @@
+*.svg
 *.swp
 build/
 dist/
