@@ -569,12 +569,14 @@ class _GymPopulation(Population):
         fig, ax = plt.subplots()
         ax.stackplot(range(num_generations), *curves)
 
-        plt.title("Speciation")
+        filename = self.config.make_name(self.best_genome)
+
+        plt.title(filename)
         plt.ylabel("Size per Species")
         plt.xlabel("Generations")
 
-        plt.savefig('visuals/%s-species.pdf' %
-                    self.config.make_name(self.best_genome))
+        plt.savefig('visuals/%s-species.pdf' % filename)
+                    
 
         plt.close()
 
