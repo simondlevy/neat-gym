@@ -438,6 +438,8 @@ class _GymPopulation(Population):
 
         Population.__init__(self, config)
 
+        self.env_name = config.env_name
+
         self.stats = stats
 
     def run(self, fitness_function, ngen=None):
@@ -555,7 +557,7 @@ class _GymPopulation(Population):
         '''
         return fitness[0], fitness[0], fitness[1]
 
-    def plot_species(self, view=False, filename='speciation.svg'):
+    def plot_species(self):
         """ Visualizes speciation throughout evolution. """
 
         species_sizes = self.stats.get_species_sizes()
@@ -569,10 +571,7 @@ class _GymPopulation(Population):
         plt.ylabel("Size per Species")
         plt.xlabel("Generations")
 
-        plt.savefig(filename)
-
-        if view:
-            plt.show()
+        plt.savefig('visuals/%s.svg' % self.env_name)
 
         plt.close()
 
