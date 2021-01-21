@@ -45,12 +45,12 @@ class _GymNeatConfig(object):
                 ConfigParameter('reset_on_extinction', bool),
                 ConfigParameter('no_fitness_termination', bool, False)]
 
-    def __init__(self, configfile, novelty=False, layout=None):
+    def __init__(self, args, layout=None):
 
         # Check config file exists
-        if not os.path.isfile(configfile):
+        if not os.path.isfile(args.configfile):
             print('No such config file: %s' %
-                  os.path.abspath(configfile))
+                  os.path.abspath(args.configfile))
             exit(1)
 
         # Use default NEAT settings
@@ -60,7 +60,7 @@ class _GymNeatConfig(object):
         self.stagnation_type = neat.DefaultStagnation
 
         parameters = ConfigParser()
-        with open(configfile) as f:
+        with open(args.configfile) as f:
             if hasattr(parameters, 'read_file'):
                 parameters.read_file(f)
             else:
@@ -92,8 +92,8 @@ class _GymNeatConfig(object):
             param_list_names.append(p.name)
 
         # Bozo filter for missing sections
-        self.check_params(configfile, parameters, 'NEAT')
-        self.check_params(configfile, parameters, 'Gym')
+        self.check_params(args.configfile, parameters, 'NEAT')
+        self.check_params(args.configfile, parameters, 'Gym')
 
         # Get number of episode repetitions
         gympar = parameters['Gym']
@@ -162,8 +162,8 @@ class _GymNeatConfig(object):
         self.total_evaluations = 0
 
         # Support novelty search
-        self.novelty = _GymNeatConfig.parse_novelty(configfile) \
-            if novelty else None
+        self.novelty = _GymNeatConfig.parse_novelty(args.configfile) \
+            if args.novelty else None
 
         # Store config parameters for subclasses
         self.params = parameters
@@ -710,14 +710,15 @@ def main():
                         help='Use Novelty Search')
     args = parser.parse_args()
 
-    # Default to original NEAT
-    config = _GymNeatConfig(args.configfile, novelty=args.novelty)
 
     # Check for HyperNEAT, ES-HyperNEAT
     if args.hyper:
-        config = _GymHyperConfig(args.configfile, novelty=args.novelty)
+        config = _GymHyperConfig(args)
     if args.eshyper:
-        config = _GymEsHyperConfig(args.configfile, novelty=args.novelty)
+        config = _GymEsHyperConfig(args)
+    # Default to original NEAT
+    else:
+        config = _GymNeatConfig(args)
 
     # Create a statistics reporter
     stats = neat.StatisticsReporter()
