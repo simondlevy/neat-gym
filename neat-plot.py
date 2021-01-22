@@ -27,7 +27,7 @@ def plot(data, beg, s1, s2, lbl):
     plt.plot(g, mn - sd, 'g--')
 
     plt.xlabel('Generation')
-    plt.legend(['Mean ' + lbl, 'Max ' + lbl])
+    plt.legend(['Mean ' + lbl, 'Max ' + lbl, '+/-1 StdDev'])
 
 
 def plot_novelty(data):
@@ -77,6 +77,7 @@ def main():
             print('No novelty data')
 
         plot_fitness(data)
+        plt.title(args.csvfile)
 
     plt.show()
 
