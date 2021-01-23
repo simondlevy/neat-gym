@@ -37,10 +37,11 @@ def _is_discrete(env):
 # Public functions ===================================================
 
 
-def read_file(allow_record=False):
+def read_file(allow_record=False, allow_seed=False):
     '''
     Reads a genome/config file based on command-line argument
-    @param allow_record set to True to support recording to movie
+    @param allow_record set to enable --record option
+    @param allow_seed set to enable --seed option
     @return genome,config tuple
     '''
 
@@ -53,13 +54,22 @@ def read_file(allow_record=False):
     if allow_record:
         parser.add_argument('--record', default=None,
                             help='If specified, sets the recording dir')
+
+    if allow_seed:
+        parser.add_argument('--seed', type=int, default=None,
+                            help='Seed for random number generator')
+
     args = parser.parse_args()
 
     # Load net and environment name from pickled file
     net, env_name = pickle.load(open(args.filename, 'rb'))
 
     # Return genome, config, and optional save flag
-    return net, env_name, args.record if allow_record else None, args.nodisplay
+    return (net,
+            env_name,
+            args.record if allow_record else None,
+            args.seed if allow_seed else None,
+            args.nodisplay)
 
 
 def eval_net(
