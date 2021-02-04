@@ -576,7 +576,6 @@ class _GymPopulation(Population):
         plt.xlabel("Generations")
 
         plt.savefig('visuals/%s-species.pdf' % filename)
-                    
 
         plt.close()
 
@@ -693,6 +692,7 @@ class _StdOutReporter(StdOutReporter):
                     best_genome)
 
         print('Evaluations this generation: %d' % config.current_evaluations)
+        print('Total evaluations: %d' % config.total_evaluations)
 
 
 def main():
@@ -709,7 +709,6 @@ def main():
     parser.add_argument('--novelty', action='store_true',
                         help='Use Novelty Search')
     args = parser.parse_args()
-
 
     # Check for HyperNEAT, ES-HyperNEAT
     if args.hyper:
@@ -742,9 +741,6 @@ def main():
 
     # Run for number of generations specified in config file
     winner = pop.run(pe.evaluate, config.ngen)
-
-    # Report total number of evaluations
-    print('\nTotal evaluations = %d' % config.total_evaluations)
 
     # Save winner
     config.save_genome(winner)
