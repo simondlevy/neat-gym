@@ -473,8 +473,9 @@ class _GymPopulation(Population):
                 g.fitness, g.actual_fitness, evaluations = (
                         self.parse_fitness(g.fitness))
 
-                # Accumulate total evaluations
+                # Accumulate evaluations
                 self.config.current_evaluations += evaluations
+                self.config.total_evaluations += evaluations
 
                 if best is None:
                     best = g
@@ -487,9 +488,6 @@ class _GymPopulation(Population):
                                          self.population,
                                          self.species,
                                          best)
-
-            # Accumulate total evaluations for this run
-            self.config.total_evaluations += self.config.current_evaluations
 
             # Track the best genome ever seen.
             if (self.best_genome is None or
