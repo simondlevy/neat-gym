@@ -336,11 +336,17 @@ class _GymHyperConfig(_GymNeatConfig):
 
         _GymNeatConfig.__init__(self, args, layout=(5, 1))
 
-        subs = self.params['Substrate']
-        actfun = subs['function']
-        inp = eval(subs['input'])
-        hid = eval(subs['hidden']) if substrate is None else substrate
-        out = eval(subs['output'])
+        # Attempt to get substrate info from environment
+        if hasattr(self.env, 'get_substrate'):
+            actfun, inp, hid, out = self.env.get_substrate()
+
+        # Default to substrate info from config file
+        else:
+            subs = self.params['Substrate']
+            inp = eval(subs['input'])
+            hid = eval(subs['hidden']) if substrate is None else substrate
+            out = eval(subs['output'])
+            actfun = subs['function']
 
         self.substrate = Substrate(inp, out, hid)
         self.actfun = actfun

@@ -48,6 +48,15 @@ can run the ```neat-plot.py``` script on this CSV file.
 NEAT-Gym supports [HyperNEAT](https://en.wikipedia.org/wiki/HyperNEAT) via the ```--hyper``` option and
 and [ES-HyperNEAT](http://eplex.cs.ucf.edu/ESHyperNEAT/) via the <br> ```--eshyper``` option.
 
+There are two ways to specify the substrate:
+
+1. In the ```[Substrate]``` section of the config file (default)
+
+2. Via a ```get_substrate()``` method in your environment.  This method should return a tuple containing the
+input, hidden, and output coordinates and the name of the activation function (e.g., ```sigmoid```).  For
+ES-HyperNEAT, the hidden coordinates should be ```None```.
+
+
 ## Novelty Search
 
 NEAT-Gym supports
