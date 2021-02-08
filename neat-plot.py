@@ -14,6 +14,11 @@ import matplotlib.pyplot as plt
 
 def plot(data, beg, s1, s2, lbl):
 
+    if len(data.shape) < 2:
+        print('Just one point: Mean = %+3.3f  Std = %+3.3f  Max = %+3.3f' %
+              (data[1], data[2], data[3]))
+        exit(0)
+
     g = data[:, 0]
 
     mn = data[:, beg]
@@ -55,7 +60,7 @@ def main():
         exit(1)
 
     # Data from Novelty Search
-    if data.shape[1] > 4:
+    if len(data.shape) > 1 and data.shape[1] > 4:
 
         if args.split:
             plot_fitness(data)
