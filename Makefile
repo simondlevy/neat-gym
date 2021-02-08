@@ -21,6 +21,12 @@ cedit:
 pole:
 	./neat-evolve.py config/cartpole
 
+hyper:
+	./neat-evolve.py --hyper config/cartpole
+
+es:
+	./neat-evolve.py --eshyper config/cartpole
+
 plot:
 	./neat-plot.py runs/CartPole-v1.csv
 
