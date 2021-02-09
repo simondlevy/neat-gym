@@ -10,7 +10,7 @@ The maze layout and robot update equations are based on [goNEAT_NS](https://gith
 ```
 % pip3 install gym
 % python3 setup.py install
-% python3 gym_nsmaze/envs/medium.py
+% python3 gym_nsmaze/demos/medium.py
 ```
 
 (On Linux you will probably have to run pip3 with sudo.)
