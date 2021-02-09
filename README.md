@@ -65,8 +65,7 @@ via the ```--novelty``` option.  To use this option, the ```info``` dictionary
 returned by your environment's ```step()``` method should have an entry for ```behavior```,
 whose value is the behavior of the agent at the end of the episode (for
 example, its final position in the maze), or ```None``` before the end of the
-episode.  (For an example,look
-[here](https://github.com/simondlevy/gym-nsmaze/blob/main/gym_nsmaze/envs/__init__.py#L134-L144).
+episode.  For an example,look [here](https://github.com/simondlevy/neat-gym/environments/maze).
 
 ## Using NEAT-Gym in other projects
 
