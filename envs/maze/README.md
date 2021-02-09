@@ -1,6 +1,6 @@
 <img src='media/hard.gif' width=300>
 
-This repository provides an OpenAI Gym environment implementing the maze
+This directory provides an OpenAI Gym environment implementing the maze
 challenges in Lehman and Stanely's 2011 Novelty Search
 [paper](https://www.cs.swarthmore.edu/~meeden/DevelopmentalRobotics/lehman_ecj11.pdf).
 The maze layout and robot update equations are based on [goNEAT_NS](https://github.com/yaricom/goNEAT_NS).
