@@ -36,7 +36,7 @@ To replicate the results in Lehman and Stanley's
 install [NEAT-Gym](https://github.com/simondlevy/Neat-Gym).  Then do
 
 ```
-% python3 [DIR]/neat-evolve.py --env gym_nsmaze:Medium-v0 --config config/maze.cfg --novelty --ngen 100
+% python3 [DIR]/neat-evolve.py config/medium --novelty
 ```
 
 where ```[DIR]``` is the directory in which you put NEAT-Gym.
