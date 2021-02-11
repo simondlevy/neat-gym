@@ -6,9 +6,15 @@ Copyright (C) 2021 Simon D. Levy
 MIT License
 '''
 
+import argparse
+from time import sleep
+
+import numpy as np
+
 import gym
-from gym import spaces
+# from gym import spaces
 from gym.utils import seeding, EzPickle
+
 
 class FoodGather(gym.Env, EzPickle):
 
@@ -45,6 +51,7 @@ class FoodGather(gym.Env, EzPickle):
 
         return
 
+
 def demo(env):
     '''
     Runs a random-walk demo with command-line arguments.
@@ -55,13 +62,10 @@ def demo(env):
     parser.add_argument('--seed', type=int, required=False, default=None,
                         help='Seed for random number generator')
     parser.add_argument('--steps', type=int, required=False,
-                        default=Maze.MAX_STEPS, help='Number of steps to run')
-    parser.add_argument('--novelty', dest='use_novelty', action='store_true',
-                        help='Compute novelty')
-    parser.add_argument('--sensors', dest='show_sensors', action='store_true',
-                        help='Show sensors')
-    parser.add_argument('--notraj', dest='hide_trajectory',
-                        action='store_false', help='Hide trajectory')
+                        default=FoodGather.MAX_STEPS,
+                        help='Number of steps to run')
+    parser.add_argument('--traj', dest='show_trajectory',
+                        action='store_true', help='Show trajectory')
     args = parser.parse_args()
 
     env.max_steps = args.steps
@@ -74,10 +78,7 @@ def demo(env):
 
         action = np.random.random(2)
 
-        if args.use_novelty:
-            state, reward, behavior, _, _ = env.step_novelty(action)
-        else:
-            state, reward, _, _ = env.step(action)
+        state, reward, _, _ = env.step(action)
 
         frame = env.render(mode='rgb_array',
                            show_sensors=args.show_sensors,
@@ -87,12 +88,8 @@ def demo(env):
         if frame is None:
             break
 
-        if k % 20 == 0 or k == args.steps - 1:
-            print('step  %05d/%05d  reward = %f' %
-                  (k, env.max_steps, reward), end='')
-            if args.use_novelty:
-                print('  behavior =', behavior, end='')
-            print()
+        print('step  %05d/%05d  reward = %f' %
+              (k, env.max_steps, reward), end='')
 
     sleep(1)
     env.close()

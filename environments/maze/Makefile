@@ -33,5 +33,4 @@ commit:
 flake:
 	flake8 setup.py
 	flake8 gym_nsmaze/envs/__init__.py
-	flake8 demos/medium.py
-	flake8 demos/hard.py
+	flake8 demos/*.py

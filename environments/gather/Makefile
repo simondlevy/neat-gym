@@ -21,5 +21,3 @@ commit:
 flake:
 	flake8 setup.py
 	flake8 gym_gather/envs/__init__.py
-	flake8 demos/medium.py
-	flake8 demos/hard.py
