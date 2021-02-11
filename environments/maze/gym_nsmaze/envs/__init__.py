@@ -71,8 +71,6 @@ class Maze(gym.Env, EzPickle):
         # Left/right, forward/back
         self.action_space = spaces.Box(-1, +1, (2,), dtype=np.float32)
 
-        self.viewer = None
-
         self.location = np.array(initial_location)
         self.heading = initial_heading
         self.linear_velocity = 0
@@ -393,8 +391,8 @@ def demo(env):
                         help='Compute novelty')
     parser.add_argument('--sensors', dest='show_sensors', action='store_true',
                         help='Show sensors')
-    parser.add_argument('--notraj', dest='hide_trajectory',
-                        action='store_false', help='Hide trajectory')
+    parser.add_argument('--traj', dest='show_trajectory',
+                        action='store_true', help='Show trajectory')
     args = parser.parse_args()
 
     env.max_steps = args.steps
@@ -407,24 +405,24 @@ def demo(env):
 
         action = np.random.random(2)
 
-        if args.use_novelty:
-            state, reward, behavior, _, _ = env.step_novelty(action)
-        else:
-            state, reward, _, _ = env.step(action)
+        state, reward, _, info = env.step(action)
 
         frame = env.render(mode='rgb_array',
                            show_sensors=args.show_sensors,
-                           show_trajectory=(not args.hide_trajectory))
+                           show_trajectory=(args.show_trajectory))
         sleep(1./env.FRAMES_PER_SECOND)
 
         if frame is None:
             break
 
-        if k % 20 == 0 or k == args.steps - 1:
-            print('step  %05d/%05d  reward = %f' %
-                  (k, env.max_steps, reward), end='')
-            if args.use_novelty:
-                print('  behavior =', behavior, end='')
+        last = (k == args.steps - 1)
+
+        if k % 20 == 0 or last:
+            print('step  %05d/%05d' % (k, env.max_steps), end='')
+            if last:
+                print('  reward = %f' % reward, end='')
+                if last and args.use_novelty:
+                    print('  behavior =', info['behavior'], end='')
             print()
 
     sleep(1)

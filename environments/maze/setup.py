@@ -18,7 +18,7 @@ setup(
     packages=['gym_nsmaze', 'gym_nsmaze.envs', 'gym_nsmaze.geometry'],
     author='Simon D. Levy',
     author_email='simon.d.levy@gmail.com',
-    url='https://github.com/simondlevy/gym-nsmaze',
+    url='https://github.com/simondlevy/neat-gym/tree/master/environments/maze',
     license='MIT',
     platforms='Linux; Windows; OS X'
 )
