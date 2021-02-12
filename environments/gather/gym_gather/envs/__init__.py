@@ -16,20 +16,23 @@ import gym
 from gym.utils import seeding, EzPickle
 
 
-class FoodGather(gym.Env, EzPickle):
+class FoodGatherConcentric(gym.Env, EzPickle):
 
     FRAMES_PER_SECOND = 50
+
+    MAX_STEPS = 400
 
     metadata = {
             'render.modes': ['human', 'rgb_array'],
             'video.frames_per_second': FRAMES_PER_SECOND
             }
 
-    def __init__(self):
+    def __init__(self, n=8):
 
         EzPickle.__init__(self)
         self.seed()
         self.viewer = None
+        self.n = n
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -62,7 +65,7 @@ def demo(env):
     parser.add_argument('--seed', type=int, required=False, default=None,
                         help='Seed for random number generator')
     parser.add_argument('--steps', type=int, required=False,
-                        default=FoodGather.MAX_STEPS,
+                        default=FoodGatherConcentric.MAX_STEPS,
                         help='Number of steps to run')
     parser.add_argument('--traj', dest='show_trajectory',
                         action='store_true', help='Show trajectory')
@@ -73,6 +76,8 @@ def demo(env):
     np.random.seed(args.seed)
 
     state = env.reset()
+
+    exit(0)
 
     for k in range(args.steps):
 
