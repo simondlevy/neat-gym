@@ -7,6 +7,7 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
+from time import time
 import os
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
@@ -627,10 +628,13 @@ class _SaveReporter(BaseReporter):
 
         # Create CSV file for history and write its header
         self.csvfile = open('runs/%s.csv' % env_name, 'w')
-        self.csvfile.write('Gen,MeanFit,StdFit,MaxFit')
+        self.csvfile.write('Gen,Time,MeanFit,StdFit,MaxFit')
         if novelty:
             self.csvfile.write(',MeanNov,StdNov,MaxNov')
         self.csvfile.write('\n')
+
+        # Start timing for CSV file data
+        self.start = time()
 
     def post_evaluate(self, config, population, species, best_genome):
 
@@ -638,8 +642,12 @@ class _SaveReporter(BaseReporter):
 
         # Save current generation info to history file
         fit_max = max(fits)
-        self.csvfile.write('%d,%+5.3f,%+5.3f,%+5.3f' %
-                           (config.gen, mean(fits), stdev(fits), fit_max))
+        self.csvfile.write('%d,%f,%+5.3f,%+5.3f,%+5.3f' %
+                           (config.gen,
+                            time()-self.start,
+                            mean(fits),
+                            stdev(fits),
+                            fit_max))
 
         if config.is_novelty():
             novs = [c.fitness for c in population.values()]
