@@ -47,6 +47,7 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         EzPickle.__init__(self)
         self.seed()
         self.viewer = None
+        self.n = n
 
         # N sensors
         self.observation_space = spaces.Box(-np.inf,
@@ -56,10 +57,6 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
         # N effecotrs
         self.action_space = spaces.Box(0, self.OMAX, (n,), dtype=np.float32)
-
-        self.n = n
-
-        # a = 2 * np.pi / n
 
         # Set up so that index 0 corresponds to position 1 in Figure 7a
         # self.angles = np.array(n)
@@ -84,10 +81,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
         # Pick actuator with maximum activation
         k = np.argmax(action)
-        # angle = self.angles[k]
+        angle = self.angles[k]
 
-        print(self.angles)
-        print(k)
+        print(angle)
 
         # Equation 1
         # s = (self.SMAX / self.OMAX) * (self.OMAX / np.sum(action))
