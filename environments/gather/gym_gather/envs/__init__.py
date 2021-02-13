@@ -83,10 +83,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         k = np.argmax(action)
         angle = self.angles[k]
 
-        print(angle)
-
         # Equation 1
-        # s = (self.SMAX / self.OMAX) * (self.OMAX / np.sum(action))
+        s = (self.SMAX / self.OMAX) * (self.OMAX / np.sum(action))
+
+        print(s, angle)
 
         return 0
 
