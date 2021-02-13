@@ -56,9 +56,11 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Food starts at random location
         self.food_location = np.random.random(2) / 2 - 1
 
-        return self.step(None)
+        return self.step(np.zeros(self.observation_space.shape[0]))
 
     def step(self, action):
+
+        print(action)
 
         return 0
 
