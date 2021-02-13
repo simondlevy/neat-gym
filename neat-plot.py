@@ -40,12 +40,12 @@ def plot(data, usetime, beg, s1, s2, lbl):
 
 def plot_novelty(data, usetime):
 
-    plot(data, usetime, 4, 'b', 'k', 'Novelty')
+    plot(data, usetime, 5, 'b', 'k', 'Novelty')
 
 
 def plot_fitness(data, usetime):
 
-    plot(data, usetime, 1, 'r', 'm', 'Fitness')
+    plot(data, usetime, 2, 'r', 'm', 'Fitness')
 
 
 def main():
