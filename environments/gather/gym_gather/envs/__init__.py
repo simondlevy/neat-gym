@@ -12,7 +12,7 @@ from time import sleep
 import numpy as np
 
 import gym
-# from gym import spaces
+from gym import spaces
 from gym.utils import seeding, EzPickle
 
 
@@ -21,6 +21,8 @@ class FoodGatherConcentric(gym.Env, EzPickle):
     FRAMES_PER_SECOND = 50
 
     MAX_STEPS = 400
+
+    OMAX = 1
 
     metadata = {
             'render.modes': ['human', 'rgb_array'],
@@ -32,13 +34,27 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         EzPickle.__init__(self)
         self.seed()
         self.viewer = None
-        self.n = n
+
+        # N sensors
+        self.observation_space = spaces.Box(-np.inf,
+                                            +np.inf,
+                                            shape=(n,),
+                                            dtype=np.float32)
+
+        # N effecotrs
+        self.action_space = spaces.Box(0, self.OMAX, (n,), dtype=np.float32)
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
     def reset(self):
+
+        # Start in center of room
+        self.robot_location = np.zeros(2)
+
+        # Food starts at random location
+        self.food_location = np.random.random(2) / 2 - 1
 
         return self.step(None)
 
