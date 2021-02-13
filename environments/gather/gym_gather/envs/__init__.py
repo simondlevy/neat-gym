@@ -57,9 +57,14 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # N effecotrs
         self.action_space = spaces.Box(0, self.OMAX, (n,), dtype=np.float32)
 
-        # Pre-compute stuff for simplicity
         self.n = n
-        self.angle = 2 * np.pi / n  # Figure 7a
+
+        # a = 2 * np.pi / n
+
+        # Set up so that index 0 corresponds to position in Figure 7a
+        # self.angles = np.array(n)
+        print(2*np.pi/n * np.roll(np.arange(1, n), 1))
+        exit(0)
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -84,7 +89,7 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Equation 1
         s = (self.SMAX / self.OMAX) * (self.OMAX / np.sum(action))
 
-        print(k, s)
+        print(k, s, k*self.angle)
 
         return 0
 
