@@ -1,5 +1,16 @@
 '''
-Abstract food-gathering environment class and demo function for HyperNEAT
+Food-gathering environment class and demo function for HyperNEAT
+
+Based on
+
+@ARTICLE{Stanley_ahypercube-based,
+    author = {Kenneth O. Stanley and Jason Gauci},
+    title = {A hypercube-based indirect encoding for evolving large-scale
+             neural networks},
+    journal = {Artificial Life},
+    year = {},
+    pages = {2009}
+}
 
 Copyright (C) 2021 Simon D. Levy
 
@@ -22,6 +33,8 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
     MAX_STEPS = 400
 
+    # Constants from Equation 1
+    SMAX = 1
     OMAX = 1
 
     metadata = {
@@ -44,23 +57,33 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # N effecotrs
         self.action_space = spaces.Box(0, self.OMAX, (n,), dtype=np.float32)
 
+        # Pre-compute angles
+        self.n = n
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
     def reset(self):
 
-        # Start in center of room
+        # Robot starts in center of room
         self.robot_location = np.zeros(2)
 
         # Food starts at random location
         self.food_location = np.random.random(2) / 2 - 1
 
-        return self.step(np.zeros(self.observation_space.shape[0]))
+        # Start with a random move
+        return self.step(np.random.random(self.n))
 
     def step(self, action):
 
-        print(action)
+        # Pick actuator with maximum activation
+        k = np.argmax(action)
+
+        # Equation 1
+        s = (self.SMAX / self.OMAX) * (self.OMAX / np.sum(action))
+
+        print(k, s)
 
         return 0
 
