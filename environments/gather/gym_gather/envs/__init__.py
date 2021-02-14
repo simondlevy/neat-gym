@@ -29,7 +29,7 @@ from gym.utils import seeding, EzPickle
 
 class FoodGatherConcentric(gym.Env, EzPickle):
 
-    WORLD_RESOLUTION = 400
+    WORLD_SIZE = 400
     FOOD_DISTANCE = 100
     FRAMES_PER_SECOND = 50
     MAX_STEPS = 1000
@@ -73,7 +73,7 @@ class FoodGatherConcentric(gym.Env, EzPickle):
     def reset(self):
 
         # Robot starts in center of room
-        self.robot_location = np.zeros(2)
+        self.robot_location = np.array([self.WORLD_SIZE/2]*2)
 
         # Food starts at the angle a given sensor or between two sensors
         food_angle = (self.angles[np.random.randint(self.n)] +
@@ -92,14 +92,19 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         k = np.argmax(action)
         angle = self.angles[k]
 
-        # Equation 1
+        # Equation 1 (speed)
         s = (self.SMAX / self.OMAX) * (self.OMAX / np.sum(action))
 
         angle, s
 
-        return None, None, None, None
+        # XXX
+        state = np.zeros(self.n)
+        reward = 0
+        done = False
 
-    def render(self, mode='human', show_trajectory=True):
+        return state, reward, done, {}
+
+    def render(self, mode='human', show_sensors=False, show_trajectory=True):
 
         return None
 
@@ -128,6 +133,8 @@ def demo(env):
                         help='Number of steps to run')
     parser.add_argument('--traj', dest='show_trajectory',
                         action='store_true', help='Show trajectory')
+    parser.add_argument('--sensors', dest='show_sensors',
+                        action='store_true', help='Show sensors')
     args = parser.parse_args()
 
     env.max_steps = args.steps
@@ -135,10 +142,6 @@ def demo(env):
     env.seed(args.seed)
 
     state = env.reset()
-
-    print(env.food_location)
-
-    exit(0)
 
     for k in range(args.steps):
 
@@ -148,7 +151,7 @@ def demo(env):
 
         frame = env.render(mode='rgb_array',
                            show_sensors=args.show_sensors,
-                           show_trajectory=(not args.hide_trajectory))
+                           show_trajectory=(not args.show_trajectory))
         sleep(1./env.FRAMES_PER_SECOND)
 
         if frame is None:
