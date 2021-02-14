@@ -110,9 +110,6 @@ def demo(env):
     Runs a random-walk demo with command-line arguments.
     '''
 
-    print(env.angles[1])
-    exit(0)
-
     fmtr = argparse.ArgumentDefaultsHelpFormatter
     parser = argparse.ArgumentParser(formatter_class=fmtr)
     parser.add_argument('--n', type=int, required=False, default=8,
@@ -132,7 +129,6 @@ def demo(env):
 
     state = env.reset()
 
-    print(env.food_location)
     exit(0)
 
     for k in range(args.steps):
