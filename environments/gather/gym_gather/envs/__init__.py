@@ -74,16 +74,18 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
     def reset(self):
 
+        center = np.array([self.WORLD_SIZE/2]*2)
+
         # Robot starts in center of room
-        self.robot_location = np.array([self.WORLD_SIZE/2]*2)
+        self.robot_location = center
 
         # Food starts at the angle a given sensor or between two sensors
         food_angle = (self.angles[np.random.randint(self.n)] +
                       np.random.randint(2) * self.angles[1]/2)
 
         # Food location is 100 units along this angle
-        self.food_location = self._polar_to_rect(self.FOOD_DISTANCE,
-                                                 food_angle)
+        self.food_location = center + self._polar_to_rect(self.FOOD_DISTANCE,
+                                                          food_angle)
 
         # Start with a random move
         return self.step(np.random.random(self.n))
@@ -124,6 +126,7 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
             # Draw food location
             self.food = rendering.make_circle(self.FOOD_RADIUS, filled=True)
+            print(self.food_location)
             xfrm = Transform(translation=self.food_location)
             self.food.add_attr(xfrm)
             self.viewer.add_geom(self.food)
