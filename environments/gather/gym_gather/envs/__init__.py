@@ -37,8 +37,8 @@ class FoodGatherConcentric(gym.Env, EzPickle):
     MAX_STEPS = 1000
 
     # Constants from Equation 1
-    SMAX = 1
-    OMAX = 1
+    SMAX = 10
+    OMAX = 10
 
     metadata = {
             'render.modes': ['human', 'rgb_array'],
@@ -99,7 +99,8 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Equation 1 (speed)
         s = (self.SMAX / self.OMAX) * (self.OMAX / np.sum(action))
 
-        angle, s
+        # Update location
+        self.robot_location += self._polar_to_rect(s, angle)
 
         # XXX
         state = np.zeros(self.n)
@@ -163,7 +164,7 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
     def _polar_to_rect(self, r, theta):
 
-        return r * np.cos(theta), r * np.sin(theta)
+        return np.array([r * np.cos(theta), r * np.sin(theta)])
 
 
 def demo(env):
