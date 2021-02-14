@@ -30,6 +30,7 @@ from gym.utils import seeding, EzPickle
 class FoodGatherConcentric(gym.Env, EzPickle):
 
     WORLD_RESOLUTION = 400
+    FOOD_DISTANCE = 100
     FRAMES_PER_SECOND = 50
     MAX_STEPS = 1000
 
@@ -78,7 +79,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         food_angle = (self.angles[np.random.randint(self.n)] +
                       np.random.randint(2) * self.angles[1]/2)
 
-        print(food_angle)
+        # Food location is 100 units along this angle
+        self.food_location = (self.FOOD_DISTANCE * np.cos(food_angle),
+                              self.FOOD_DISTANCE * np.sin(food_angle))
 
         # Start with a random move
         return self.step(np.random.random(self.n))
@@ -128,6 +131,8 @@ def demo(env):
     env.seed(args.seed)
 
     state = env.reset()
+
+    print(env.food_location)
 
     exit(0)
 
