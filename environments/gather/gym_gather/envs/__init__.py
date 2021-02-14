@@ -87,6 +87,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         self.food_location = center + self._polar_to_rect(self.FOOD_DISTANCE,
                                                           food_angle)
 
+        # Support optional display of trajectory
+        self.trajectory = []
+
         # Start with a random move
         return self.step(np.random.random(self.n))
 
@@ -101,6 +104,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
         # Update location
         self.robot_location += self._polar_to_rect(s, angle)
+
+        # Update trajectory
+        self.trajectory.append(self.robot_location.copy())
 
         # XXX
         state = np.zeros(self.n)
@@ -127,13 +133,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
             # Draw food location
             self.food = rendering.make_circle(self.FOOD_RADIUS, filled=True)
-            print(self.food_location)
             xfrm = Transform(translation=self.food_location)
             self.food.add_attr(xfrm)
             self.viewer.add_geom(self.food)
-
-            # Set up for showing trajectory
-            self.trajectory = []
 
         # Show sensors if indicated
         if show_sensors:
@@ -150,12 +152,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
         # Show trajectory if indicated
         if show_trajectory:
-            self.trajectory.append(self.robot_location)
             for i in range(len(self.trajectory)-1):
                 self._draw_line((self.trajectory[i],
                                 self.trajectory[i+1]),
                                 (0, 0, 1))
-
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
     def close(self):
@@ -165,6 +165,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
     def _polar_to_rect(self, r, theta):
 
         return np.array([r * np.cos(theta), r * np.sin(theta)])
+
+    def _draw_line(self, line, color):
+
+        self.viewer.draw_line(line[0], line[1], color=color)
 
 
 def demo(env):
@@ -202,6 +206,7 @@ def demo(env):
         frame = env.render(mode='rgb_array',
                            show_sensors=args.show_sensors,
                            show_trajectory=args.show_trajectory)
+
         sleep(1./env.FRAMES_PER_SECOND)
 
         if frame is None:
