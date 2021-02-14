@@ -108,10 +108,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
     def render(self, mode='human', show_sensors=False, show_trajectory=True):
 
-        from gym.envs.classic_control import rendering
-        from gym.envs.classic_control.rendering import Transform
-
         if self.viewer is None:
+
+            from gym.envs.classic_control import rendering
+            from gym.envs.classic_control.rendering import Transform
 
             self.viewer = rendering.Viewer(self.WORLD_SIZE, self.WORLD_SIZE)
 
@@ -215,7 +215,10 @@ def demo(env):
         if frame is None:
             break
 
-        print('step  %05d/%05d  reward = %f' % (k, env.max_steps, reward))
+        last = (k == args.steps - 1)
+
+        if k % 20 == 0 or last:
+            print('step  %05d/%05d  reward = %f' % (k, env.max_steps, reward))
 
     sleep(1)
     env.close()
