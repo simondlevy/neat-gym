@@ -16,7 +16,7 @@ clean:
 	sudo rm -rf build/ dist/ *.egg-info __pycache__ */__pycache__ models/ visuals/ runs/
 
 demo:
-	python3 demos/concentric.py --steps 400 --traj
+	python3 demos/concentric.py --steps 100 --sensors
 
 commit:
 	git commit -a

@@ -156,7 +156,6 @@ class Maze(gym.Env, EzPickle):
 
             from gym.envs.classic_control import rendering
             from gym.envs.classic_control.rendering import Transform
-            from pyglet.text import Label
 
             self.viewer = rendering.Viewer(*self.maze_size)
 
@@ -186,6 +185,8 @@ class Maze(gym.Env, EzPickle):
 
         # Show sensors if indicated
         if show_sensors:
+
+            from pyglet.text import Label
 
             # Show rangefinders as line segments
             for i, line in enumerate(self.rangefinder_lines):

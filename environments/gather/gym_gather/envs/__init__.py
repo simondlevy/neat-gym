@@ -142,11 +142,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Show sensors if indicated
         if show_sensors:
 
-            pass
-            # Show rangefinders as line segments
-            # for i, line in enumerate(self.rangefinder_lines):
-            #     self._draw_line(line, (0, 1, 0) if i == 2 else (1, 0, 0))
+            for i, line in enumerate(self.rangefinder_lines):
+                self._draw_line(line, (0, 1, 0) if i == 2 else (1, 0, 0))
 
+        # Otherwise, just draw robot
         else:
 
             # Draw robot
