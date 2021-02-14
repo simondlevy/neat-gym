@@ -29,6 +29,8 @@ from gym.utils import seeding, EzPickle
 
 class FoodGatherConcentric(gym.Env, EzPickle):
 
+    ROBOT_RADIUS = 5
+    FOOD_RADIUS = 2
     WORLD_SIZE = 400
     FOOD_DISTANCE = 100
     FRAMES_PER_SECOND = 50
@@ -106,7 +108,56 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
     def render(self, mode='human', show_sensors=False, show_trajectory=True):
 
-        return None
+        from gym.envs.classic_control import rendering
+        from gym.envs.classic_control.rendering import Transform
+
+        if self.viewer is None:
+
+            self.viewer = rendering.Viewer(self.WORLD_SIZE, self.WORLD_SIZE)
+
+            # Set up drawing for robot
+            self.robot_circle = rendering.make_circle(self.ROBOT_RADIUS,
+                                                      filled=False)
+            self.robot_line = self.viewer.draw_line((0, 0),
+                                                    (self.ROBOT_RADIUS, 0))
+            self.robot_transform = Transform(translation=(0, 0), rotation=0)
+            self.robot_circle.add_attr(self.robot_transform)
+            self.robot_line.add_attr(self.robot_transform)
+            self.viewer.add_geom(self.robot_circle)
+            self.viewer.add_geom(self.robot_line)
+
+            # Draw food location
+            self.food = rendering.make_circle(self.FOOD_RADIUS, filled=True)
+            xfrm = Transform(translation=self._reshape(self.food_location))
+            self.food.add_attr(xfrm)
+            self.viewer.add_geom(self.food)
+
+            # Set up for showing trajectory
+            self.trajectory = []
+
+        # Show sensors if indicated
+        if show_sensors:
+
+            pass
+            # Show rangefinders as line segments
+            # for i, line in enumerate(self.rangefinder_lines):
+            #     self._draw_line(line, (0, 1, 0) if i == 2 else (1, 0, 0))
+
+        else:
+
+            # Draw robot
+            self.robot_transform.set_translation(
+                    *self._reshape(self.robot_location))
+
+        # Show trajectory if indicated
+        if show_trajectory:
+            self.trajectory.append(self.robot_location)
+            for i in range(len(self.trajectory)-1):
+                self._draw_line((self.trajectory[i],
+                                self.trajectory[i+1]),
+                                (0, 0, 1))
+
+        return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
     def close(self):
 
@@ -115,6 +166,13 @@ class FoodGatherConcentric(gym.Env, EzPickle):
     def _polar_to_rect(self, r, theta):
 
         return r * np.cos(theta), r * np.sin(theta)
+
+    def _reshape(self, point):
+        '''
+        Allows us to keep original maze coordinates while presenting it in a
+        larger, upside-down format.
+        '''
+        return 2*point[0], (self.WORLD_SIZE-2*point[1])
 
 
 def demo(env):
@@ -151,7 +209,7 @@ def demo(env):
 
         frame = env.render(mode='rgb_array',
                            show_sensors=args.show_sensors,
-                           show_trajectory=(not args.show_trajectory))
+                           show_trajectory=args.show_trajectory)
         sleep(1./env.FRAMES_PER_SECOND)
 
         if frame is None:

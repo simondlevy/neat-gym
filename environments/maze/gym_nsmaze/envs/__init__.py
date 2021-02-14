@@ -208,7 +208,7 @@ class Maze(gym.Env, EzPickle):
             self.robot_transform.set_translation(*self._reshape(self.location))
             self.robot_transform.set_rotation(-np.radians(self.heading))
 
-        # Show sensors if indicated
+        # Show trajectory if indicated
         if show_trajectory:
             self.trajectory.append(self.location)
             for i in range(len(self.trajectory)-1):
