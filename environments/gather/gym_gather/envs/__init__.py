@@ -74,9 +74,11 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Robot starts in center of room
         self.robot_location = np.zeros(2)
 
-        # Food starts at 100 units along a given sensor or between two sensors
-        self.food_location = (self.angles[np.random.randint(self.n)] +
-                              np.random.randint(2) * self.angles[1]/2)
+        # Food starts at the angle a given sensor or between two sensors
+        food_angle = (self.angles[np.random.randint(self.n)] +
+                      np.random.randint(2) * self.angles[1]/2)
+
+        print(food_angle)
 
         # Start with a random move
         return self.step(np.random.random(self.n))
