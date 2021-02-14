@@ -215,8 +215,7 @@ def demo(env):
         if frame is None:
             break
 
-        print('step  %05d/%05d  reward = %f' %
-              (k, env.max_steps, reward), end='')
+        print('step  %05d/%05d  reward = %f' % (k, env.max_steps, reward))
 
     sleep(1)
     env.close()
