@@ -29,9 +29,9 @@ from gym.utils import seeding, EzPickle
 
 class FoodGatherConcentric(gym.Env, EzPickle):
 
+    WORLD_RESOLUTION = 400
     FRAMES_PER_SECOND = 50
-
-    MAX_STEPS = 400
+    MAX_STEPS = 1000
 
     # Constants from Equation 1
     SMAX = 1
@@ -62,7 +62,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # self.angles = np.array(n)
         self.angles = 2*np.pi/n * np.array([n] + list(range(1, n)))
 
+        self.reset()
+
     def seed(self, seed=None):
+        np.random.seed(seed)
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
@@ -71,8 +74,8 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Robot starts in center of room
         self.robot_location = np.zeros(2)
 
-        # Food starts at random location
-        self.food_location = np.random.random(2) / 2 - 1
+        # Food starts at 100 units along a given sensor or between two sensors
+        self.food_location = np.random.randint(self.n)
 
         # Start with a random move
         return self.step(np.random.random(self.n))
@@ -86,9 +89,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Equation 1
         s = (self.SMAX / self.OMAX) * (self.OMAX / np.sum(action))
 
-        print(s, angle)
+        angle, s
 
-        return 0
+        return None, None, None, None
 
     def render(self, mode='human', show_trajectory=True):
 
@@ -106,6 +109,8 @@ def demo(env):
 
     fmtr = argparse.ArgumentDefaultsHelpFormatter
     parser = argparse.ArgumentParser(formatter_class=fmtr)
+    parser.add_argument('--n', type=int, required=False, default=8,
+                        help='Number of sensors (actuators)')
     parser.add_argument('--seed', type=int, required=False, default=None,
                         help='Seed for random number generator')
     parser.add_argument('--steps', type=int, required=False,
@@ -116,16 +121,17 @@ def demo(env):
     args = parser.parse_args()
 
     env.max_steps = args.steps
+    env.n = args.n
     env.seed(args.seed)
-    np.random.seed(args.seed)
 
     state = env.reset()
 
+    print(env.food_location)
     exit(0)
 
     for k in range(args.steps):
 
-        action = np.random.random(2)
+        action = np.random.random(env.n)
 
         state, reward, _, _ = env.step(action)
 
