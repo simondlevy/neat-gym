@@ -118,17 +118,13 @@ class FoodGatherConcentric(gym.Env, EzPickle):
             # Set up drawing for robot
             self.robot_circle = rendering.make_circle(self.ROBOT_RADIUS,
                                                       filled=False)
-            self.robot_line = self.viewer.draw_line((0, 0),
-                                                    (self.ROBOT_RADIUS, 0))
             self.robot_transform = Transform(translation=(0, 0), rotation=0)
             self.robot_circle.add_attr(self.robot_transform)
-            self.robot_line.add_attr(self.robot_transform)
             self.viewer.add_geom(self.robot_circle)
-            self.viewer.add_geom(self.robot_line)
 
             # Draw food location
             self.food = rendering.make_circle(self.FOOD_RADIUS, filled=True)
-            xfrm = Transform(translation=self._reshape(self.food_location))
+            xfrm = Transform(translation=self.food_location)
             self.food.add_attr(xfrm)
             self.viewer.add_geom(self.food)
 
@@ -146,8 +142,7 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         else:
 
             # Draw robot
-            self.robot_transform.set_translation(
-                    *self._reshape(self.robot_location))
+            self.robot_transform.set_translation(*self.robot_location)
 
         # Show trajectory if indicated
         if show_trajectory:
@@ -166,13 +161,6 @@ class FoodGatherConcentric(gym.Env, EzPickle):
     def _polar_to_rect(self, r, theta):
 
         return r * np.cos(theta), r * np.sin(theta)
-
-    def _reshape(self, point):
-        '''
-        Allows us to keep original maze coordinates while presenting it in a
-        larger, upside-down format.
-        '''
-        return 2*point[0], (self.WORLD_SIZE-2*point[1])
 
 
 def demo(env):
