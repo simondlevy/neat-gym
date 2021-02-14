@@ -80,8 +80,8 @@ class FoodGatherConcentric(gym.Env, EzPickle):
                       np.random.randint(2) * self.angles[1]/2)
 
         # Food location is 100 units along this angle
-        self.food_location = (self.FOOD_DISTANCE * np.cos(food_angle),
-                              self.FOOD_DISTANCE * np.sin(food_angle))
+        self.food_location = self._polar_to_rect(self.FOOD_DISTANCE,
+                                                 food_angle)
 
         # Start with a random move
         return self.step(np.random.random(self.n))
@@ -106,6 +106,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
     def close(self):
 
         return
+
+    def _polar_to_rect(self, r, theta):
+
+        return r * np.cos(theta), r * np.sin(theta)
 
 
 def demo(env):
