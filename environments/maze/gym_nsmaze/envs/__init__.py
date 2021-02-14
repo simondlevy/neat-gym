@@ -143,10 +143,6 @@ class Maze(gym.Env, EzPickle):
 
     def render(self, mode='human', show_sensors=False, show_trajectory=True):
 
-        from gym.envs.classic_control import rendering
-        from gym.envs.classic_control.rendering import Transform
-        from pyglet.text import Label
-
         # Helper class for showing radar as cardinal direction
         class _DrawText:
 
@@ -157,6 +153,10 @@ class Maze(gym.Env, EzPickle):
                 self.label.draw()
 
         if self.viewer is None:
+
+            from gym.envs.classic_control import rendering
+            from gym.envs.classic_control.rendering import Transform
+            from pyglet.text import Label
 
             self.viewer = rendering.Viewer(*self.maze_size)
 
