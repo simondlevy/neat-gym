@@ -102,8 +102,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Equation 1 (speed)
         s = (self.SMAX / self.OMAX) * (self.OMAX / np.sum(action))
 
-        # Update location
-        self.robot_location += self._polar_to_rect(s, angle)
+        # Update location using cyclic boundary conditions
+        self.robot_location = ((self.robot_location +
+                                self._polar_to_rect(s, angle))
+                               % self.WORLD_SIZE)
 
         # Update trajectory
         self.trajectory.append(self.robot_location.copy())
