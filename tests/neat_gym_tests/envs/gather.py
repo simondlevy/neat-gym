@@ -27,6 +27,7 @@ import gym
 from gym import spaces
 from gym.utils import seeding, EzPickle
 
+from neat_gym_tests.geometry import distance_point_to_point
 from neat_gym_tests.geometry import distance_point_to_line
 
 
@@ -36,7 +37,7 @@ class GatherConcentric(gym.Env, EzPickle):
     FOOD_RADIUS = 2
     WORLD_SIZE = 400
     FOOD_DISTANCE = 100
-    FRAMES_PER_SECOND = 50
+    FRAMES_PER_SECOND = 10
     MAX_STEPS = 1000
 
     # Constants from Equation 1
@@ -130,9 +131,14 @@ class GatherConcentric(gym.Env, EzPickle):
         state = np.zeros(self.n)
         state[self.winner] = 1
 
-        # XXX
         reward = 0
         done = False
+
+        if (distance_point_to_point(self.robot_location,
+                                    self.food_location)
+           < self.ROBOT_RADIUS):
+            reward = 1
+            done = True
 
         return state, reward, done, {}
 
@@ -205,12 +211,11 @@ def gather_demo(env):
     parser = argparse.ArgumentParser(formatter_class=fmtr)
     parser.add_argument('--n', type=int, required=False, default=8,
                         help='Number of sensors (actuators)')
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('--seed', type=int, required=False, default=None,
-                       help='Seed for random number generator')
-    group.add_argument('--heuristic', dest='use_heuristic',
-                       action='store_true',
-                       help='Use heuristic instead of random')
+    parser.add_argument('--seed', type=int, required=False, default=None,
+                        help='Seed for random number generator')
+    parser.add_argument('--heuristic', dest='use_heuristic',
+                        action='store_true',
+                        help='Use heuristic instead of random')
     parser.add_argument('--steps', type=int, required=False,
                         default=GatherConcentric.MAX_STEPS,
                         help='Number of steps to run')
@@ -232,9 +237,6 @@ def gather_demo(env):
 
         state, reward, done, _ = env.step(action)
 
-        if done:
-            break
-
         frame = env.render(mode='rgb_array',
                            show_sensors=args.show_sensors,
                            show_trajectory=args.show_trajectory)
@@ -244,10 +246,13 @@ def gather_demo(env):
         if frame is None:
             break
 
-        last = (k == args.steps - 1)
+        last = done or (k == args.steps - 1)
 
         if k % 20 == 0 or last:
             print('step  %05d/%05d  reward = %f' % (k, env.max_steps, reward))
+
+        if done:
+            break
 
     sleep(1)
     env.close()
