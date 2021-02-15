@@ -1,4 +1,5 @@
 '''
+
 Food-gathering environment class and demo function for HyperNEAT
 
 Based on
@@ -100,7 +101,7 @@ class GatherConcentric(gym.Env, EzPickle):
         self.trajectory = []
 
         # Start with a random move
-        return self.step(np.random.random(self.n))
+        return self.step(np.random.random(self.n))[0]
 
     def step(self, action):
 
@@ -125,6 +126,7 @@ class GatherConcentric(gym.Env, EzPickle):
                                                         line)
                                  for line in self.rangefinder_lines])
 
+        # State is a one-hot vector using the closest rangefinder
         state = np.zeros(self.n)
         state[self.winner] = 1
 
@@ -203,8 +205,12 @@ def gather_demo(env):
     parser = argparse.ArgumentParser(formatter_class=fmtr)
     parser.add_argument('--n', type=int, required=False, default=8,
                         help='Number of sensors (actuators)')
-    parser.add_argument('--seed', type=int, required=False, default=None,
-                        help='Seed for random number generator')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--seed', type=int, required=False, default=None,
+                       help='Seed for random number generator')
+    group.add_argument('--heuristic', dest='use_heuristic',
+                       action='store_true',
+                       help='Use heuristic instead of random')
     parser.add_argument('--steps', type=int, required=False,
                         default=GatherConcentric.MAX_STEPS,
                         help='Number of steps to run')
@@ -222,9 +228,12 @@ def gather_demo(env):
 
     for k in range(args.steps):
 
-        action = np.random.random(env.n)
+        action = state if args.use_heuristic else np.random.random(env.n)
 
-        state, reward, _, _ = env.step(action)
+        state, reward, done, _ = env.step(action)
+
+        if done:
+            break
 
         frame = env.render(mode='rgb_array',
                            show_sensors=args.show_sensors,
