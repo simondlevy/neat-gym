@@ -118,6 +118,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         self.rangefinder_lines = [(self.robot_location, self.robot_location+pt)
                                   for pt in self.rangefinder_points]
 
+        # Get rangefinder closest to food
+
+
         # XXX
         state = np.zeros(self.n)
         reward = 0
