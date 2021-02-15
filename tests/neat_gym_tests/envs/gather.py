@@ -121,11 +121,14 @@ class GatherConcentric(gym.Env, EzPickle):
                                   for pt in self.rangefinder_points]
 
         # Get rangefinder closest to food
-        print([distance_point_to_line(self.food_location, rangefinder_line)
-               for rangefinder_line in self.rangefinder_lines])
+        self.winner = np.argmin([distance_point_to_line(self.food_location,
+                                                        line)
+                                 for line in self.rangefinder_lines])
+
+        state = np.zeros(self.n)
+        state[self.winner] = 1
 
         # XXX
-        state = np.zeros(self.n)
         reward = 0
         done = False
 
@@ -156,8 +159,9 @@ class GatherConcentric(gym.Env, EzPickle):
         # Show sensors if indicated
         if show_sensors:
 
-            for line in self.rangefinder_lines:
-                self._draw_line(line, (1, 0, 0))
+            for i, line in enumerate(self.rangefinder_lines):
+                self._draw_line(line,
+                                (1, 0, 0) if i == self.winner else (0, 1, 0))
 
         # Otherwise, just draw robot
         else:
