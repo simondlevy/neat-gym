@@ -17,3 +17,8 @@ register(
     entry_point='neat_gym_tests.envs:MazeHard',
     max_episode_steps=400
 )
+
+register(
+    id='Gather-v0',
+    entry_point='neat_gym_tests.envs:GatherConcentric'
+)

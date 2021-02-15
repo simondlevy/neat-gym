@@ -27,7 +27,7 @@ from gym import spaces
 from gym.utils import seeding, EzPickle
 
 
-class FoodGatherConcentric(gym.Env, EzPickle):
+class GatherConcentric(gym.Env, EzPickle):
 
     ROBOT_RADIUS = 5
     FOOD_RADIUS = 2
@@ -120,7 +120,6 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
         # Get rangefinder closest to food
 
-
         # XXX
         state = np.zeros(self.n)
         reward = 0
@@ -199,7 +198,7 @@ def demo(env):
     parser.add_argument('--seed', type=int, required=False, default=None,
                         help='Seed for random number generator')
     parser.add_argument('--steps', type=int, required=False,
-                        default=FoodGatherConcentric.MAX_STEPS,
+                        default=GatherConcentric.MAX_STEPS,
                         help='Number of steps to run')
     parser.add_argument('--traj', dest='show_trajectory',
                         action='store_true', help='Show trajectory')
