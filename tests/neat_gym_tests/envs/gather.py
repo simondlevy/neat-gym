@@ -26,6 +26,8 @@ import gym
 from gym import spaces
 from gym.utils import seeding, EzPickle
 
+from neat_gym_tests.geometry import distance_point_to_line
+
 
 class GatherConcentric(gym.Env, EzPickle):
 
@@ -119,6 +121,8 @@ class GatherConcentric(gym.Env, EzPickle):
                                   for pt in self.rangefinder_points]
 
         # Get rangefinder closest to food
+        print([distance_point_to_line(self.food_location, rangefinder_line)
+               for rangefinder_line in self.rangefinder_lines])
 
         # XXX
         state = np.zeros(self.n)
