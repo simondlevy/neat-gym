@@ -91,6 +91,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         self.food_location = center + self._polar_to_rect(self.FOOD_DISTANCE,
                                                           food_angle)
 
+        # No rangefinder data yet
+        self.rangefinder_lines = None
+
         # Support optional display of trajectory
         self.trajectory = []
 
@@ -110,6 +113,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         self.robot_location = ((self.robot_location +
                                 self._polar_to_rect(s, angle))
                                % self.WORLD_SIZE)
+
+        # Update rangefinders
+        self.rangefinder_lines = [(self.robot_location, self.robot_location+pt)
+                                  for pt in self.rangefinder_points]
 
         # Update trajectory
         self.trajectory.append(self.robot_location.copy())
@@ -146,9 +153,8 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Show sensors if indicated
         if show_sensors:
 
-            for pt in self.rangefinder_points:
-                self._draw_line((self.robot_location, self.robot_location+pt),
-                                (1, 0, 0))
+            for line in self.rangefinder_lines:
+                self._draw_line(line, (1, 0, 0))
 
         # Otherwise, just draw robot
         else:
