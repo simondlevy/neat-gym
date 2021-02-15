@@ -118,9 +118,6 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         self.rangefinder_lines = [(self.robot_location, self.robot_location+pt)
                                   for pt in self.rangefinder_points]
 
-        # Update trajectory
-        self.trajectory.append(self.robot_location.copy())
-
         # XXX
         state = np.zeros(self.n)
         reward = 0
@@ -164,6 +161,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
 
         # Show trajectory if indicated
         if show_trajectory:
+
+            self.trajectory.append(self.robot_location.copy())
+
             for i in range(len(self.trajectory)-1):
                 self._draw_line((self.trajectory[i],
                                 self.trajectory[i+1]),
