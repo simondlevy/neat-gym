@@ -186,7 +186,7 @@ class GatherConcentric(gym.Env, EzPickle):
         self.viewer.draw_line(line[0], line[1], color=color)
 
 
-def demo(env):
+def gather_demo(env):
     '''
     Runs a random-walk demo with command-line arguments.
     '''

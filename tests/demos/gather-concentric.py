@@ -7,8 +7,8 @@ Copyright (C) 2021 Simon D. Levy
 MIT License
 '''
 
-from gym_gather.envs import FoodGatherConcentric, demo
+from neat_gym_tests.envs.gather import GatherConcentric, gather_demo
 
 if __name__ == '__main__':
 
-    demo(FoodGatherConcentric())
+    gather_demo(GatherConcentric())
