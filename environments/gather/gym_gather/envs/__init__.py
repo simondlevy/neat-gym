@@ -65,6 +65,10 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # self.angles = np.array(n)
         self.angles = 2*np.pi/n * np.array([n] + list(range(1, n)))
 
+        # Set up relative endpoints for rangefinders
+        self.rangefinder_points = [self._polar_to_rect(self.WORLD_SIZE, angle)
+                                   for angle in self.angles]
+
         self.reset()
 
     def seed(self, seed=None):
@@ -142,8 +146,9 @@ class FoodGatherConcentric(gym.Env, EzPickle):
         # Show sensors if indicated
         if show_sensors:
 
-            for i, line in enumerate(self.rangefinder_lines):
-                self._draw_line(line, (0, 1, 0) if i == 2 else (1, 0, 0))
+            for pt in self.rangefinder_points:
+                self._draw_line((self.robot_location, self.robot_location+pt),
+                                (1, 0, 0))
 
         # Otherwise, just draw robot
         else:
@@ -157,6 +162,7 @@ class FoodGatherConcentric(gym.Env, EzPickle):
                 self._draw_line((self.trajectory[i],
                                 self.trajectory[i+1]),
                                 (0, 0, 1))
+
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
     def close(self):
