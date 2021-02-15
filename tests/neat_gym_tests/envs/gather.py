@@ -131,9 +131,11 @@ class GatherConcentric(gym.Env, EzPickle):
         state = np.zeros(self.n)
         state[self.winner] = 1
 
+        # Assume no reward yet
         reward = 0
         done = False
 
+        # Get a reward and finish if robot is on top of food
         if (distance_point_to_point(self.robot_location,
                                     self.food_location)
            < self.ROBOT_RADIUS):
