@@ -18,8 +18,9 @@ import gym
 from gym import spaces
 from gym.utils import seeding, EzPickle
 
-from gym_nsmaze.geometry import distance_point_to_point, distance_point_to_line
-from gym_nsmaze.geometry import rotate, intersection, arctan_degrees
+from neat_gym_tests.geometry import distance_point_to_point
+from neat_gym_tests.geometry import distance_point_to_line
+from neat_gym_tests.geometry import rotate, intersection, arctan_degrees
 
 
 class Maze(gym.Env, EzPickle):
@@ -317,7 +318,7 @@ class Maze(gym.Env, EzPickle):
                 self.radar[i] = 1
 
 
-class Medium(Maze):
+class MazeMedium(Maze):
 
     INITIAL_LOCATION = 30, 22
     INITIAL_HEADING = 0
@@ -347,7 +348,7 @@ class Medium(Maze):
                       self.WALLS)
 
 
-class Hard(Maze):
+class MazeHard(Maze):
 
     INITIAL_LOCATION = 36, 184
     INITIAL_HEADING = 0
@@ -377,7 +378,7 @@ class Hard(Maze):
                       self.WALLS)
 
 
-def demo(env):
+def maze_demo(env):
     '''
     Runs a random-walk demo with command-line arguments.
     '''

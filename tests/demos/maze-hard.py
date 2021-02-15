@@ -7,9 +7,9 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-from neat_gym_tests.envs import MazeHard, demo
+from neat_gym_tests.envs import MazeHard, maze_demo
 
 
 if __name__ == '__main__':
 
-    demo(MazeHard())
+    maze_demo(MazeHard())

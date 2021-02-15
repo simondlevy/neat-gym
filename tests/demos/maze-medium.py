@@ -7,8 +7,8 @@ Copyright (C) 2020 Simon D. Levy
 MIT License
 '''
 
-from neat_gym_tests.envs import MazeMedium, demo
+from neat_gym_tests.envs import MazeMedium, maze_demo
 
 if __name__ == '__main__':
 
-    demo(MazeMedium())
+    maze_demo(MazeMedium())
