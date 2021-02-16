@@ -36,8 +36,6 @@ To run a demo food-gathering task, do
 % python3 demos/gather-concentric.py --steps 400 --sensors
 ```
 
-
-
 ## Running experiments
 
 To replicate the results in Lehman and Stanley's

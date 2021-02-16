@@ -18,9 +18,9 @@ import gym
 from gym import spaces
 from gym.utils import seeding, EzPickle
 
-from neat_gym_tests.geometry import distance_point_to_point
-from neat_gym_tests.geometry import distance_point_to_line
-from neat_gym_tests.geometry import rotate, intersection, arctan_degrees
+from neat_gym_challenges.geometry import distance_point_to_point
+from neat_gym_challenges.geometry import distance_point_to_line
+from neat_gym_challenges.geometry import rotate, intersection, arctan_degrees
 
 
 class Maze(gym.Env, EzPickle):

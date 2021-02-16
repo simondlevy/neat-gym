@@ -32,6 +32,6 @@ commit:
 
 flake:
 	flake8 setup.py
-	flake8 neat_gym_tests/__init__.py
-	flake8 neat_gym_tests/envs/*.py
+	flake8 neat_gym_challenges/__init__.py
+	flake8 neat_gym_challenges/envs/*.py
 	flake8 demos/*.py

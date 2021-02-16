@@ -7,7 +7,7 @@ Copyright (C) 2021 Simon D. Levy
 MIT License
 '''
 
-from neat_gym_tests.envs.gather import GatherConcentric, gather_demo
+from neat_gym_challenges.envs.gather import GatherConcentric, gather_demo
 
 if __name__ == '__main__':
 

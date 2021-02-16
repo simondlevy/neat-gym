@@ -11,13 +11,13 @@ MIT License
 from setuptools import setup
 
 setup(
-    name='neat_gym_tests',
+    name='neat_gym_challenges',
     version='0.1',
     install_requires=['gym', 'numpy', 'Box2D'],
     description='Gym environments for NEAT',
-    packages=['neat_gym_tests',
-              'neat_gym_tests.envs',
-              'neat_gym_tests.geometry'],
+    packages=['neat_gym_challenges',
+              'neat_gym_challenges.envs',
+              'neat_gym_challenges.geometry'],
     author='Simon D. Levy',
     author_email='simon.d.levy@gmail.com',
     url='https://github.com/simondlevy/neat-gym',
