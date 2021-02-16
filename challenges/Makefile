@@ -9,18 +9,6 @@
 install:
 	sudo python3 setup.py install
 
-pole:
-	../neat-evolve.py config/cartpole
-
-hyper:
-	../neat-evolve.py --hyper config/cartpole
-
-es:
-	../neat-evolve.py --eshyper config/cartpole
-
-plot:
-	./neat-plot.py runs/CartPole-v1.csv
-
 clean:
 	sudo rm -rf build/ dist/ *.egg-info __pycache__ */__pycache__ models/ visuals/ runs/
 
