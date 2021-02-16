@@ -9,6 +9,12 @@
 install:
 	sudo python3 setup.py install
 
+gdemo:
+	python3 demos/gather-concentric.py --heuristic --sensors
+
+gedit:
+	vim neat_gym_challenges/envs/gather.py
+
 clean:
 	sudo rm -rf build/ dist/ *.egg-info __pycache__ */__pycache__ models/ visuals/ runs/
 

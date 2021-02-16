@@ -81,25 +81,11 @@ class GatherConcentric(gym.Env, EzPickle):
 
     def reset(self):
 
-        center = np.array([self.WORLD_SIZE/2]*2)
-
-        # Robot starts in center of room
-        self.robot_location = center
-
-        # Food starts at the angle a given sensor or between two sensors
-        food_angle = (self.angles[np.random.randint(self.n)] +
-                      np.random.randint(2) * self.angles[1]/2)
-
-        # Food location is 100 units along this angle
-        self.food_location = center + self._polar_to_rect(self.FOOD_DISTANCE,
-                                                          food_angle)
-
-        # No rangefinder data yet
-        self.rangefinder_lines = None
+        # Set up initial conditions for a trial
+        self._restart()
 
         # We'll repeat for N trials
         self.trials = 0
-        self.steps = 0
 
         # Values for Equation 2
         self.r = 2 * self.n
@@ -175,15 +161,22 @@ class GatherConcentric(gym.Env, EzPickle):
             # Set up drawing for robot
             self.robot_circle = rendering.make_circle(self.ROBOT_RADIUS,
                                                       filled=False)
-            self.robot_transform = Transform(translation=(0, 0), rotation=0)
+            self.robot_transform = Transform(translation=(0, 0))
             self.robot_circle.add_attr(self.robot_transform)
             self.viewer.add_geom(self.robot_circle)
 
-            # Draw food location
-            self.food = rendering.make_circle(self.FOOD_RADIUS, filled=True)
-            xfrm = Transform(translation=self.food_location)
-            self.food.add_attr(xfrm)
-            self.viewer.add_geom(self.food)
+            # Set up drawing for food
+            self.food_circle = rendering.make_circle(self.FOOD_RADIUS,
+                                                     filled=True)
+            self.food_transform = Transform(translation=(0, 0))
+            self.food_circle.add_attr(self.food_transform)
+            self.viewer.add_geom(self.food_circle)
+
+        # Draw food
+        self.food_transform.set_translation(*self.food_location)
+
+        # Draw robot
+        self.robot_transform.set_translation(*self.robot_location)
 
         # Show sensors if indicated
         if show_sensors:
@@ -191,12 +184,6 @@ class GatherConcentric(gym.Env, EzPickle):
             for i, line in enumerate(self.rangefinder_lines):
                 self._draw_line(line,
                                 (1, 0, 0) if i == self.winner else (0, 1, 0))
-
-        # Otherwise, just draw robot
-        else:
-
-            # Draw robot
-            self.robot_transform.set_translation(*self.robot_location)
 
         # Show trajectory if indicated
         if show_trajectory:
@@ -214,10 +201,31 @@ class GatherConcentric(gym.Env, EzPickle):
 
         return
 
+    def _restart(self):
+        '''
+        Sets up initial conditions for a trial
+        '''
+
+        center = np.array([self.WORLD_SIZE/2]*2)
+
+        # Robot starts in center of room
+        self.robot_location = center
+
+        # Food starts at the angle a given sensor or between two sensors
+        food_angle = (self.angles[np.random.randint(self.n)] +
+                      np.random.randint(2) * self.angles[1]/2)
+
+        # Food location is 100 units along this angle
+        self.food_location = center + self._polar_to_rect(self.FOOD_DISTANCE,
+                                                          food_angle)
+
+        # Records steps in current trial
+        self.steps = 0
+
     def _start_new_trial(self):
         self.trials += 1
         self.ttot += self.steps
-        self.steps = 0
+        self._restart()
 
     def _polar_to_rect(self, r, theta):
 
@@ -272,10 +280,11 @@ def gather_demo(env):
         if frame is None:
             break
 
-        last = done or (k == args.steps - 1)
+        # last = done or (k == args.steps - 1)
 
-        if k % 20 == 0 or last:
-            print('step  %05d/%05d  reward = %f' % (k, env.max_steps, reward))
+        # if k % 20 == 0 or last:
+        #     print('trial %03d/%03d  step  %05d/%05d  reward = %f' %
+        #           (env.trials, env.r, k, env.max_steps, reward))
 
         if done:
             break
