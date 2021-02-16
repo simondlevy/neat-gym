@@ -243,10 +243,7 @@ class GatherConcentric(gym.Env, EzPickle):
         self.viewer.draw_line(line[0], line[1], color=color)
 
 
-def gather_demo(env):
-    '''
-    Runs a random-walk demo with command-line arguments.
-    '''
+def main():
 
     fmtr = argparse.ArgumentDefaultsHelpFormatter
     parser = argparse.ArgumentParser(formatter_class=fmtr)
@@ -266,8 +263,8 @@ def gather_demo(env):
                         action='store_true', help='Show sensors')
     args = parser.parse_args()
 
+    env = GatherConcentric(n=args.n)
     env.max_steps = args.steps
-    env.n = args.n
     env.seed(args.seed)
 
     state = env.reset()
@@ -290,3 +287,7 @@ def gather_demo(env):
 
     sleep(1)
     env.close()
+
+
+if __name__ == '__main__':
+    main()
