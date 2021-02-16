@@ -10,7 +10,7 @@ install:
 	sudo python3 setup.py install
 
 gdemo:
-	python3 neat_gym_challenges/envs/gather.py --heuristic --sensors --n 16
+	python3 neat_gym_challenges/envs/gather.py --sensors --n 16
 
 gedit:
 	vim neat_gym_challenges/envs/gather.py

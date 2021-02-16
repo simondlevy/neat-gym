@@ -30,16 +30,10 @@ To run a demo of the more difficult maze, do
 % python3 demos/maze-hard.py --steps 400
 ```
 
-To run a demo food-gathering task, do
+Tor run demo of the food-gathering task with a heurstic solution, do
 
 ```
-% python3 demos/gather-concentric.py --steps 400 --sensors
-```
-
-For a heurstic solution to food-gathering task, do
-
-```
-% python3 demos/gather-concentric.py --sensors --heuristic
+% python3 neat_gym_challenges/envs/gather.py --sensors
 ```
 
 ## Running experiments

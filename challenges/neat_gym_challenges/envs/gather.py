@@ -251,9 +251,6 @@ def main():
                         help='Number of sensors (actuators)')
     parser.add_argument('--seed', type=int, required=False, default=None,
                         help='Seed for random number generator')
-    parser.add_argument('--heuristic', dest='use_heuristic',
-                        action='store_true',
-                        help='Use heuristic instead of random')
     parser.add_argument('--steps', type=int, required=False,
                         default=GatherConcentric.MAX_STEPS,
                         help='Number of steps to run')
@@ -271,7 +268,8 @@ def main():
 
     for k in range(args.steps):
 
-        action = state if args.use_heuristic else np.random.random(env.n)
+        # Heuristic trick
+        action = state
 
         state, reward, done, _ = env.step(action)
 
