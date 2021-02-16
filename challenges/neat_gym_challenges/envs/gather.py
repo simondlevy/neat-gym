@@ -114,13 +114,13 @@ class GatherConcentric(gym.Env, EzPickle):
                                   for pt in self.rangefinder_points]
 
         # Get rangefinder closest to food
-        self.winner = np.argmin([distance_point_to_line(self.food_location,
-                                                        line)
-                                 for line in self.rangefinder_lines])
+        self.closest = np.argmin([distance_point_to_line(self.food_location,
+                                                         line)
+                                  for line in self.rangefinder_lines])
 
         # State is a one-hot vector using the closest rangefinder
         state = np.zeros(self.n)
-        state[self.winner] = 1
+        state[self.closest] = 1
 
         # Assume no reward yet
         reward = 0
@@ -147,6 +147,9 @@ class GatherConcentric(gym.Env, EzPickle):
         return state, reward, done, {}
 
     def render(self, mode='human', show_sensors=False, show_trajectory=True):
+
+        if self.closest is None:
+            return
 
         if self.viewer is None:
 
@@ -183,7 +186,7 @@ class GatherConcentric(gym.Env, EzPickle):
 
             for i, line in enumerate(self.rangefinder_lines):
                 self._draw_line(line,
-                                (1, 0, 0) if i == self.winner else (0, 1, 0))
+                                (1, 0, 0) if i == self.closest else (0, 1, 0))
 
         # Show trajectory if indicated
         if show_trajectory:
@@ -218,6 +221,8 @@ class GatherConcentric(gym.Env, EzPickle):
         # Food location is 100 units along this angle
         self.food_location = center + self._polar_to_rect(self.FOOD_DISTANCE,
                                                           food_angle)
+
+        self.closest = None
 
         # Records steps in current trial
         self.steps = 0
@@ -271,23 +276,14 @@ def gather_demo(env):
 
         state, reward, done, _ = env.step(action)
 
-        frame = env.render(mode='rgb_array',
-                           show_sensors=(not done and args.show_sensors),
-                           show_trajectory=(args.show_trajectory))
-
-        sleep(1./env.FRAMES_PER_SECOND)
-
-        if frame is None:
-            break
-
-        # last = done or (k == args.steps - 1)
-
-        # if k % 20 == 0 or last:
-        #     print('trial %03d/%03d  step  %05d/%05d  reward = %f' %
-        #           (env.trials, env.r, k, env.max_steps, reward))
+        env.render(mode='rgb_array',
+                   show_sensors=(not done and args.show_sensors),
+                   show_trajectory=(args.show_trajectory))
 
         if done:
             break
+
+        sleep(1./env.FRAMES_PER_SECOND)
 
     sleep(1)
     env.close()
