@@ -26,6 +26,8 @@ import numpy as np
 import gym
 from gym import spaces
 from gym.utils import seeding, EzPickle
+from gym.envs.classic_control import rendering
+from gym.envs.classic_control.rendering import Transform
 
 from neat_gym_challenges.geometry import distance_point_to_point
 from neat_gym_challenges.geometry import distance_point_to_line
@@ -156,27 +158,16 @@ class GatherConcentric(gym.Env, EzPickle):
 
         if self.viewer is None:
 
-            from gym.envs.classic_control import rendering
-            from gym.envs.classic_control.rendering import Transform
-
             self.viewer = rendering.Viewer(self.WORLD_SIZE, self.WORLD_SIZE)
 
             # Support optional display of trajectory
             self.trajectory = []
 
             # Set up drawing for robot
-            robot_circle = rendering.make_circle(self.ROBOT_RADIUS,
-                                                 filled=False)
-            self.robot_transform = Transform(translation=(0, 0))
-            robot_circle.add_attr(self.robot_transform)
-            self.viewer.add_geom(robot_circle)
+            self.robot_transform = self._make_graphic(self.ROBOT_RADIUS, False)
 
             # Set up drawing for food
-            food_circle = rendering.make_circle(self.FOOD_RADIUS,
-                                                filled=True)
-            self.food_transform = Transform(translation=(0, 0))
-            food_circle.add_attr(self.food_transform)
-            self.viewer.add_geom(food_circle)
+            self.food_transform = self._make_graphic(self.FOOD_RADIUS, True)
 
         # Draw food
         self.food_transform.set_translation(*self.food_location)
@@ -207,14 +198,13 @@ class GatherConcentric(gym.Env, EzPickle):
 
         return
 
-    '''
     def _make_graphic(self, radius, filled):
 
         circle = rendering.make_circle(radius, filled=filled)
         transform = Transform(translation=(0, 0))
-        circle.add_attr(self.transform)
+        circle.add_attr(transform)
         self.viewer.add_geom(circle)
-    '''
+        return transform
 
     def _restart(self):
         '''
