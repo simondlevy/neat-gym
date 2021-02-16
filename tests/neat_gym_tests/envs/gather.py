@@ -240,8 +240,8 @@ def gather_demo(env):
         state, reward, done, _ = env.step(action)
 
         frame = env.render(mode='rgb_array',
-                           show_sensors=args.show_sensors,
-                           show_trajectory=args.show_trajectory)
+                           show_sensors=(not done and args.show_sensors),
+                           show_trajectory=(args.show_trajectory))
 
         sleep(1./env.FRAMES_PER_SECOND)
 

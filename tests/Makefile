@@ -25,7 +25,7 @@ hard:
 	neat-evolve.py config/hard --novelty 
 
 gdemo:
-	python3 demos/gather-concentric.py --steps 400 --sensors
+	python3 demos/gather-concentric.py --steps 400 --sensors --heuristic
 
 commit:
 	git commit -a
