@@ -97,6 +97,15 @@ class GatherConcentric(gym.Env, EzPickle):
         # No rangefinder data yet
         self.rangefinder_lines = None
 
+        # We'll repeat for N trials
+        self.trials = 0
+        self.steps = 0
+
+        # Values for Equation 2
+        self.r = 2 * self.n
+        self.ttot = 0
+        self.fc = 0
+
         # Start with a random move
         return self.step(np.random.random(self.n))[0]
 
@@ -131,12 +140,23 @@ class GatherConcentric(gym.Env, EzPickle):
         reward = 0
         done = False
 
+        self.steps += 1
+
         # Get a reward and finish if robot is on top of food
         if (distance_point_to_point(self.robot_location,
                                     self.food_location)
            < self.ROBOT_RADIUS):
-            reward = 1
-            done = True
+            self.fc = +1
+            self._start_new_trial()
+
+        # Failed to get reward this trial
+        elif self.steps == self.MAX_STEPS:
+            self._start_new_trial()
+
+        done = (self.trials == self.r)
+
+        # Equation 2
+        reward = (10000*self.fc/self.r + 1000-self.ttot) if done else 0
 
         return state, reward, done, {}
 
@@ -193,6 +213,11 @@ class GatherConcentric(gym.Env, EzPickle):
     def close(self):
 
         return
+
+    def _start_new_trial(self):
+        self.trials += 1
+        self.ttot += self.steps
+        self.steps = 0
 
     def _polar_to_rect(self, r, theta):
 
