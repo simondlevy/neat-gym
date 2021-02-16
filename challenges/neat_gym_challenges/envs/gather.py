@@ -153,9 +153,11 @@ class GatherConcentric(gym.Env, EzPickle):
 
     def render(self, mode='human', show_sensors=False, show_trajectory=True):
 
+        # Avoid rendering after final trial
         if self.closest is None:
             return
 
+        # Initial graphics first time around
         if self.viewer is None:
 
             self.viewer = rendering.Viewer(self.WORLD_SIZE, self.WORLD_SIZE)
