@@ -283,6 +283,7 @@ def gather_demo(env):
                    show_trajectory=(args.show_trajectory))
 
         if done:
+            print('Fitness = %f' % reward)
             break
 
         sleep(1./env.FRAMES_PER_SECOND)
