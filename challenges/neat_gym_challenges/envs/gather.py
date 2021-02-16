@@ -5,7 +5,7 @@ Food-gathering environment class and demo function for HyperNEAT
 Based on
 
 @ARTICLE{Stanley_ahypercube-based,
-    author = {Kenneth O. Stanley and Jason Gauci},
+    author = {Kenneth O. Stanley and David B. D'Ambrosio and Jason Gauci},
     title = {A hypercube-based indirect encoding for evolving large-scale
              neural networks},
     journal = {Artificial Life},
@@ -33,16 +33,19 @@ from neat_gym_challenges.geometry import distance_point_to_line
 
 class GatherConcentric(gym.Env, EzPickle):
 
+    # Constants from Stanley et al.
+    FOOD_DISTANCE = 100
+    MAX_STEPS = 1000
+
+    # Constants for Equation 1
+    SMAX = 10
+    OMAX = 10
+
+    # Arbitrary constants
     ROBOT_RADIUS = 5
     FOOD_RADIUS = 2
     WORLD_SIZE = 400
-    FOOD_DISTANCE = 100
     FRAMES_PER_SECOND = 10
-    MAX_STEPS = 1000
-
-    # Constants from Equation 1
-    SMAX = 10
-    OMAX = 10
 
     metadata = {
             'render.modes': ['human', 'rgb_array'],
@@ -162,18 +165,18 @@ class GatherConcentric(gym.Env, EzPickle):
             self.trajectory = []
 
             # Set up drawing for robot
-            self.robot_circle = rendering.make_circle(self.ROBOT_RADIUS,
-                                                      filled=False)
+            robot_circle = rendering.make_circle(self.ROBOT_RADIUS,
+                                                 filled=False)
             self.robot_transform = Transform(translation=(0, 0))
-            self.robot_circle.add_attr(self.robot_transform)
-            self.viewer.add_geom(self.robot_circle)
+            robot_circle.add_attr(self.robot_transform)
+            self.viewer.add_geom(robot_circle)
 
             # Set up drawing for food
-            self.food_circle = rendering.make_circle(self.FOOD_RADIUS,
-                                                     filled=True)
+            food_circle = rendering.make_circle(self.FOOD_RADIUS,
+                                                filled=True)
             self.food_transform = Transform(translation=(0, 0))
-            self.food_circle.add_attr(self.food_transform)
-            self.viewer.add_geom(self.food_circle)
+            food_circle.add_attr(self.food_transform)
+            self.viewer.add_geom(food_circle)
 
         # Draw food
         self.food_transform.set_translation(*self.food_location)
@@ -203,6 +206,15 @@ class GatherConcentric(gym.Env, EzPickle):
     def close(self):
 
         return
+
+    '''
+    def _make_graphic(self, radius, filled):
+
+        circle = rendering.make_circle(radius, filled=filled)
+        transform = Transform(translation=(0, 0))
+        circle.add_attr(self.transform)
+        self.viewer.add_geom(circle)
+    '''
 
     def _restart(self):
         '''
