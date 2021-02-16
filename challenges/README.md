@@ -1,9 +1,15 @@
 <img src='media/hard.gif' width=300>
 
-This directory provides an OpenAI Gym environment implementing the maze
-challenges in Lehman and Stanely's 2011 Novelty Search
+This directory provides OpenAI Gym environments implementing two kinds of ``challenge'' problem
+from the NEAT liteature:
+
+1. The maze challenges in Lehman and Stanely's 2011 Novelty Search
 [paper](https://www.cs.swarthmore.edu/~meeden/DevelopmentalRobotics/lehman_ecj11.pdf).
 The maze layout and robot update equations are based on [goNEAT_NS](https://github.com/yaricom/goNEAT_NS).
+
+2.  The Food Gathering challenge in Stanely, D'Ambroiso and Gauci's 2009
+HyperNEAT
+[paper](https://axon.cs.byu.edu/Dan/778/papers/NeuroEvolution/stanley3**.pdf).
 
 ## Quickstart
 
