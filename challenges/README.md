@@ -14,9 +14,8 @@ HyperNEAT
 ## Quickstart
 
 ```
-% pip3 install gym
 % python3 setup.py install
-% python3 gym_nsmaze/demos/medium.py
+% python3 demos/maze-medium.py --steps 400
 ```
 
 (On Linux you will probably have to run pip3 with sudo.)
@@ -25,15 +24,19 @@ You should see the robot taking a [random walk](https://en.wikipedia.org/wiki/Ra
 in the medium-difficulty maze.  To see what other options are available with this demo
 script, you can do
 
-```
-% python3 demos/envs/medium.py --help
-```
-
 To run a demo of the more difficult maze, do
 
 ```
-% python3 demos/envs/hard.py
+% python3 demos/maze-hard.py --steps 400
 ```
+
+To run a demo food-gathering task, do
+
+```
+% python3 demos/gather-concentric.py --steps 400 --sensors
+```
+
+
 
 ## Running experiments
 
