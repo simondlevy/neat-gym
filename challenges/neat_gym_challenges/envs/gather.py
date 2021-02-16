@@ -97,9 +97,6 @@ class GatherConcentric(gym.Env, EzPickle):
         # No rangefinder data yet
         self.rangefinder_lines = None
 
-        # Support optional display of trajectory
-        self.trajectory = []
-
         # Start with a random move
         return self.step(np.random.random(self.n))[0]
 
@@ -151,6 +148,9 @@ class GatherConcentric(gym.Env, EzPickle):
             from gym.envs.classic_control.rendering import Transform
 
             self.viewer = rendering.Viewer(self.WORLD_SIZE, self.WORLD_SIZE)
+
+            # Support optional display of trajectory
+            self.trajectory = []
 
             # Set up drawing for robot
             self.robot_circle = rendering.make_circle(self.ROBOT_RADIUS,
