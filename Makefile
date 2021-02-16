@@ -15,21 +15,6 @@ edit:
 nedit:
 	vim neat_gym/novelty/__init__.py
 
-cedit:
-	vim config/cartpole
-
-pole:
-	./neat-evolve.py config/cartpole
-
-hyper:
-	./neat-evolve.py --hyper config/cartpole
-
-es:
-	./neat-evolve.py --eshyper config/cartpole
-
-plot:
-	./neat-plot.py runs/CartPole-v1.csv
-
 help:
 	./neat-evolve.py --help
 

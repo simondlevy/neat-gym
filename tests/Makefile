@@ -9,29 +9,26 @@
 install:
 	sudo python3 setup.py install
 
+pole:
+	../neat-evolve.py config/cartpole
+
+hyper:
+	../neat-evolve.py --hyper config/cartpole
+
+es:
+	../neat-evolve.py --eshyper config/cartpole
+
+plot:
+	./neat-plot.py runs/CartPole-v1.csv
+
 clean:
 	sudo rm -rf build/ dist/ *.egg-info __pycache__ */__pycache__ models/ visuals/ runs/
-
-mdemo:
-	python3 demos/maze-medium.py
-
-hdemo:
-	python3 demos/maze-hard.py
-
-medium:
-	neat-evolve.py config/medium --novelty 
-
-hard:
-	neat-evolve.py config/hard --novelty 
-
-gdemo:
-	python3 demos/gather-concentric.py --steps 400 --sensors --heuristic
 
 commit:
 	git commit -a
 
 flake:
 	flake8 setup.py
+	flake8 demos/*.py
 	flake8 neat_gym_tests/__init__.py
 	flake8 neat_gym_tests/envs/*.py
-	flake8 demos/*.py
