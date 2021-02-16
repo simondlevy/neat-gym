@@ -66,7 +66,6 @@ class GatherConcentric(gym.Env, EzPickle):
         self.action_space = spaces.Box(0, self.OMAX, (n,), dtype=np.float32)
 
         # Set up so that index 0 corresponds to position 1 in Figure 7a
-        # self.angles = np.array(n)
         self.angles = 2*np.pi/n * np.array([n] + list(range(1, n)))
 
         # Set up relative endpoints for rangefinders
