@@ -104,6 +104,21 @@ def eval_net(
 
     is_discrete = _is_discrete(env)
 
+    csvfile = None
+
+    if csvfilename is not None:
+
+        if (not hasattr(env, 'get_cvsheader')
+           or not hasattr(env, 'cvs_getstate')):
+
+            print('Environment must have cvs_getheader(), ' +
+                  ' cvs_getstate() methods')
+
+        else:
+
+            csvfile = open(csvfilename, 'w')
+            csvfile.write('%s\n' % env.get_csvheader())
+
     while max_episode_steps is None or steps < max_episode_steps:
 
         # Support recurrent nets
@@ -126,6 +141,9 @@ def eval_net(
             break
 
         steps += 1
+
+    if csvfile is not None:
+        csvfile.close()
 
     env.close()
 
