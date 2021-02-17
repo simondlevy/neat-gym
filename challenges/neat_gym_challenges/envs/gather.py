@@ -113,10 +113,16 @@ class GatherConcentric(gym.Env, EzPickle):
         self.ttot = 0
         self.fc = 0
 
+        self.need_restart = False
+
         # Start with a random move
         return self.step(np.random.random(self.n))[0]
 
     def step(self, action):
+
+        if self.need_restart:
+            self.need_restart = False
+            self._start_new_trial()
 
         # Pick actuator with maximum activation
         k = np.argmax(action)
@@ -154,12 +160,13 @@ class GatherConcentric(gym.Env, EzPickle):
                                     self.food_location)
            < self.ROBOT_RADIUS):
             self.fc = +1
-            self._start_new_trial()
+            self.need_restart = True
 
         # Failed to get reward this trial
         elif self.steps == self.MAX_STEPS:
-            self._start_new_trial()
+            self.need_restart = True
 
+        # We're done when we've reached the desired number of trials
         done = (self.trials == self.r)
 
         # Equation 2
