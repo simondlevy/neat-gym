@@ -223,7 +223,9 @@ class GatherConcentric(gym.Env, EzPickle):
 
     def close(self):
 
-        return
+        if self.viewer is not None:
+            self.viewer.close()
+            self.viewer = None
 
     def _make_graphic(self, radius, filled):
 
