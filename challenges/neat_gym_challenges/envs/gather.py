@@ -23,6 +23,8 @@ from time import sleep
 
 import numpy as np
 
+from pyglet.text import Label
+
 import gym
 from gym import spaces
 from gym.utils import seeding, EzPickle
@@ -31,6 +33,18 @@ from gym.envs.classic_control.rendering import Transform
 
 from neat_gym_challenges.geometry import distance_point_to_point
 from neat_gym_challenges.geometry import distance_point_to_line
+
+
+class _DrawText:
+    '''
+    https://stackoverflow.com/questions/56744840
+    '''
+
+    def __init__(self, label):
+        self.label = label
+
+    def render(self):
+        self.label.draw()
 
 
 class GatherConcentric(gym.Env, EzPickle):
@@ -60,6 +74,7 @@ class GatherConcentric(gym.Env, EzPickle):
         self.seed()
         self.viewer = None
         self.n = n
+        self.trial_label = None
 
         # N sensors
         self.observation_space = spaces.Box(-np.inf,
@@ -170,6 +185,20 @@ class GatherConcentric(gym.Env, EzPickle):
 
             # Set up drawing for food
             self.food_transform = self._make_graphic(self.FOOD_RADIUS, True)
+
+        if self.trial_label is not None:
+            self.trial_label.label.delete()
+
+        self.trial_label = _DrawText(Label('%d' % self.trials,
+                                font_size=36,
+                                x=20,
+                                y=20,
+                                anchor_x='left',
+                                anchor_y='center',
+                                color=(0, 0, 0, 255)))
+
+        self.viewer.add_onetime(self.trial_label)
+        self.trial_label.render()
 
         # Draw food
         self.food_transform.set_translation(*self.food_location)
