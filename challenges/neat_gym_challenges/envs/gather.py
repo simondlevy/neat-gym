@@ -185,20 +185,17 @@ class GatherConcentric(gym.Env, EzPickle):
             # Set up drawing for food
             self.food_transform = self._make_graphic(self.FOOD_RADIUS, True)
 
-            # Set up for displaying trial number
-            self.trial_label = None
-
         # Display current trial number
-        self.trial_label = _DrawText(Label('Trial %03d/%03d' %
-                                           (self.trials+1, self.r),
-                                           font_size=18,
-                                           x=20,
-                                           y=20,
-                                           anchor_x='left',
-                                           anchor_y='center',
-                                           color=(0, 0, 0, 255)))
-        self.viewer.add_onetime(self.trial_label)
-        self.trial_label.render()
+        self.trial_text = _DrawText(Label('Trial %03d/%03d' %
+                                          (self.trials+1, self.r),
+                                          font_size=18,
+                                          x=20,
+                                          y=20,
+                                          anchor_x='left',
+                                          anchor_y='center',
+                                          color=(0, 0, 0, 255)))
+        self.viewer.add_onetime(self.trial_text)
+        self.trial_text.render()
 
         # Draw food
         self.food_transform.set_translation(*self.food_location)
