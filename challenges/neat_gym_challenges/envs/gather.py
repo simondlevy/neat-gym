@@ -195,7 +195,6 @@ class GatherConcentric(gym.Env, EzPickle):
                                      anchor_y='center',
                                      color=(0, 0, 0, 255)))
         self.viewer.add_onetime(trial_text)
-        trial_text.render()
 
         # Draw food
         self.food_transform.set_translation(*self.food_location)
