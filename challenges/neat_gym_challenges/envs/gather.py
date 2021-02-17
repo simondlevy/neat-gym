@@ -306,8 +306,8 @@ def main():
         state, reward, done, _ = env.step(action)
 
         env.render(mode='rgb_array',
-                   show_sensors=(not done and args.show_sensors),
-                   show_trajectory=(args.show_trajectory))
+                   show_sensors=(args.show_sensors),
+                   show_trajectory=args.show_trajectory)
 
         if done:
             print('Fitness = %f' % reward)
