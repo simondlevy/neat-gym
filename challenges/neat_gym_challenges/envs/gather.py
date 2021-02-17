@@ -269,6 +269,8 @@ class GatherConcentric(gym.Env, EzPickle):
 
         self.viewer.draw_line(line[0], line[1], color=color)
 
+# End of Gather classes
+
 
 def main():
 
