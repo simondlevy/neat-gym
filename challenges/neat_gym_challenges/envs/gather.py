@@ -40,8 +40,8 @@ class _OneTimeLabel:
     https://stackoverflow.com/questions/56744840
     '''
 
-    def __init__(self, viewer, label):
-        self.label = label
+    def __init__(self, viewer, text, **kwargs):
+        self.label = Label(text, **kwargs)
         viewer.add_onetime(self)
 
     def render(self):
@@ -188,14 +188,13 @@ class GatherConcentric(gym.Env, EzPickle):
 
         # Display current trial number
         _OneTimeLabel(self.viewer,
-                      Label('Trial %03d/%03d' %
-                            (self.trials+1, self.r),
-                            font_size=18,
-                            x=20,
-                            y=20,
-                            anchor_x='left',
-                            anchor_y='center',
-                            color=(0, 0, 0, 255)))
+                      'Trial %03d/%03d' % (self.trials+1, self.r),
+                      font_size=18,
+                      x=20,
+                      y=20,
+                      anchor_x='left',
+                      anchor_y='center',
+                      color=(0, 0, 0, 255))
 
         # Draw food
         self.food_transform.set_translation(*self.food_location)
