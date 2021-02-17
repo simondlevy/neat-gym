@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''
 
 Food-gathering environment class and demo function for HyperNEAT
@@ -169,7 +170,7 @@ class GatherConcentric(gym.Env, EzPickle):
     def render(self, mode='human', show_sensors=False, show_trajectory=True):
 
         # Avoid rendering after final trial
-        if self.closest is None:
+        if self.trials == self.r:
             return
 
         # Initial graphics first time around
