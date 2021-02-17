@@ -108,16 +108,7 @@ def eval_net(
 
     if csvfilename is not None:
 
-        if (not hasattr(env, 'get_cvsheader')
-           or not hasattr(env, 'cvs_getstate')):
-
-            print('Environment must have cvs_getheader(), ' +
-                  ' cvs_getstate() methods')
-
-        else:
-
-            csvfile = open(csvfilename, 'w')
-            csvfile.write('%s\n' % env.get_csvheader())
+        csvfile = open(csvfilename, 'w')
 
     while max_episode_steps is None or steps < max_episode_steps:
 
@@ -130,6 +121,12 @@ def eval_net(
                   if is_discrete else action * env.action_space.high)
 
         state, reward, done, _ = env.step(action)
+
+        if csvfile is not None:
+
+            fmt = ('%f,' * len(state))[:-1] + '\n'
+
+            csvfile.write(fmt % tuple(state))
 
         if render or (record_dir is not None):
             env.render()
