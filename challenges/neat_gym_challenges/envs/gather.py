@@ -122,7 +122,9 @@ class GatherConcentric(gym.Env, EzPickle):
 
         if self.need_restart:
             self.need_restart = False
-            self._start_new_trial()
+            self.trials += 1
+            self.ttot += self.steps
+            self._restart()
 
         # Pick actuator with maximum activation
         k = np.argmax(action)
@@ -265,11 +267,6 @@ class GatherConcentric(gym.Env, EzPickle):
 
         # Records steps in current trial
         self.steps = 0
-
-    def _start_new_trial(self):
-        self.trials += 1
-        self.ttot += self.steps
-        self._restart()
 
     def _polar_to_rect(self, r, theta):
 
