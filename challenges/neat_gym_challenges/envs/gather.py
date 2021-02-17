@@ -188,13 +188,9 @@ class GatherConcentric(gym.Env, EzPickle):
             # Set up for displaying trial number
             self.trial_label = None
 
-        # Remove display of previous trial number
-        if self.trial_label is not None:
-            self.trial_label.label.delete()
-
         # Display current trial number
         self.trial_label = _DrawText(Label('Trial %03d/%03d' %
-                                           (self.trials, self.r),
+                                           (self.trials+1, self.r),
                                            font_size=18,
                                            x=20,
                                            y=20,
