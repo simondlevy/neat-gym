@@ -80,7 +80,8 @@ def eval_net(
         record_dir=None,
         activations=1,
         seed=None,
-        max_episode_steps=None):
+        max_episode_steps=None,
+        csvfilename=None):
     '''
     Evaluates a network
     @param net the network
@@ -89,8 +90,10 @@ def eval_net(
     @param record_dir set to directory name for recording video
     @param activations number of times to repeat
     @param seed seed for random number generator
+    @param csvfilename name of CSV file for saving trajectory
     @return total reward
     '''
+
     if record_dir is not None:
         env = wrappers.Monitor(env, record_dir, force=True)
 
@@ -114,7 +117,6 @@ def eval_net(
         state, reward, done, _ = env.step(action)
 
         if render or (record_dir is not None):
-            # env.render('rgb_array')
             env.render()
             time.sleep(.02)
 
