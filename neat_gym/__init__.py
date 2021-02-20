@@ -130,8 +130,12 @@ def eval_net(
 
         if csvfile is not None:
 
-            fmt = ('%f,' * len(action))
-            csvfile.write(fmt % tuple(action))
+            if is_discrete:
+                csvfile.write('%d,' % action)
+
+            else:
+                fmt = ('%f,' * len(action))
+                csvfile.write(fmt % tuple(action))
 
             fmt = ('%f,' * len(state))[:-1] + '\n'
             csvfile.write(fmt % tuple(state))
