@@ -11,8 +11,10 @@ import gym
 from neat_gym import read_file, eval_net
 
 # Load genome and configuration from pickled file
-net, env_name, record_dir, seed, nodisplay = read_file(allow_record=True,
-                                                       allow_seed=True)
+net, env_name, record_dir, seed, nodisplay, csvfilename = \
+        read_file(allow_record=True, allow_seed=True)
+
+print(csvfilename)
 
 # Run the network on the environment
 eval_net(net,

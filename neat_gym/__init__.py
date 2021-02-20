@@ -42,13 +42,15 @@ def read_file(allow_record=False, allow_seed=False):
     Reads a genome/config file based on command-line argument
     @param allow_record set to enable --record option
     @param allow_seed set to enable --seed option
-    @return genome,config tuple
+    @return net, env_name, recording flag, seed, no-display flag, CSV file name
     '''
 
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
     parser.add_argument('filename', metavar='FILENAME', help='.dat input file')
+
     parser.add_argument('--nodisplay', dest='nodisplay', action='store_true',
                         help='Suppress display')
     if allow_record:
@@ -58,6 +60,9 @@ def read_file(allow_record=False, allow_seed=False):
     if allow_seed:
         parser.add_argument('--seed', type=int, default=None,
                             help='Seed for random number generator')
+
+    parser.add_argument('--save', dest='csvfilename',
+                        help='Save trajectory in CSV file')
 
     args = parser.parse_args()
 
@@ -69,7 +74,8 @@ def read_file(allow_record=False, allow_seed=False):
             env_name,
             args.record if allow_record else None,
             args.seed if allow_seed else None,
-            args.nodisplay)
+            args.nodisplay,
+            args.csvfilename)
 
 
 def eval_net(
