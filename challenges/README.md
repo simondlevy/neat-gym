@@ -43,7 +43,7 @@ To replicate the results in Lehman and Stanley's
 install [NEAT-Gym](https://github.com/simondlevy/Neat-Gym).  Then do
 
 ```
-% python3 [DIR]/neat-evolve.py config/medium --novelty
+% python3 [DIR]/neat-evolve.py config/maze-medium --novelty
 ```
 
 where ```[DIR]``` is the directory in which you put NEAT-Gym.
