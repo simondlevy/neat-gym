@@ -15,7 +15,7 @@ reset_on_extinction    = False
 generations            = 100
 
 [Gym]
-environment  = gym_nsmaze:Hard-v0
+environment  = neat_gym_challenges:Gather-v0
 episode_reps = 1
 
 [Novelty]
