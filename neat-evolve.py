@@ -451,11 +451,13 @@ class _GymPopulation(Population):
 
         self.stats = stats
 
-    def run(self, fitness_function, ngen):
+    def run(self, fitness_function, ngen, maxtime):
 
         gen = 0
+        start = time()
 
-        while ngen is None or gen < ngen:
+        while ((ngen is None or gen < ngen)
+               and (maxtime is None or time()-start < maxtime)):
 
             self.config.gen = gen
 
@@ -754,7 +756,7 @@ def main():
     pe = neat.ParallelEvaluator(mp.cpu_count(), config.eval_genome)
 
     # Run for number of generations specified in config file
-    winner = pop.run(pe.evaluate, config.ngen)
+    winner = pop.run(pe.evaluate, config.ngen, args.maxtime)
 
     # Save winner
     config.save_genome(winner)
