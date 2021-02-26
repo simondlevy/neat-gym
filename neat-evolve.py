@@ -451,7 +451,7 @@ class _GymPopulation(Population):
 
         self.stats = stats
 
-    def run(self, fitness_function, ngen=None):
+    def run(self, fitness_function, ngen):
 
         gen = 0
 
@@ -720,6 +720,8 @@ def main():
                        help='Use ES-HyperNEAT')
     parser.add_argument('--novelty', action='store_true',
                         help='Use Novelty Search')
+    parser.add_argument('--maxtime', default=None, type=int,
+                        help='Maximum time in seconds')
     args = parser.parse_args()
 
     # Check for HyperNEAT, ES-HyperNEAT
